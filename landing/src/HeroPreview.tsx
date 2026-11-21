@@ -15,7 +15,7 @@ export function HeroPreview({ t }: { t: Copy['preview'] }) {
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <Brand variant="monogram" size="sm" />
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-base font-bold">{t.waitingTitle}</p>
+            <p className="font-heading text-base font-semibold">{t.waitingTitle}</p>
             <p className="text-sm text-secondary">{t.date}</p>
           </div>
           <div className="text-right">
@@ -27,7 +27,7 @@ export function HeroPreview({ t }: { t: Copy['preview'] }) {
           <dl className="grid grid-cols-3 gap-2">
             {t.metrics.map((label, i) => (
               <div key={label} className="rounded-panel border border-border bg-surface p-3">
-                <dd className="font-heading text-3xl font-extrabold tracking-tight text-action tabular-nums">
+                <dd className={`font-heading text-3xl font-medium tabular-nums ${i === 1 ? 'text-action' : 'text-primary'}`}>
                   {t.metricValues[i]}
                 </dd>
                 <dt className="mt-1 text-sm leading-snug text-secondary">{label}</dt>
@@ -43,7 +43,16 @@ export function HeroPreview({ t }: { t: Copy['preview'] }) {
             </p>
             <div className="mt-3 ml-5 rounded-2xl rounded-br-sm bg-action p-3 text-base leading-relaxed text-on-action">
               {t.reply[0]}
-              <strong>{t.facts[0]}</strong>
+              <button
+                type="button"
+                aria-label={`${t.showSource}: ${t.facts[0]}`}
+                aria-expanded={sourceOpen}
+                aria-controls="hero-reply-source"
+                onClick={() => setSourceOpen(!sourceOpen)}
+                className="source-fact"
+              >
+                {t.facts[0]}
+              </button>
               {t.reply[1]}
             </div>
             <p className="mt-3 flex items-center justify-end gap-1.5 text-sm font-medium text-success">
@@ -64,7 +73,7 @@ export function HeroPreview({ t }: { t: Copy['preview'] }) {
               {sourceOpen && (
                 <p
                   id="hero-reply-source"
-                  className="pop-in rounded-control bg-fact px-3 py-2 text-sm text-on-fact"
+                  className="source-record pop-in bg-fact text-sm text-on-fact"
                 >
                   {t.source} · {t.facts[0]}
                 </p>

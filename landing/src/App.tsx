@@ -37,7 +37,6 @@ import {
   buttonLarge,
   buttonPrimary,
   buttonSecondary,
-  useReveal,
   type Tone,
 } from './ui'
 import { WaitlistForm } from './WaitlistForm'
@@ -67,7 +66,6 @@ export function App() {
   const [lang, setLang] = useState<Lang>(initialLang)
   const [theme, setTheme] = useState<Theme>(initialTheme)
   const t = copy[lang]
-  const revealRoot = useReveal([lang])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -100,7 +98,7 @@ export function App() {
   const active = useActiveSection(t.nav.links.map((l) => l.id).concat('pilot'))
 
   return (
-    <div ref={revealRoot}>
+    <div>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-surface focus:px-4 focus:py-3 focus:shadow-frame"
@@ -118,7 +116,7 @@ export function App() {
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
             <div>
               <SectionHeader eyebrow={t.demo.eyebrow} title={t.demo.title} body={t.demo.body} />
-              <ul className="reveal mt-10 flex flex-col gap-5">
+              <ul className="mt-10 flex flex-col gap-5">
                 {t.demo.points.map((point, i) => (
                   <li key={point.title} className="flex gap-4">
                     <span
@@ -128,14 +126,14 @@ export function App() {
                       {[<TagIcon key="t" />, <CheckIcon key="c" />, <HandIcon key="h" />][i]}
                     </span>
                     <div>
-                      <h3 className="font-heading text-base font-bold">{point.title}</h3>
+                      <h3 className="font-heading text-base font-semibold">{point.title}</h3>
                       <p className="mt-0.5 text-base leading-relaxed text-secondary">{point.body}</p>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="reveal">
+            <div>
               <DraftDemo t={t.demo} />
             </div>
           </div>
@@ -304,20 +302,12 @@ function LangSwitch({ t, lang, setLang }: { t: Copy; lang: Lang; setLang: (l: La
 function Hero({ t, heroRef }: { t: Copy; heroRef: RefObject<HTMLElement | null> }) {
   return (
     <section ref={heroRef} className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-48 right-[-12rem] size-[44rem] rounded-full bg-fact/50 blur-3xl dark:bg-fact/40" />
-        <div className="dot-field absolute inset-x-0 top-0 h-[36rem] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      </div>
-
       <div
-        className={`${container} relative grid items-center gap-14 pt-10 pb-24 md:pt-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14 lg:pb-28`}
+        className={`${container} hero-enter relative grid items-center gap-12 pt-12 pb-20 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24`}
       >
         <div className="min-w-0 max-w-[40rem]">
-          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-[0.8125rem] font-medium">
-            <span aria-hidden className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-50 motion-reduce:hidden" />
-              <span className="relative inline-flex size-2 rounded-full bg-success" />
-            </span>
+          <p className="inline-flex items-center gap-2 text-sm font-medium text-secondary">
+            <span aria-hidden className="size-1.5 rounded-full bg-success" />
             {t.hero.badge}
           </p>
 
@@ -325,7 +315,7 @@ function Hero({ t, heroRef }: { t: Copy; heroRef: RefObject<HTMLElement | null> 
             {t.hero.title} <span className="block text-action">{t.hero.accent}</span>
           </h1>
 
-          <p className="mt-6 text-lg leading-relaxed text-secondary md:text-xl md:leading-relaxed">
+          <p className="mt-6 max-w-[36rem] text-lg leading-relaxed text-secondary md:text-xl md:leading-relaxed">
             {t.hero.lead}
           </p>
 
@@ -338,7 +328,7 @@ function Hero({ t, heroRef }: { t: Copy; heroRef: RefObject<HTMLElement | null> 
             </a>
           </div>
 
-          <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-secondary">
+          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-secondary">
             {t.hero.points.map((point) => (
               <li key={point} className="flex items-center gap-1.5">
                 <CheckIcon aria-hidden className="text-success" />
@@ -359,7 +349,7 @@ function Promises({ t }: { t: Copy }) {
   return (
     <section aria-label={t.promises.map((p) => p.title).join(' ')} className="relative">
       <div className={container}>
-        <ul className="reveal grid overflow-hidden rounded-frame border border-border bg-surface md:grid-cols-3">
+        <ul className="grid overflow-hidden rounded-frame border border-border bg-surface md:grid-cols-3">
           {t.promises.map((promise, i) => (
             <li
               key={promise.title}
@@ -372,19 +362,19 @@ function Promises({ t }: { t: Copy }) {
                 {icons[i]}
               </span>
               <div>
-                <h2 className="font-heading text-lg font-bold tracking-tight">{promise.title}</h2>
+                <h2 className="font-heading text-lg font-semibold">{promise.title}</h2>
                 <p className="mt-1 text-base leading-relaxed text-secondary">{promise.body}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="reveal mt-8 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
           <span className="mr-1 text-sm text-secondary">{t.audience.label}:</span>
           {t.audience.items.map((item) => (
             <span
               key={item}
-              className="rounded-full border border-border bg-surface px-3 py-1 text-sm font-medium"
+              className="px-2 py-1 text-sm text-secondary"
             >
               {item}
             </span>
@@ -426,8 +416,7 @@ function HowItWorks({ t }: { t: Copy }) {
         {t.how.steps.map((step, i) => (
           <li
             key={step.title}
-            className="reveal relative rounded-frame border border-border bg-canvas p-5"
-            style={{ transitionDelay: `${i * 70}ms` }}
+            className="relative rounded-frame border border-border bg-canvas p-5"
           >
             <div className="flex items-center justify-between">
               <span
@@ -437,17 +426,17 @@ function HowItWorks({ t }: { t: Copy }) {
                 {icons[i]}
               </span>
             </div>
-            <h3 className="mt-5 font-heading text-lg leading-snug font-bold tracking-tight">{step.title}</h3>
+            <h3 className="mt-5 font-heading text-lg leading-snug font-semibold">{step.title}</h3>
             <p className="mt-1.5 text-base leading-relaxed text-secondary">{step.body}</p>
           </li>
         ))}
       </ol>
 
       <div className="mt-20 grid gap-8 md:mt-24">
-        <div className="reveal grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
           <div>
             <Eyebrow>{t.knowledge.eyebrow}</Eyebrow>
-            <h3 className="mt-3 font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-extrabold tracking-[-0.025em]">
+            <h3 className="mt-3 font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-semibold">
               {t.knowledge.title}
             </h3>
           </div>
@@ -473,7 +462,7 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
             type="button"
             aria-pressed={channel === i}
             onClick={() => setChannel(i)}
-            className="flex min-h-12 items-center gap-2 rounded-full border border-border bg-surface px-5 text-base font-semibold text-secondary transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
+            className="flex min-h-12 items-center gap-2 rounded-control border border-border bg-surface px-5 text-base font-medium text-secondary transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
           >
             {channelIcons[i]}
             {item.title}
@@ -481,7 +470,7 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
         ))}
       </div>
       <div className="grid gap-12 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-20">
-        <div className="reveal order-last lg:sticky lg:top-20 lg:order-first lg:self-start">
+        <div className="order-last lg:sticky lg:top-20 lg:order-first lg:self-start">
           {channel === 0 ? (
             <OwnerChat t={t} selected={selected === null ? null : t.commands[selected]} />
           ) : (
@@ -490,14 +479,14 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
         </div>
         <div className="min-w-0">
           <div className="rounded-frame border border-border bg-assistant p-6">
-            <h3 className="font-heading text-2xl font-bold">{t.channels[channel].title}</h3>
+            <h3 className="font-heading text-2xl font-semibold">{t.channels[channel].title}</h3>
             <p className="mt-3 text-lg leading-relaxed text-secondary">{t.channels[channel].body}</p>
           </div>
 
           {channel === 0 && (
-            <div className="reveal mt-8">
+            <div className="mt-8">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 className="font-heading text-lg font-bold tracking-tight">{t.commandsTitle}</h3>
+                <h3 className="font-heading text-lg font-semibold">{t.commandsTitle}</h3>
                 <p className="text-sm text-secondary">{t.commandsHint}</p>
               </div>
               <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
@@ -522,7 +511,7 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
             </div>
           )}
 
-          <ul className="reveal mt-10 grid gap-x-6 gap-y-5 border-t border-border pt-8 sm:grid-cols-2">
+          <ul className="mt-10 grid gap-x-6 gap-y-5 border-t border-border pt-8 sm:grid-cols-2">
             {t.channels.map((channel, i) => (
               <li key={channel.title} className="flex gap-3.5">
                 <span
@@ -532,13 +521,13 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
                   {channelIcons[i]}
                 </span>
                 <div>
-                  <h3 className="font-heading text-base font-bold">{channel.title}</h3>
+                  <h3 className="font-heading text-base font-semibold">{channel.title}</h3>
                   <p className="mt-0.5 text-sm leading-relaxed text-secondary">{channel.body}</p>
                 </div>
               </li>
             ))}
           </ul>
-          <p className="reveal mt-6 flex gap-3 rounded-panel border border-border p-4 text-sm leading-relaxed text-secondary">
+          <p className="mt-6 flex gap-3 rounded-panel border border-border p-4 text-sm leading-relaxed text-secondary">
             <ShieldCheckIcon aria-hidden className="mt-0.5 shrink-0 text-lg text-action" />
             {t.note}
           </p>
@@ -561,10 +550,10 @@ function ContentAndReport({ t }: { t: Copy }) {
       <div className="grid gap-16 lg:grid-cols-2 lg:gap-16">
         <div className="min-w-0">
           <SectionHeader eyebrow={t.content.eyebrow} title={t.content.title} body={t.content.body} />
-          <figure className="reveal mt-10">
+          <figure className="mt-10">
             <div className="overflow-hidden rounded-frame border border-border bg-canvas">
               <figcaption className="flex items-center justify-between gap-2 border-b border-border bg-surface px-5 py-3">
-                <span className="font-heading text-sm font-bold">{t.content.heading}</span>
+                <span className="font-heading text-sm font-semibold">{t.content.heading}</span>
                 <ExampleLabel>{t.content.example}</ExampleLabel>
               </figcaption>
               <ul className="divide-y divide-border">
@@ -572,7 +561,7 @@ function ContentAndReport({ t }: { t: Copy }) {
                   <li key={`${post.day}-${post.time}`} className="flex flex-col gap-2.5 px-5 py-3.5">
                     <div className="flex items-center gap-3.5">
                       <div className="flex w-10 shrink-0 flex-col text-xs tabular-nums">
-                        <span className="font-bold">{post.day}</span>
+                        <span className="font-semibold">{post.day}</span>
                         <span className="text-secondary">{post.time}</span>
                       </div>
                       <PostThumb index={idx} />
@@ -612,18 +601,18 @@ function ContentAndReport({ t }: { t: Copy }) {
         </div>
 
         <div className="min-w-0 lg:pt-[7.5rem]">
-          <div className="reveal">
-            <h3 className="font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-extrabold tracking-[-0.025em]">
+          <div>
+            <h3 className="font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-semibold">
               {t.report.title}
             </h3>
             <p className="mt-4 max-w-[34rem] text-[1.0625rem] leading-relaxed text-secondary">
               {t.report.body}
             </p>
           </div>
-          <figure className="reveal mt-8 rounded-frame border border-border bg-canvas p-5">
+          <figure className="mt-8 rounded-frame border border-border bg-canvas p-5">
             <figcaption className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-heading text-sm font-bold">{t.report.heading}</p>
+                <p className="font-heading text-sm font-semibold">{t.report.heading}</p>
                 <p className="text-xs text-secondary">{t.report.asOf}</p>
               </div>
               <ExampleLabel>{t.report.example}</ExampleLabel>
@@ -633,7 +622,7 @@ function ContentAndReport({ t }: { t: Copy }) {
                 <div key={label} className="rounded-panel border border-border bg-surface px-3.5 py-3">
                   <dt className="text-xs text-secondary">{label}</dt>
                   <dd
-                    className={`mt-1 font-heading font-bold tabular-nums ${
+                    className={`mt-1 font-heading font-semibold tabular-nums ${
                       /^\d+$/.test(value) ? 'text-[1.75rem] leading-9 text-action' : 'text-base leading-9'
                     }`}
                   >
@@ -680,7 +669,7 @@ function Trust({ t }: { t: Copy['trust'] }) {
     <TrashIcon key="d" />,
   ]
   const group = (title: string, items: Copy['trust']['control'], icons: ReactNode[]) => (
-    <div className="reveal">
+    <div>
       <h3 className="type-eyebrow text-band-accent">{title}</h3>
       <ul className="mt-5 grid gap-x-8 gap-y-6 sm:grid-cols-2">
         {items.map((item, i) => (
@@ -692,7 +681,7 @@ function Trust({ t }: { t: Copy['trust'] }) {
               {icons[i]}
             </span>
             <div>
-              <p className="font-heading font-bold text-white dark:text-primary">{item.title}</p>
+              <p className="font-heading font-semibold text-white dark:text-primary">{item.title}</p>
               <p className="mt-1 text-base leading-relaxed text-band-text/80">{item.body}</p>
             </div>
           </li>
@@ -703,7 +692,7 @@ function Trust({ t }: { t: Copy['trust'] }) {
   return (
     <section id="guven" className="bg-band py-20 text-band-text md:py-28">
       <div className={container}>
-        <header className="reveal max-w-[44rem]">
+        <header className="max-w-[44rem]">
           <p className="type-eyebrow text-band-accent">{t.eyebrow}</p>
           <h2 className="type-title mt-3 text-white dark:text-primary">{t.title}</h2>
           <p className="mt-5 max-w-[38rem] text-lg leading-relaxed text-band-text/85">{t.body}</p>
@@ -732,8 +721,7 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
         {t.items.map((item, i) => (
           <li
             key={item.title}
-            className="reveal flex min-w-0 flex-col rounded-frame border border-border bg-canvas p-5"
-            style={{ transitionDelay: `${i * 60}ms` }}
+            className="flex min-w-0 flex-col rounded-frame border border-border bg-canvas p-6 last:sm:col-span-2"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span
@@ -748,7 +736,7 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
                 </Badge>
               )}
             </div>
-            <h3 className="mt-4 font-heading text-lg leading-snug font-bold tracking-tight">{item.title}</h3>
+            <h3 className="mt-4 font-heading text-lg leading-snug font-semibold">{item.title}</h3>
             <p className="mt-1.5 text-base leading-relaxed text-secondary">{item.body}</p>
             {i === 1 && (
               <div className="mt-4">
@@ -757,7 +745,7 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
                   {t.legal.map((doc) => {
                     const href = appLink(doc.path)
                     const chip =
-                      'inline-flex min-h-9 items-center rounded-full border border-border bg-surface px-3 text-sm font-medium'
+                      'inline-flex min-h-9 items-center rounded-control border border-border bg-surface px-3 text-sm font-medium'
                     return (
                       <li key={doc.path}>
                         {href ? (
@@ -778,18 +766,18 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
             )}
           </li>
         ))}
-        <li className="reveal flex min-w-0 flex-col justify-center gap-5 rounded-frame border border-border bg-assistant p-5 sm:col-span-2 lg:col-span-1">
-          {PACKAGE_PRICE && (
-            <div>
-              <p className="type-eyebrow text-secondary">{t.priceLabel}</p>
-              <p className="mt-1 font-heading text-3xl font-extrabold tracking-tight">{PACKAGE_PRICE}</p>
-            </div>
-          )}
-          <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
-            {t.cta}
-          </a>
-        </li>
       </ul>
+      <div className="mt-8 flex flex-wrap items-center gap-6">
+        {PACKAGE_PRICE && (
+          <div>
+            <p className="type-eyebrow text-secondary">{t.priceLabel}</p>
+            <p className="mt-1 font-heading text-3xl font-semibold">{PACKAGE_PRICE}</p>
+          </div>
+        )}
+        <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
+          {t.cta}
+        </a>
+      </div>
     </Section>
   )
 }
@@ -801,10 +789,10 @@ function Faq({ t }: { t: Copy['faq'] }) {
         <div className="lg:sticky lg:top-28 lg:self-start">
           <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
         </div>
-        <div className="reveal overflow-hidden rounded-frame border border-border bg-surface">
+        <div className="overflow-hidden rounded-frame border border-border bg-surface">
           {t.items.map((item) => (
             <details key={item.q} className="group border-b border-border last:border-b-0">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 px-5 py-4 font-heading text-base font-bold transition-colors hover:bg-surface-subtle sm:px-6 [&::-webkit-details-marker]:hidden">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 px-5 py-4 font-heading text-base font-semibold transition-colors hover:bg-surface-subtle sm:px-6 [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <span
                   aria-hidden
@@ -832,10 +820,6 @@ function Pilot({ t, lang, pilotRef }: { t: Copy; lang: Lang; pilotRef: RefObject
       className="relative overflow-hidden border-t border-border bg-assistant py-20 md:py-28"
     >
       <div
-        aria-hidden
-        className="dot-field pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent_70%)]"
-      />
-      <div
         className={`${container} relative grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,31rem)] lg:gap-16`}
       >
         <div className="min-w-0">
@@ -843,22 +827,22 @@ function Pilot({ t, lang, pilotRef }: { t: Copy; lang: Lang; pilotRef: RefObject
 
           <ul className="mt-10 grid gap-3 sm:grid-cols-2">
             {t.pilot.expectations.map((item) => (
-              <li key={item.title} className="reveal rounded-panel border border-border bg-surface p-5">
+              <li key={item.title} className="rounded-panel border border-border bg-surface p-5">
                 <Badge tone="brand" size="sm">
                   {item.badge}
                 </Badge>
-                <h3 className="mt-3 font-heading text-base font-bold">{item.title}</h3>
+                <h3 className="mt-3 font-heading text-base font-semibold">{item.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-secondary">{item.detail}</p>
               </li>
             ))}
           </ul>
 
-          <div className="reveal mt-10">
+          <div className="mt-10">
             <h3 className="type-eyebrow text-secondary">{t.pilot.nextStepsTitle}</h3>
             <ol className="mt-4 grid gap-4 sm:grid-cols-3">
               {t.pilot.nextSteps.map((step, i) => (
                 <li key={step.title} className="flex gap-3 sm:flex-col sm:gap-2">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-band font-heading text-sm font-bold text-band-accent">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-band font-heading text-sm font-semibold text-band-accent">
                     {i + 1}
                   </span>
                   <div>

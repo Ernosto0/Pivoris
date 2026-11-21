@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode, type SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 
 // Stroke icons drawn the same way as the app's (frontend/src/components/icons.tsx).
 // Decorative: meaning is always carried by adjacent text.
@@ -6,11 +6,11 @@ function Svg({ children, ...props }: SVGProps<SVGSVGElement> & { children: React
   return (
     <svg
       viewBox="0 0 24 24"
-      width="1em"
-      height="1em"
+      width="16"
+      height="16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -78,7 +78,7 @@ const TONES: Record<Tone, string> = {
   brand: 'bg-fact text-on-fact ring-transparent',
 }
 
-/** Same shape as the app's StatusBadge: a pill with an icon, the word carrying the meaning. */
+/** Status keeps its semantic colour and label, with a compact tag shape. */
 export function Badge({
   tone,
   icon,
@@ -94,7 +94,7 @@ export function Badge({
 }) {
   const sizing = size === 'sm' ? 'gap-1 px-2 py-px text-xs leading-5' : 'gap-1.5 px-2.5 py-0.5 text-[0.8125rem] leading-6'
   return (
-    <span className={`inline-flex shrink-0 items-center rounded-full font-medium ring-1 ring-inset ${sizing} ${TONES[tone]} ${className}`}>
+    <span className={`inline-flex shrink-0 items-center rounded-md font-medium ring-1 ring-inset ${sizing} ${TONES[tone]} ${className}`}>
       {icon}
       {children}
     </span>
@@ -105,7 +105,7 @@ export function Badge({
 export function ExampleLabel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-medium text-secondary ${className}`}
+      className={`inline-flex items-center gap-2 text-xs font-medium text-secondary ${className}`}
     >
       <span aria-hidden className="size-1.5 rounded-full bg-control" />
       {children}
@@ -131,7 +131,7 @@ export function SectionHeader({
   className?: string
 }) {
   return (
-    <header className={`reveal max-w-[44rem] ${center ? 'mx-auto text-center' : ''} ${className}`}>
+    <header className={`max-w-[44rem] ${center ? 'mx-auto text-center' : ''} ${className}`}>
       <Eyebrow>{eyebrow}</Eyebrow>
       <h2 className="type-title mt-3">{title}</h2>
       {body && <p className={`mt-5 text-lg leading-relaxed text-secondary ${center ? 'mx-auto' : ''} max-w-[38rem]`}>{body}</p>}
@@ -145,32 +145,3 @@ export const buttonBase =
 export const buttonPrimary = `${buttonBase} bg-action text-on-action hover:bg-action-hover`
 export const buttonSecondary = `${buttonBase} border border-border bg-surface text-primary hover:bg-surface-subtle`
 export const buttonLarge = 'min-h-13 px-6 text-base'
-
-/** Adds `is-visible` to every `.reveal` element below `root` as it scrolls into view, once. */
-export function useReveal(deps: unknown[] = []) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const root = ref.current
-    if (!root) return
-    const items = Array.from(root.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)'))
-    if (!('IntersectionObserver' in window)) {
-      items.forEach((el) => el.classList.add('is-visible'))
-      return
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            observer.unobserve(entry.target)
-          }
-        }
-      },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-    )
-    items.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
-  return ref
-}

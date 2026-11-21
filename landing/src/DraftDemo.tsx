@@ -33,7 +33,7 @@ export function DraftDemo({ t }: { t: Copy['demo'] }) {
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <span
             aria-hidden
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-subtle text-sm font-bold text-secondary"
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-subtle text-sm font-semibold text-secondary"
           >
             {conversation.customer.slice(0, 2).toUpperCase()}
           </span>
@@ -56,7 +56,7 @@ export function DraftDemo({ t }: { t: Copy['demo'] }) {
                   aria-expanded={sourceOpen}
                   aria-controls="demo-reply-source"
                   onClick={() => setSourceOpen(!sourceOpen)}
-                  className="rounded bg-on-action/15 px-1 font-bold underline decoration-dotted underline-offset-4"
+                  className="source-fact"
                 >
                   {t.known.facts[0].value}
                 </button>
@@ -68,7 +68,7 @@ export function DraftDemo({ t }: { t: Copy['demo'] }) {
               </p>
               <p className="text-right text-sm text-secondary">{t.known.hint}</p>
               {sourceOpen && (
-                <p id="demo-reply-source" className="pop-in rounded-panel bg-fact p-3 text-sm text-on-fact">
+                <p id="demo-reply-source" className="source-record pop-in bg-fact text-sm text-on-fact">
                   {t.known.facts[0].source}
                 </p>
               )}

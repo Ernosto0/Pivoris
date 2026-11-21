@@ -31,7 +31,12 @@ export function OwnerChat({ t, selected }: { t: Copy['owner']; selected: Command
           </div>
         </div>
 
-        <div className="dot-field relative flex min-h-0 flex-1 flex-col justify-end overflow-y-auto bg-canvas px-3 py-3">
+        <div
+          role="region"
+          aria-label={t.example}
+          tabIndex={0}
+          className="dot-field relative flex min-h-0 flex-1 flex-col justify-end overflow-y-auto bg-canvas px-3 py-3 focus-visible:-outline-offset-2"
+        >
           <span className="mx-auto mb-2 rounded-full bg-surface px-2.5 py-0.5 text-[0.6875rem] text-secondary shadow-sm">
             {t.today}
           </span>
@@ -102,11 +107,11 @@ function Story({ kicker, title, note }: { kicker: string; title: string; note: s
         aria-hidden
         className="absolute top-3 -left-5 size-12 rounded-full border-[5px] border-[#2a2118]/15"
       />
-      <span className="relative text-[0.625rem] font-bold tracking-[0.14em] uppercase">{kicker}</span>
-      <span className="relative mt-0.5 text-lg leading-[1.05] font-extrabold tracking-[-0.02em]">
+      <span className="relative text-[0.6875rem] font-medium">{kicker}</span>
+      <span className="relative mt-0.5 text-lg leading-tight font-semibold">
         {title}
       </span>
-      <span className="relative mt-1.5 self-start rounded-full bg-[#2a2118] px-2.5 py-0.5 text-xs font-bold text-[#e9dfcf]">
+      <span className="relative mt-1.5 self-start rounded-full bg-[#2a2118] px-2.5 py-0.5 text-xs font-semibold text-[#e9dfcf]">
         {note}
       </span>
     </div>

@@ -254,21 +254,21 @@ export function JourneySection({ lang }: { lang: Lang }) {
           <h2 className="type-title mt-4 text-white dark:text-primary">{t.title}</h2>
           <p className="mt-5 text-lg leading-relaxed">{t.body}</p>
         </div>
-        <div role="group" aria-label={t.title} className="mt-9 flex flex-wrap gap-2">
+        <div role="group" aria-label={t.title} className="mt-8 flex flex-wrap gap-2">
           {t.stories.map((s, i) => (
             <button
               key={s.tab}
               type="button"
               aria-pressed={selected === i}
               onClick={() => setSelected(i)}
-              className="min-h-11 rounded-full border border-band-text/30 px-5 py-2 text-sm font-semibold transition-colors hover:bg-band-text/10 aria-pressed:border-band-accent aria-pressed:bg-band-accent aria-pressed:text-on-band-accent"
+              className="min-h-11 rounded-control border border-band-text/20 px-5 py-2 text-sm font-medium transition-colors hover:bg-band-text/10 aria-pressed:border-band-accent aria-pressed:bg-band-accent aria-pressed:text-on-band-accent"
             >
               {s.tab}
             </button>
           ))}
         </div>
         <div className="mt-6 rounded-frame border border-band-text/20 bg-canvas p-5 text-primary sm:p-8">
-          <div className="mb-7 flex justify-end">
+          <div className="mb-6 flex justify-end">
             <ExampleLabel>{t.example}</ExampleLabel>
           </div>
           <div key={selected} className="pop-in grid gap-6 lg:grid-cols-[1fr_1fr_1.1fr] lg:gap-8">
@@ -294,10 +294,10 @@ export function JourneySection({ lang }: { lang: Lang }) {
                 <CheckIcon />
                 {t.result}
               </p>
-              <p className="mt-2 font-heading text-lg font-bold">{story.result}</p>
+              <p className="mt-2 font-heading text-lg font-semibold">{story.result}</p>
             </div>
           </div>
-          <p className="mt-7 border-t border-border pt-5 text-sm leading-relaxed text-secondary">
+          <p className="mt-6 border-t border-border pt-5 text-sm leading-relaxed text-secondary">
             {story.note}
           </p>
         </div>
@@ -322,7 +322,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
         <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
           <article className="rounded-frame border border-border bg-assistant p-6 sm:p-8 lg:row-span-2">
-            <h3 className="font-heading text-2xl font-bold tracking-tight">{t.languageTitle}</h3>
+            <h3 className="font-heading text-2xl font-semibold">{t.languageTitle}</h3>
             <p className="mt-4 text-base leading-relaxed text-secondary">{t.languageBody}</p>
             <div role="group" aria-label={t.languageTitle} className="mt-6 flex flex-wrap gap-2">
               {languages.map((l, i) => (
@@ -332,7 +332,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
                   lang={l.code}
                   aria-pressed={i === selected}
                   onClick={() => setSelected(i)}
-                  className="min-h-11 rounded-full border border-border bg-surface px-3 text-sm font-semibold aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
+                  className="min-h-11 rounded-control border border-border bg-surface px-3 text-sm font-medium transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
                 >
                   {l.name}
                 </button>
@@ -361,7 +361,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
               >
                 {icons[i]}
               </span>
-              <h3 className="mt-5 font-heading text-xl font-bold tracking-tight">{card.title}</h3>
+              <h3 className="mt-5 font-heading text-xl font-semibold">{card.title}</h3>
               <p className="mt-3 text-base leading-relaxed text-secondary">{card.body}</p>
               <p className="mt-5 text-sm font-semibold text-action">{card.tag}</p>
             </article>
@@ -395,7 +395,7 @@ export function ChannelPreview({
         {channel === 1 ? (
           <div className="dot-field flex flex-1 flex-col justify-center gap-4 p-4">
             <div className="rounded-2xl rounded-bl-sm border border-border bg-surface p-4">
-              <p className="flex items-center gap-2 font-heading font-bold">
+              <p className="flex items-center gap-2 font-heading font-semibold">
                 <CalendarIcon className="text-action" />
                 {t.whatsappTitle}
               </p>
@@ -409,7 +409,7 @@ export function ChannelPreview({
           </div>
         ) : (
           <div className="flex flex-1 flex-col p-5">
-            <p className="mt-4 font-heading text-2xl font-bold">{t.appTitle}</p>
+            <p className="mt-4 font-heading text-2xl font-semibold">{t.appTitle}</p>
             <ul className="mt-6 space-y-3">
               {t.appItems.map((item) => (
                 <li

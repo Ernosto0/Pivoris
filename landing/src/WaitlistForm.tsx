@@ -91,7 +91,7 @@ export function WaitlistForm({ t, pilot, lang }: Props) {
       className="flex flex-col gap-5 rounded-frame border border-border bg-surface p-5 shadow-frame sm:p-7"
     >
       <div>
-        <h3 id="wl-title" className="font-heading text-xl font-bold tracking-tight">
+        <h3 id="wl-title" className="font-heading text-xl font-semibold">
           {t.title}
         </h3>
         <p className="mt-1 text-sm text-secondary">{t.subtitle}</p>
@@ -106,7 +106,7 @@ export function WaitlistForm({ t, pilot, lang }: Props) {
               type="button"
               aria-pressed={categoryIdx === idx}
               onClick={() => setCategoryIdx(idx)}
-              className="min-h-9 rounded-full border border-border bg-surface px-3.5 text-sm text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-transparent aria-pressed:bg-band aria-pressed:font-medium aria-pressed:text-band-text"
+              className="min-h-9 rounded-control border border-border bg-surface px-3 text-sm text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-transparent aria-pressed:bg-band aria-pressed:font-medium aria-pressed:text-band-text"
             >
               {cat}
             </button>

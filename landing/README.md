@@ -11,9 +11,13 @@ npm run typecheck
 ```
 
 - **Look**: the light colour tokens, fonts (Manrope headings, Inter text), radii, buttons and status
-  pills are the app's own (`frontend/src/index.css`, `StatusBadge`, `Button`), so the page and the
+  vocabulary come from the app (`frontend/src/index.css`, `StatusBadge`, `Button`), so the page and the
   product read as one thing. The page adds larger display type, a dark theme and the dark-green brand
-  band. Tokens live in `src/index.css`; shared pieces (icons, badges, buttons) in `src/ui.tsx`.
+  band. Marketing uses lighter headings, sentence-case section labels, 16px panel radii and compact
+  status tags. Tokens live in `src/index.css`; shared pieces (icons, badges, buttons) in `src/ui.tsx`.
+  Verified reply values use a dotted source marker (`.source-fact`) and open the existing source
+  details locally. The hero has one brief entrance; sections remain visible without scroll animations.
+  Polish guided by [unslop](https://github.com/heydamir/unslop) by Damir Sokolovsky, CC BY 4.0.
 - **Copy** for both languages lives in `src/copy.ts`; operational stories, channel previews and
   the five-language demo live in `src/ProductStories.tsx`. The page leads with automatic routine
   DM and eligible comment replies, then shows comment-to-private-reply, calendar requests,

@@ -21,7 +21,7 @@ export function KnowledgePreview({ t, example }: { t: Copy['knowledge']; example
   const progress = t.progress.replace('{n}', String(done)).replace('{total}', String(verified.length))
 
   return (
-    <div className="reveal grid items-start gap-4 lg:grid-cols-[minmax(0,0.85fr)_auto_minmax(0,1.15fr)] lg:gap-6">
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,0.85fr)_auto_minmax(0,1.15fr)] lg:gap-6">
       <figure className="rounded-panel border border-dashed border-control/50 bg-surface p-5">
         <figcaption className="flex items-center justify-between gap-2">
           <span className="type-eyebrow text-secondary">{t.pasteLabel}</span>
@@ -41,15 +41,15 @@ export function KnowledgePreview({ t, example }: { t: Copy['knowledge']; example
 
       <div className="overflow-hidden rounded-panel border border-border bg-surface">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3.5">
-          <span className="font-heading text-sm font-bold">{t.ledgerTitle}</span>
+          <span className="font-heading text-sm font-semibold">{t.ledgerTitle}</span>
           <span className="flex items-center gap-3">
             <span aria-live="polite" className="text-xs font-medium text-secondary tabular-nums">
               {progress}
             </span>
             <span aria-hidden className="h-1.5 w-20 overflow-hidden rounded-full bg-surface-subtle">
               <span
-                className="block h-full rounded-full bg-action transition-[width] duration-500"
-                style={{ width: `${(done / verified.length) * 100}%` }}
+                className="block h-full origin-left rounded-full bg-action transition-transform duration-300"
+                style={{ transform: `scaleX(${done / verified.length})` }}
               />
             </span>
           </span>
@@ -65,7 +65,7 @@ export function KnowledgePreview({ t, example }: { t: Copy['knowledge']; example
                 <span className="text-xs text-secondary">
                   {fact.category} · {fact.label}
                 </span>
-                <span className="mt-0.5 font-heading text-base font-bold tabular-nums">{fact.value}</span>
+                <span className="mt-0.5 font-heading text-base font-semibold tabular-nums">{fact.value}</span>
               </div>
               {verified[i] ? (
                 <Badge tone="success" size="sm" icon={<CheckIcon />} className="pop-in">

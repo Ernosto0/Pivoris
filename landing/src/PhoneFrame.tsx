@@ -8,9 +8,9 @@ export function PhoneFrame({ label, clock, children }: { label: string; clock: s
       <figcaption className="mb-3 flex justify-center">
         <ExampleLabel>{label}</ExampleLabel>
       </figcaption>
-      <div className="dot-field rounded-[2.25rem] p-3 sm:p-5">
-        <div className="rounded-[2.6rem] bg-[#0e1612] p-2 shadow-frame ring-1 ring-black/5 dark:ring-white/10">
-          <div className="flex min-h-[34rem] flex-col overflow-hidden rounded-[2.1rem] bg-surface">
+      <div className="rounded-[2.25rem] p-3 sm:p-5">
+        <div className="rounded-[2.5rem] bg-[#0e1612] p-2 shadow-frame ring-1 ring-black/5 dark:ring-white/10">
+          <div className="flex min-h-[34rem] flex-col overflow-hidden rounded-[2rem] bg-surface">
             <div aria-hidden className="flex items-center justify-between px-6 pt-2.5 pb-1 text-[0.75rem] font-semibold tabular-nums">
               <span>{clock}</span>
               <span className="h-5 w-20 rounded-full bg-[#0e1612]" />
