@@ -239,9 +239,9 @@ export const copy: Record<Lang, Copy> = {
     },
     hero: {
       badge: 'Ücretsiz pilot programı · Başvurular açık',
-      title: 'Siz işletmenize odaklanın.',
-      accent: 'Rutin işleri Pivoris halletsin.',
-      lead: 'Müşteri sorularını güncel bilgilerinizle otomatik yanıtlasın, yorumları özel sohbette karşılasın, içeriklerinizi hazırlayıp planlasın. Telegram’dan talimat verin; önemli gelişmeler seçtiğiniz kanala gelsin.',
+      title: 'Müşteri soruları,',
+      accent: 'mesai dışında da yanıtlansın',
+      lead: 'Pivoris, Instagram sorularını doğrulanmış işletme bilgilerinizle yanıtlar, yorumları özel sohbete taşır, içerik hazırlar ve planlar. Telegram’dan talimat verin; önemli gelişmeleri seçtiğiniz kanaldan takip edin.',
       cta: 'Ücretsiz pilota başvurun',
       secondary: 'Otomasyonu keşfedin',
       points: ['30 gün ücretsiz', 'Kart bilgisi yok', 'Kurulum 30 dakika'],
@@ -460,10 +460,10 @@ export const copy: Record<Lang, Copy> = {
           action: 'Saati değiştir',
         },
         {
-          ask: 'Aylık üyelik artık 7.000 TL.',
+          ask: 'Reformer paketini 6.500 TL yapalım. Eski fiyatla paylaşım çıkmasın.',
           answer:
-            'Aylık üyeliği 7.000 ₺ olarak güncelleyeyim mi? Eski fiyatı kullanan içerikleri de kontrol edeceğim.',
-          action: 'Güncelle',
+            'Eski fiyatı kullanan 1 müşteri yanıtı ve Cuma 19:00’a planlı bir paylaşım buldum. Onayınızla paket fiyatını 6.500 TL yapıp yanıtı yenileyeceğim; paylaşımı da incelemeniz için beklemeye alacağım. Onaylıyor musunuz?',
+          action: 'Onayla ve güncelle',
         },
         {
           ask: 'Son 7 günde Instagram’da durum nasıl?',
@@ -478,7 +478,7 @@ export const copy: Record<Lang, Copy> = {
       note: 'Planlandı, yayınlandı demek değildir. Paylaşım gerçekten yayınlanınca haber verir, yayınlanamazsa nedenini söyler.',
       example: 'Örnek',
       heading: 'Bu hafta',
-      heldReason: 'Fiyat 6.000 ₺ → 7.000 ₺ olarak değiştiği için kendiliğinden beklemeye alındı.',
+      heldReason: 'Fiyat 6.000 ₺ → 6.500 ₺ olarak değiştiği için kendiliğinden beklemeye alındı.',
       posts: [
         {
           day: 'Pzt',
@@ -776,9 +776,9 @@ export const copy: Record<Lang, Copy> = {
     },
     hero: {
       badge: 'Free pilot programme · Applications open',
-      title: 'Focus on your business.',
-      accent: 'Let Pivoris handle the routine.',
-      lead: 'Automatically answer customer questions with your latest business details, respond to comments in private and prepare and schedule content. Give instructions on Telegram; get important updates on the channel you choose.',
+      title: 'Customer questions,',
+      accent: 'answered after hours',
+      lead: 'Pivoris answers Instagram questions from your verified business details, moves comments into private conversations, and prepares and schedules content. Give instructions on Telegram; follow important updates on your chosen channel.',
       cta: 'Apply for the free pilot',
       secondary: 'Explore the automation',
       points: ['Free for 30 days', 'No card needed', '30-minute setup'],
@@ -996,9 +996,9 @@ export const copy: Record<Lang, Copy> = {
           action: 'Change time',
         },
         {
-          ask: 'Monthly membership is now $210.',
-          answer: 'Update the monthly membership to $210? I’ll also check content using the old price.',
-          action: 'Update price',
+          ask: 'Make the reformer package $195. Don’t let the next post go out with the old price.',
+          answer: 'I found 1 pending customer reply and a post scheduled for Friday at 19:00 using the old price. With your approval, I’ll set the package to $195, redraft the reply and hold the post for your review. Shall I go ahead?',
+          action: 'Approve & update',
         },
         {
           ask: 'How did Instagram do over the last 7 days?',
@@ -1014,7 +1014,7 @@ export const copy: Record<Lang, Copy> = {
       note: 'Scheduled does not mean published. You hear when a post actually goes out, and if it fails, you hear why.',
       example: 'Example',
       heading: 'This week',
-      heldReason: 'Put on hold automatically because the price changed from $180 to $210.',
+      heldReason: 'Put on hold automatically because the price changed from $180 to $195.',
       posts: [
         {
           day: 'Mon',

@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { PRODUCT_NAME } from './brand'
 import { Brand } from './BrandIdentity'
+import { ChaosToCalm } from './ChaosToCalm'
 import { copy, type Copy, type Lang, type PostStatus } from './copy'
 import { PACKAGE_PRICE, appLink } from './config'
+import { DominoSandbox } from './DominoSandbox'
 import { DraftDemo } from './DraftDemo'
 import { HeroPreview } from './HeroPreview'
 import { KnowledgePreview } from './KnowledgePreview'
+import { MissedRevenueCalculator } from './MissedRevenueCalculator'
 import { OwnerChat } from './OwnerChat'
 import { CapabilitiesSection, ChannelPreview, JourneySection } from './ProductStories'
+import { getScenario, getScenarios, type BusinessId, type BusinessScenario } from './scenarios'
+import { Reveal, ScrollProgress } from './ScrollReveal'
 import {
   ArrowUpIcon,
   Badge,
@@ -75,7 +80,10 @@ const container = 'gutter mx-auto w-full max-w-[76rem]'
 export function App() {
   const [lang, setLangState] = useState<Lang>(initialLang)
   const [theme, setTheme] = useState<Theme>(initialTheme)
+  const [businessId, setBusinessId] = useState<BusinessId>('pilates')
   const t = copy[lang]
+  const scenarios = getScenarios(lang)
+  const scenario = getScenario(lang, businessId)
 
   const setLang = (next: Lang) => {
     setLangState(next)
@@ -123,43 +131,79 @@ export function App() {
       <SiteHeader t={t} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} active={active} />
 
       <main id="main" tabIndex={-1} className="outline-none">
-        <Hero t={t} heroRef={heroRef} />
-        <Promises t={t} />
+        <Hero
+          t={t}
+          lang={lang}
+          heroRef={heroRef}
+          scenarios={scenarios}
+          scenario={scenario}
+          onSelectBusiness={setBusinessId}
+        />
+
+        <Reveal>
+          <Promises t={t} />
+        </Reveal>
+
+        <Reveal>
+          <ChaosToCalm lang={lang} />
+        </Reveal>
+
+        <Reveal>
+          <DominoSandbox lang={lang} scenario={scenario} />
+        </Reveal>
+
         <JourneySection lang={lang} />
+
         <Section id="demo" tone="surface">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
-            <div>
-              <SectionHeader eyebrow={t.demo.eyebrow} title={t.demo.title} body={t.demo.body} />
-              <ul className="mt-10 flex flex-col gap-5">
-                {t.demo.points.map((point, i) => (
-                  <li key={point.title} className="flex gap-4">
-                    <span
-                      aria-hidden
-                      className="grid size-10 shrink-0 place-items-center rounded-panel bg-assistant text-lg text-action"
-                    >
-                      {[<TagIcon key="t" />, <CheckIcon key="c" />, <HandIcon key="h" />][i]}
-                    </span>
-                    <div>
-                      <h3 className="font-heading text-base font-semibold">{point.title}</h3>
-                      <p className="mt-0.5 text-base leading-relaxed text-secondary">{point.body}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <Reveal>
+            <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
+              <div>
+                <SectionHeader eyebrow={t.demo.eyebrow} title={t.demo.title} body={t.demo.body} />
+                <ul className="mt-10 flex flex-col gap-5">
+                  {t.demo.points.map((point, i) => (
+                    <li key={point.title} className="flex gap-4">
+                      <span
+                        aria-hidden
+                        className="grid size-10 shrink-0 place-items-center rounded-panel bg-assistant text-lg text-action"
+                      >
+                        {[<TagIcon key="t" />, <CheckIcon key="c" />, <HandIcon key="h" />][i]}
+                      </span>
+                      <div>
+                        <h3 className="font-heading text-base font-semibold">{point.title}</h3>
+                        <p className="mt-0.5 text-base leading-relaxed text-secondary">{point.body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <DraftDemo t={t.demo} lang={lang} scenario={scenario} />
+              </div>
             </div>
-            <div>
-              <DraftDemo t={t.demo} />
-            </div>
-          </div>
+          </Reveal>
         </Section>
+
         <OwnerSection t={t.owner} lang={lang} />
-        <CapabilitiesSection lang={lang} />
-        <HowItWorks t={t} />
+
+        <Reveal>
+          <CapabilitiesSection lang={lang} />
+        </Reveal>
+
+        <HowItWorks t={t} lang={lang} scenario={scenario} />
+
         <ContentAndReport t={t} />
+
+        <Reveal>
+          <MissedRevenueCalculator lang={lang} scenario={scenario} />
+        </Reveal>
+
         <Trust t={t.trust} />
+
         <LocalPackage t={t.localPackage} />
+
         <Faq t={t.faq} />
-        <Pilot t={t} lang={lang} pilotRef={pilotRef} />
+
+        <Pilot t={t} lang={lang} pilotRef={pilotRef} scenario={scenario} />
       </main>
 
       <SiteFooter t={t} />
@@ -205,11 +249,11 @@ function SiteHeader({
   return (
     <header
       className={`sticky top-0 z-40 border-b transition-colors ${
-        scrolled || open ? 'border-border bg-canvas/90 backdrop-blur-md' : 'border-transparent bg-canvas'
+        scrolled || open ? 'border-border bg-canvas/85 backdrop-blur-md' : 'border-transparent bg-canvas/70 backdrop-blur-sm'
       }`}
     >
       <div className={`${container} flex h-16 items-center gap-4`}>
-        <a href="#" className="flex items-center gap-2.5 rounded-control" aria-label={PRODUCT_NAME}>
+        <a href="#" className="flex items-center gap-3 rounded-control" aria-label={PRODUCT_NAME}>
           <Brand className="pivoris-brand--navigation" />
         </a>
 
@@ -284,6 +328,8 @@ function SiteHeader({
           </div>
         </nav>
       )}
+
+      <ScrollProgress />
     </header>
   )
 }
@@ -313,23 +359,44 @@ function LangSwitch({ t, lang, setLang }: { t: Copy; lang: Lang; setLang: (l: La
 
 /* -------------------------------------------------------------------- hero */
 
-function Hero({ t, heroRef }: { t: Copy; heroRef: RefObject<HTMLElement | null> }) {
+function Hero({
+  t,
+  lang,
+  heroRef,
+  scenarios,
+  scenario,
+  onSelectBusiness,
+}: {
+  t: Copy
+  lang: Lang
+  heroRef: RefObject<HTMLElement | null>
+  scenarios: BusinessScenario[]
+  scenario: BusinessScenario
+  onSelectBusiness: (id: BusinessId) => void
+}) {
+  const switcherLabel =
+    lang === 'tr' ? 'Örnekleri işletmenize göre görün' : 'See the demos for your business'
+
   return (
     <section ref={heroRef} className="relative overflow-hidden">
+      {/* Faint texture behind the product; the headline stays on calm space. */}
+      <div aria-hidden className="hero-atmosphere pointer-events-none absolute inset-0" />
+      <div aria-hidden className="hero-grid-pattern pointer-events-none absolute inset-0" />
+
       <div
-        className={`${container} hero-enter relative grid items-center gap-12 pt-12 pb-20 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24`}
+        className={`${container} hero-enter relative grid items-center gap-12 pt-12 pb-16 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.04fr)] lg:gap-12`}
       >
         <div className="min-w-0 max-w-[40rem]">
-          <p className="inline-flex items-center gap-2 text-sm font-medium text-secondary">
-            <span aria-hidden className="size-1.5 rounded-full bg-success" />
+          <p className="type-eyebrow flex items-center gap-2 text-secondary">
+            <span className="size-1.5 rounded-full bg-success" aria-hidden />
             {t.hero.badge}
           </p>
 
           <h1 className="type-display mt-6">
-            {t.hero.title} <span className="block text-action">{t.hero.accent}</span>
+            {t.hero.title} <span className="block">{t.hero.accent}</span>
           </h1>
 
-          <p className="mt-6 max-w-[36rem] text-lg leading-relaxed text-secondary md:text-xl md:leading-relaxed">
+          <p className="mt-6 max-w-[32rem] text-lg leading-relaxed text-secondary">
             {t.hero.lead}
           </p>
 
@@ -337,22 +404,42 @@ function Hero({ t, heroRef }: { t: Copy; heroRef: RefObject<HTMLElement | null> 
             <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
               {t.hero.cta}
             </a>
-            <a href="#otomasyon" className={`${buttonSecondary} ${buttonLarge}`}>
-              {t.hero.secondary}
+            <a href="#zincir" className={`${buttonSecondary} ${buttonLarge}`}>
+              {lang === 'tr' ? 'Simülasyonu deneyin' : 'Try the simulation'}
             </a>
           </div>
 
           <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-secondary">
             {t.hero.points.map((point) => (
-              <li key={point} className="flex items-center gap-1.5">
-                <CheckIcon aria-hidden className="text-success" />
+              <li key={point} className="flex items-center gap-2">
+                <CheckIcon aria-hidden />
                 {point}
               </li>
             ))}
           </ul>
+
         </div>
 
-        <HeroPreview t={t.preview} />
+        <div className="min-w-0">
+          {/* One selection adapts Hero, Domino, Draft, Knowledge, calculator and waitlist. */}
+          <div className="mb-6">
+            <p className="text-xs font-medium text-secondary">{switcherLabel}</p>
+            <div role="group" aria-label={switcherLabel} className="mt-3 flex flex-wrap gap-2">
+              {scenarios.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={scenario.id === item.id}
+                  onClick={() => onSelectBusiness(item.id)}
+                  className="min-h-9 rounded-control border border-border bg-surface px-3 text-xs font-medium text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-control aria-pressed:bg-surface-subtle aria-pressed:text-primary"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <HeroPreview t={t.preview} lang={lang} scenario={scenario} />
+        </div>
       </div>
     </section>
   )
@@ -363,11 +450,11 @@ function Promises({ t }: { t: Copy }) {
   return (
     <section aria-label={t.promises.map((p) => p.title).join(' ')} className="relative">
       <div className={container}>
-        <ul className="grid overflow-hidden rounded-frame border border-border bg-surface md:grid-cols-3">
+        <ul className="grid overflow-hidden rounded-frame border border-border bg-surface shadow-frame md:grid-cols-3">
           {t.promises.map((promise, i) => (
             <li
               key={promise.title}
-              className="flex gap-4 border-border p-6 not-last:border-b md:not-last:border-r md:not-last:border-b-0 lg:p-7"
+              className="flex gap-4 border-border p-6 transition-colors hover:bg-surface-subtle/40 not-last:border-b md:not-last:border-r md:not-last:border-b-0 lg:p-7"
             >
               <span
                 aria-hidden
@@ -382,18 +469,6 @@ function Promises({ t }: { t: Copy }) {
             </li>
           ))}
         </ul>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-          <span className="mr-1 text-sm text-secondary">{t.audience.label}:</span>
-          {t.audience.items.map((item) => (
-            <span
-              key={item}
-              className="px-2 py-1 text-sm text-secondary"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
       </div>
     </section>
   )
@@ -420,33 +495,36 @@ function Section({
   )
 }
 
-function HowItWorks({ t }: { t: Copy }) {
+function HowItWorks({ t, lang, scenario }: { t: Copy; lang: Lang; scenario: BusinessScenario }) {
   const icons = [<BookIcon key="b" />, <ChatIcon key="c" />, <CheckIcon key="k" />, <ChartIcon key="r" />]
   return (
     <Section id="nasil" tone="surface">
-      <SectionHeader eyebrow={t.how.eyebrow} title={t.how.title} body={t.how.body} />
+      <Reveal>
+        <SectionHeader eyebrow={t.how.eyebrow} title={t.how.title} body={t.how.body} />
 
-      <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {t.how.steps.map((step, i) => (
-          <li
-            key={step.title}
-            className="relative rounded-frame border border-border bg-canvas p-5"
-          >
-            <div className="flex items-center justify-between">
-              <span
-                aria-hidden
-                className="grid size-10 place-items-center rounded-panel bg-band text-lg text-band-accent"
-              >
-                {icons[i]}
-              </span>
-            </div>
-            <h3 className="mt-5 font-heading text-lg leading-snug font-semibold">{step.title}</h3>
-            <p className="mt-1.5 text-base leading-relaxed text-secondary">{step.body}</p>
-          </li>
-        ))}
-      </ol>
+        <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {t.how.steps.map((step, i) => (
+            <li
+              key={step.title}
+              className="card-lift relative rounded-frame border border-border bg-canvas p-5"
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  aria-hidden
+                  className="grid size-10 place-items-center rounded-panel bg-band text-lg text-band-accent"
+                >
+                  {icons[i]}
+                </span>
+                <span className="font-heading text-xs font-semibold text-secondary tabular-nums">0{i + 1}</span>
+              </div>
+              <h3 className="mt-5 font-heading text-lg leading-snug font-semibold">{step.title}</h3>
+              <p className="mt-2 text-base leading-relaxed text-secondary">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </Reveal>
 
-      <div className="mt-20 grid gap-8 md:mt-24">
+      <Reveal className="mt-20 grid gap-8 md:mt-24">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
           <div>
             <Eyebrow>{t.knowledge.eyebrow}</Eyebrow>
@@ -456,8 +534,8 @@ function HowItWorks({ t }: { t: Copy }) {
           </div>
           <p className="text-[1.0625rem] leading-relaxed text-secondary">{t.knowledge.body}</p>
         </div>
-        <KnowledgePreview t={t.knowledge} example={t.demo.example} />
-      </div>
+        <KnowledgePreview t={t.knowledge} lang={lang} example={t.demo.example} scenario={scenario} />
+      </Reveal>
     </Section>
   )
 }
@@ -468,85 +546,71 @@ function OwnerSection({ t, lang }: { t: Copy['owner']; lang: Lang }) {
   const channelIcons = [<ChatIcon key="t" />, <ChatIcon key="w" />, <SmartphoneIcon key="s" />]
   return (
     <Section id="yonetim">
-      <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
-      <div role="group" aria-label={t.title} className="mt-8 mb-10 flex flex-wrap gap-2">
-        {t.channels.map((item, i) => (
-          <button
-            key={item.title}
-            type="button"
-            aria-pressed={channel === i}
-            onClick={() => setChannel(i)}
-            className="flex min-h-12 items-center gap-2 rounded-control border border-border bg-surface px-5 text-base font-medium text-secondary transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
-          >
-            {channelIcons[i]}
-            {item.title}
-          </button>
-        ))}
-      </div>
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-20">
-        <div className="order-last lg:sticky lg:top-20 lg:order-first lg:self-start">
-          {channel === 0 ? (
-            <OwnerChat t={t} selected={selected === null ? null : t.commands[selected]} />
-          ) : (
-            <ChannelPreview lang={lang} channel={channel} owner={t} />
-          )}
+      <Reveal>
+        <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
+        <div role="group" aria-label={t.title} className="mt-8 mb-10 flex flex-wrap gap-2">
+          {t.channels.map((item, i) => (
+            <button
+              key={item.title}
+              type="button"
+              aria-pressed={channel === i}
+              onClick={() => setChannel(i)}
+              className="flex min-h-12 items-center gap-2 rounded-control border border-border bg-surface px-5 text-base font-medium text-secondary transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-action aria-pressed:text-on-action"
+            >
+              {channelIcons[i]}
+              {item.title}
+            </button>
+          ))}
         </div>
-        <div className="min-w-0">
-          <div className="rounded-frame border border-border bg-assistant p-6">
-            <h3 className="font-heading text-2xl font-semibold">{t.channels[channel].title}</h3>
-            <p className="mt-3 text-lg leading-relaxed text-secondary">{t.channels[channel].body}</p>
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-20">
+          <div className="order-last lg:sticky lg:top-20 lg:order-first lg:self-start">
+            {channel === 0 ? (
+              <OwnerChat t={t} lang={lang} selected={selected === null ? null : t.commands[selected]} />
+            ) : (
+              <ChannelPreview lang={lang} channel={channel} owner={t} />
+            )}
           </div>
-
-          {channel === 0 && (
-            <div className="mt-8">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 className="font-heading text-lg font-semibold">{t.commandsTitle}</h3>
-                <p className="text-sm text-secondary">{t.commandsHint}</p>
-              </div>
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                {t.commands.map((command, idx) => (
-                  <button
-                    key={command.ask}
-                    type="button"
-                    aria-pressed={selected === idx}
-                    onClick={() => setSelected(selected === idx ? null : idx)}
-                    className="group flex min-h-13 items-center gap-3 rounded-panel border border-border bg-surface px-4 py-3 text-left text-base transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-assistant"
-                  >
-                    <span
-                      aria-hidden
-                      className="grid size-6 shrink-0 place-items-center rounded-full border border-border text-sm text-secondary transition-colors group-aria-pressed:border-action group-aria-pressed:bg-action group-aria-pressed:text-on-action"
-                    >
-                      {selected === idx ? <CheckIcon /> : <PlusIcon />}
-                    </span>
-                    <span className="font-medium">“{command.ask}”</span>
-                  </button>
-                ))}
-              </div>
+          <div className="min-w-0">
+            <div className="rounded-frame border border-border bg-assistant p-6">
+              <h3 className="font-heading text-2xl font-semibold">{t.channels[channel].title}</h3>
+              <p className="mt-3 text-lg leading-relaxed text-secondary">{t.channels[channel].body}</p>
             </div>
-          )}
 
-          <ul className="mt-10 grid gap-x-6 gap-y-5 border-t border-border pt-8 sm:grid-cols-2">
-            {t.channels.map((channel, i) => (
-              <li key={channel.title} className="flex gap-3.5">
-                <span
-                  aria-hidden
-                  className="grid size-10 shrink-0 place-items-center rounded-panel bg-assistant text-lg text-action"
-                >
-                  {channelIcons[i]}
-                </span>
-                <div>
-                  <h3 className="font-heading text-base font-semibold">{channel.title}</h3>
-                  <p className="mt-0.5 text-sm leading-relaxed text-secondary">{channel.body}</p>
+            {channel === 0 && (
+              <div className="mt-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <h3 className="font-heading text-lg font-semibold">{t.commandsTitle}</h3>
+                  <p className="text-sm text-secondary">{t.commandsHint}</p>
                 </div>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 flex gap-3 rounded-panel border border-border p-4 text-sm leading-relaxed text-secondary">
-            <ShieldCheckIcon aria-hidden className="mt-0.5 shrink-0 text-lg text-action" />
-            {t.note}
-          </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {t.commands.map((command, idx) => (
+                    <button
+                      key={command.ask}
+                      type="button"
+                      aria-pressed={selected === idx}
+                      onClick={() => setSelected(selected === idx ? null : idx)}
+                      className="group flex min-h-13 items-center gap-3 rounded-panel border border-border bg-surface px-4 py-3 text-left text-base transition-colors hover:border-control aria-pressed:border-action aria-pressed:bg-assistant"
+                    >
+                      <span
+                        aria-hidden
+                        className="grid size-6 shrink-0 place-items-center rounded-full border border-border text-sm text-secondary transition-colors group-aria-pressed:border-action group-aria-pressed:bg-action group-aria-pressed:text-on-action"
+                      >
+                        {selected === idx ? <CheckIcon /> : <PlusIcon />}
+                      </span>
+                      <span className="font-medium">“{command.ask}”</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p className="mt-8 flex gap-3 rounded-panel border border-border bg-surface p-4 text-sm leading-relaxed text-secondary">
+              <ShieldCheckIcon aria-hidden className="mt-0.5 shrink-0 text-lg text-action" />
+              {t.note}
+            </p>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </Section>
   )
 }
@@ -560,116 +624,133 @@ const postTone: Record<PostStatus, { tone: Tone; icon: ReactNode }> = {
 
 function ContentAndReport({ t }: { t: Copy }) {
   return (
-    <Section id="paylasim" tone="surface">
-      <div className="grid gap-16 lg:grid-cols-2 lg:gap-16">
-        <div className="min-w-0">
-          <SectionHeader eyebrow={t.content.eyebrow} title={t.content.title} body={t.content.body} />
-          <figure className="mt-10">
-            <div className="overflow-hidden rounded-frame border border-border bg-canvas">
-              <figcaption className="flex items-center justify-between gap-2 border-b border-border bg-surface px-5 py-3">
-                <span className="font-heading text-sm font-semibold">{t.content.heading}</span>
-                <ExampleLabel>{t.content.example}</ExampleLabel>
-              </figcaption>
-              <ul className="divide-y divide-border">
-                {t.content.posts.map((post, idx) => (
-                  <li key={`${post.day}-${post.time}`} className="flex flex-col gap-2.5 px-5 py-3.5">
-                    <div className="flex items-center gap-3.5">
-                      <div className="flex w-10 shrink-0 flex-col text-xs tabular-nums">
-                        <span className="font-semibold">{post.day}</span>
-                        <span className="text-secondary">{post.time}</span>
-                      </div>
-                      <PostThumb index={idx} />
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="text-xs text-secondary">{post.kind}</span>
-                        <span className="truncate text-sm font-semibold">{post.title}</span>
+    <Section id="paylasim">
+      <Reveal>
+        <div className="grid gap-16 lg:grid-cols-2 lg:gap-16">
+          <div className="min-w-0">
+            <SectionHeader eyebrow={t.content.eyebrow} title={t.content.title} body={t.content.body} />
+            <figure className="mt-10">
+              <div className="overflow-hidden rounded-frame border border-border bg-surface shadow-frame">
+                <figcaption className="flex items-center justify-between gap-2 border-b border-border bg-canvas px-5 py-3">
+                  <span className="font-heading text-sm font-semibold">{t.content.heading}</span>
+                  <ExampleLabel>{t.content.example}</ExampleLabel>
+                </figcaption>
+                <ul className="divide-y divide-border">
+                  {t.content.posts.map((post, idx) => (
+                    <li key={`${post.day}-${post.time}`} className="flex flex-col gap-3 px-5 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="flex w-10 shrink-0 flex-col text-xs tabular-nums">
+                          <span className="font-semibold">{post.day}</span>
+                          <span className="text-secondary">{post.time}</span>
+                        </div>
+                        <PostThumb index={idx} />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <span className="text-xs text-secondary">{post.kind}</span>
+                          <span className="truncate text-sm font-semibold">{post.title}</span>
+                        </div>
+                        <Badge
+                          tone={postTone[post.state].tone}
+                          size="sm"
+                          icon={postTone[post.state].icon}
+                          className="hidden sm:inline-flex"
+                        >
+                          {post.status}
+                        </Badge>
                       </div>
                       <Badge
                         tone={postTone[post.state].tone}
                         size="sm"
                         icon={postTone[post.state].icon}
-                        className="hidden sm:inline-flex"
+                        className="self-start sm:hidden"
                       >
                         {post.status}
                       </Badge>
-                    </div>
-                    <Badge
-                      tone={postTone[post.state].tone}
-                      size="sm"
-                      icon={postTone[post.state].icon}
-                      className="self-start sm:hidden"
-                    >
-                      {post.status}
-                    </Badge>
-                    {post.state === 'held' && (
-                      <p className="flex items-start gap-2 rounded-control bg-attention-subtle px-3 py-2 text-xs leading-snug text-attention">
-                        <PauseIcon aria-hidden className="mt-px shrink-0" />
-                        {t.content.heldReason}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-secondary">{t.content.note}</p>
-          </figure>
-        </div>
-
-        <div className="min-w-0 lg:pt-[7.5rem]">
-          <div>
-            <h3 className="font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-semibold">
-              {t.report.title}
-            </h3>
-            <p className="mt-4 max-w-[34rem] text-[1.0625rem] leading-relaxed text-secondary">
-              {t.report.body}
-            </p>
-          </div>
-          <figure className="mt-8 rounded-frame border border-border bg-canvas p-5">
-            <figcaption className="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <p className="font-heading text-sm font-semibold">{t.report.heading}</p>
-                <p className="text-xs text-secondary">{t.report.asOf}</p>
+                      {post.state === 'held' && (
+                        <p className="flex items-start gap-2 rounded-control bg-attention-subtle px-3 py-2 text-xs leading-snug text-attention">
+                          <PauseIcon aria-hidden className="mt-px shrink-0" />
+                          {t.content.heldReason}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ExampleLabel>{t.report.example}</ExampleLabel>
-            </figcaption>
-            <dl className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-              {t.report.metrics.map(({ label, value }) => (
-                <div key={label} className="rounded-panel border border-border bg-surface px-3.5 py-3">
-                  <dt className="text-xs text-secondary">{label}</dt>
-                  <dd
-                    className={`mt-1 font-heading font-semibold tabular-nums ${
-                      /^\d+$/.test(value) ? 'text-[1.75rem] leading-9 text-action' : 'text-base leading-9'
-                    }`}
-                  >
-                    {value}
-                  </dd>
+              <p className="mt-4 text-sm leading-relaxed text-secondary">{t.content.note}</p>
+            </figure>
+          </div>
+
+          <div className="min-w-0 lg:pt-[7.5rem]">
+            <div>
+              <h3 className="font-heading text-[clamp(1.5rem,1.2rem+1.2vw,2.125rem)] leading-tight font-semibold">
+                {t.report.title}
+              </h3>
+              <p className="mt-4 max-w-[34rem] text-[1.0625rem] leading-relaxed text-secondary">
+                {t.report.body}
+              </p>
+            </div>
+            <figure className="mt-8 rounded-frame border border-border bg-surface p-5 shadow-frame">
+              <figcaption className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-heading text-sm font-semibold">{t.report.heading}</p>
+                  <p className="text-xs text-secondary">{t.report.asOf}</p>
                 </div>
+                <ExampleLabel>{t.report.example}</ExampleLabel>
+              </figcaption>
+              <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {t.report.metrics.map(({ label, value }) => (
+                  <div key={label} className="rounded-panel border border-border bg-canvas px-4 py-3">
+                    <dt className="text-xs text-secondary">{label}</dt>
+                    <dd
+                      className={`mt-1 font-heading font-semibold tabular-nums ${
+                        /^\d+$/.test(value) ? 'text-[1.75rem] leading-9 text-action' : 'text-base leading-9'
+                      }`}
+                    >
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-secondary">
+                <CheckIcon aria-hidden className="mt-0.5 shrink-0 text-success" />
+                {t.report.footerNote}
+              </p>
+            </figure>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              {t.report.highlights.map((item) => (
+                <li key={item.title} className="rounded-panel border border-border bg-surface p-4">
+                  <h4 className="font-heading text-sm font-semibold">{item.title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-secondary">{item.body}</p>
+                </li>
               ))}
-            </dl>
-            <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-secondary">
-              <CheckIcon aria-hidden className="mt-0.5 shrink-0 text-success" />
-              {t.report.footerNote}
-            </p>
-          </figure>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-            {t.report.highlights.map((item) => (
-              <li key={item.title} className="rounded-panel border border-border bg-canvas p-4">
-                <h4 className="font-heading text-sm font-semibold">{item.title}</h4>
-                <p className="mt-1.5 text-sm leading-relaxed text-secondary">{item.body}</p>
-              </li>
-            ))}
-          </ul>
+            </ul>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </Section>
   )
 }
 
 function PostThumb({ index }: { index: number }) {
+  if (index === 0 || index === 2) {
+    return (
+      <span
+        aria-hidden
+        className="relative h-12 w-9 shrink-0 overflow-hidden rounded-md ring-1 ring-black/10"
+      >
+        <img
+          src={index === 0 ? './preview/movement.jpg' : './preview/studio.jpg'}
+          alt=""
+          loading="lazy"
+          className="size-full object-cover"
+        />
+      </span>
+    )
+  }
   const palettes = ['bg-[#d7dccd]', 'bg-[#e9dfcf]', 'bg-[#dfe7e2]', 'bg-[#e5e9d6]']
   return (
     <span
       aria-hidden
-      className={`relative h-11 w-8 shrink-0 overflow-hidden rounded-md ring-1 ring-black/5 ${palettes[index % palettes.length]}`}
+      className={`relative h-12 w-9 shrink-0 overflow-hidden rounded-md ring-1 ring-black/5 ${palettes[index % palettes.length]}`}
     >
       <span className="absolute -top-2 -right-2 size-5 rounded-full bg-[#253b31]/80" />
       <span className="absolute right-1.5 bottom-1.5 left-1.5 h-1 rounded-full bg-[#253b31]/40" />
@@ -695,7 +776,7 @@ function Trust({ t }: { t: Copy['trust'] }) {
       <h3 className="type-eyebrow text-band-accent">{title}</h3>
       <ul className="mt-5 grid gap-x-8 gap-y-6 sm:grid-cols-2">
         {items.map((item, i) => (
-          <li key={item.title} className="flex gap-3.5">
+          <li key={item.title} className="flex gap-4">
             <span
               aria-hidden
               className="grid size-10 shrink-0 place-items-center rounded-panel bg-white/8 text-lg text-band-accent ring-1 ring-white/10"
@@ -712,8 +793,8 @@ function Trust({ t }: { t: Copy['trust'] }) {
     </div>
   )
   return (
-    <section id="guven" className="bg-band py-20 text-band-text md:py-28">
-      <div className={container}>
+    <section id="guven" className="band-glow border-t border-white/10 bg-band py-20 text-band-text md:py-28">
+      <Reveal className={container}>
         <header className="max-w-[44rem]">
           <p className="type-eyebrow text-band-accent">{t.eyebrow}</p>
           <h2 className="type-title mt-3 text-white dark:text-primary">{t.title}</h2>
@@ -723,7 +804,7 @@ function Trust({ t }: { t: Copy['trust'] }) {
           {group(t.controlTitle, t.control, controlIcons)}
           {group(t.securityTitle, t.security, securityIcons)}
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }
@@ -738,68 +819,70 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
   ]
   return (
     <Section id="paket" tone="surface">
-      <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
-      <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {t.items.map((item, i) => (
-          <li
-            key={item.title}
-            className="flex min-w-0 flex-col rounded-frame border border-border bg-canvas p-6 last:sm:col-span-2"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span
-                aria-hidden
-                className="grid size-10 place-items-center rounded-panel bg-assistant text-lg text-action"
-              >
-                {icons[i]}
-              </span>
-              {item.badge && (
-                <Badge tone="attention" size="sm" icon={<ClockIcon />}>
-                  {item.badge}
-                </Badge>
-              )}
-            </div>
-            <h3 className="mt-4 font-heading text-lg leading-snug font-semibold">{item.title}</h3>
-            <p className="mt-1.5 text-base leading-relaxed text-secondary">{item.body}</p>
-            {i === 1 && (
-              <div className="mt-4">
-                <p className="text-xs font-semibold text-secondary">{t.legalLabel}</p>
-                <ul className="mt-2 flex flex-wrap gap-2">
-                  {t.legal.map((doc) => {
-                    const href = appLink(doc.path)
-                    const chip =
-                      'inline-flex min-h-9 items-center rounded-control border border-border bg-surface px-3 text-sm font-medium'
-                    return (
-                      <li key={doc.path}>
-                        {href ? (
-                          <a
-                            href={href}
-                            className={`${chip} text-action hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`}
-                          >
-                            {doc.label}
-                          </a>
-                        ) : (
-                          <span className={`${chip} text-secondary`}>{doc.label}</span>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
+      <Reveal>
+        <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {t.items.map((item, i) => (
+            <li
+              key={item.title}
+              className="card-lift flex min-w-0 flex-col rounded-frame border border-border bg-canvas p-6 last:sm:col-span-2"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span
+                  aria-hidden
+                  className="grid size-10 place-items-center rounded-panel bg-assistant text-lg text-action"
+                >
+                  {icons[i]}
+                </span>
+                {item.badge && (
+                  <Badge tone="attention" size="sm" icon={<ClockIcon />}>
+                    {item.badge}
+                  </Badge>
+                )}
               </div>
-            )}
-          </li>
-        ))}
-      </ul>
-      <div className="mt-8 flex flex-wrap items-center gap-6">
-        {PACKAGE_PRICE && (
-          <div>
-            <p className="type-eyebrow text-secondary">{t.priceLabel}</p>
-            <p className="mt-1 font-heading text-3xl font-semibold">{PACKAGE_PRICE}</p>
-          </div>
-        )}
-        <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
-          {t.cta}
-        </a>
-      </div>
+              <h3 className="mt-4 font-heading text-lg leading-snug font-semibold">{item.title}</h3>
+              <p className="mt-2 text-base leading-relaxed text-secondary">{item.body}</p>
+              {i === 1 && (
+                <div className="mt-4">
+                  <p className="text-xs font-semibold text-secondary">{t.legalLabel}</p>
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {t.legal.map((doc) => {
+                      const href = appLink(doc.path)
+                      const chip =
+                        'inline-flex min-h-9 items-center rounded-control border border-border bg-surface px-3 text-sm font-medium'
+                      return (
+                        <li key={doc.path}>
+                          {href ? (
+                            <a
+                              href={href}
+                              className={`${chip} text-action hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`}
+                            >
+                              {doc.label}
+                            </a>
+                          ) : (
+                            <span className={`${chip} text-secondary`}>{doc.label}</span>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 flex flex-wrap items-center gap-6">
+          {PACKAGE_PRICE && (
+            <div>
+              <p className="type-eyebrow text-secondary">{t.priceLabel}</p>
+              <p className="mt-1 font-heading text-3xl font-semibold">{PACKAGE_PRICE}</p>
+            </div>
+          )}
+          <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
+            {t.cta}
+          </a>
+        </div>
+      </Reveal>
     </Section>
   )
 }
@@ -807,34 +890,46 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
 function Faq({ t }: { t: Copy['faq'] }) {
   return (
     <Section id="sss">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
+      <Reveal>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
+          </div>
+          <div className="overflow-hidden rounded-frame border border-border bg-surface">
+            {t.items.map((item) => (
+              <details key={item.q} className="group border-b border-border last:border-b-0">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 px-5 py-4 font-heading text-base font-semibold transition-colors hover:bg-surface-subtle sm:px-6 [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span
+                    aria-hidden
+                    className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-secondary transition-transform group-open:rotate-45 group-open:border-action group-open:bg-action group-open:text-on-action"
+                  >
+                    <PlusIcon />
+                  </span>
+                </summary>
+                <p className="max-w-[40rem] px-5 pb-5 text-base leading-relaxed text-secondary sm:px-6">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
         </div>
-        <div className="overflow-hidden rounded-frame border border-border bg-surface">
-          {t.items.map((item) => (
-            <details key={item.q} className="group border-b border-border last:border-b-0">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 px-5 py-4 font-heading text-base font-semibold transition-colors hover:bg-surface-subtle sm:px-6 [&::-webkit-details-marker]:hidden">
-                {item.q}
-                <span
-                  aria-hidden
-                  className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-secondary transition-transform group-open:rotate-45 group-open:border-action group-open:bg-action group-open:text-on-action"
-                >
-                  <PlusIcon />
-                </span>
-              </summary>
-              <p className="max-w-[40rem] px-5 pb-5 text-base leading-relaxed text-secondary sm:px-6">
-                {item.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </div>
+      </Reveal>
     </Section>
   )
 }
 
-function Pilot({ t, lang, pilotRef }: { t: Copy; lang: Lang; pilotRef: RefObject<HTMLElement | null> }) {
+function Pilot({
+  t,
+  lang,
+  pilotRef,
+  scenario,
+}: {
+  t: Copy
+  lang: Lang
+  pilotRef: RefObject<HTMLElement | null>
+  scenario: BusinessScenario
+}) {
   return (
     <section
       id="pilot"
@@ -849,7 +944,7 @@ function Pilot({ t, lang, pilotRef }: { t: Copy; lang: Lang; pilotRef: RefObject
 
           <ul className="mt-10 grid gap-3 sm:grid-cols-2">
             {t.pilot.expectations.map((item) => (
-              <li key={item.title} className="rounded-panel border border-border bg-surface p-5">
+              <li key={item.title} className="card-lift rounded-panel border border-border bg-surface p-5">
                 <Badge tone="brand" size="sm">
                   {item.badge}
                 </Badge>
@@ -878,7 +973,12 @@ function Pilot({ t, lang, pilotRef }: { t: Copy; lang: Lang; pilotRef: RefObject
         </div>
 
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <WaitlistForm t={t.form} pilot={t.pilot} lang={lang} />
+          <WaitlistForm
+            t={t.form}
+            pilot={t.pilot}
+            lang={lang}
+            initialCategoryIdx={scenario.waitlistCategoryIdx}
+          />
         </div>
       </div>
     </section>

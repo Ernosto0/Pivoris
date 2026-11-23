@@ -73,8 +73,9 @@
   /* A verified fact inside running text: the app's selected-navigation pair. */
   --an-fact: #d1e4b7;
   --an-on-fact: #1d3328;
-  --an-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
+  --an-shadow: 0 1px 2px rgb(0 0 0 / 0.03), 0 8px 24px rgb(0 0 0 / 0.035);
   --an-dot: rgb(37 59 49 / 0.09);
+  --an-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root[data-theme='dark'] {
@@ -146,7 +147,7 @@
   --shadow-frame: var(--an-shadow);
 
   --default-transition-duration: 160ms;
-  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  --default-transition-timing-function: var(--an-motion-ease);
 }
 
 /* Unlayered on purpose: a host page's own body reset must not win over the page colours. */
@@ -203,8 +204,8 @@ body {
 
 @utility type-display {
   font-family: var(--font-heading);
-  font-size: clamp(2.375rem, 1.55rem + 3.1vw, 4rem);
-  font-weight: 600;
+  font-size: clamp(2.375rem, 1.55rem + 3.1vw, 3.5rem);
+  font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
@@ -232,7 +233,7 @@ body {
   text-decoration: underline dotted;
   text-underline-offset: 4px;
   cursor: pointer;
-  transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 160ms var(--an-motion-ease);
 }
 .source-fact:hover {
   background: color-mix(in srgb, currentColor 20%, transparent);
@@ -246,7 +247,7 @@ body {
   padding: 12px;
 }
 
-/* One entrance for the hero; the rest of the page is visible immediately. */
+/* One small entrance; the rest of the page is visible without scroll choreography. */
 @keyframes hero-enter {
   from {
     opacity: 0;
@@ -258,26 +259,174 @@ body {
   }
 }
 .hero-enter {
-  animation: hero-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hero-enter 400ms var(--an-motion-ease) both;
 }
 
 /* Local feedback when a visitor switches a demo or opens a source. */
 @keyframes pop-in {
   from {
     opacity: 0;
+    transform: translateY(2px);
   }
   to {
     opacity: 1;
+    transform: none;
   }
 }
 .pop-in {
-  animation: pop-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: pop-in 180ms var(--an-motion-ease) both;
+}
+
+/* A trace of the brand tint; the product preview carries the color. */
+.hero-atmosphere {
+  background: radial-gradient(ellipse at 80% 35%, rgb(37 59 49 / 0.045), transparent 64%);
+}
+:root[data-theme='dark'] .hero-atmosphere {
+  background: radial-gradient(ellipse at 80% 35%, rgb(198 223 166 / 0.035), transparent 64%);
+}
+
+.hero-grid-pattern {
+  background-image:
+    linear-gradient(to right, var(--an-dot) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--an-dot) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.28;
+  mask-image: radial-gradient(ellipse at 85% 36%, black, transparent 64%);
+}
+
+/* Almost neutral highlights, kept below the contrast of the content. */
+.band-glow {
+  background-image: radial-gradient(ellipse at 88% 10%, rgb(255 255 255 / 0.025), transparent 64%);
+}
+
+/* One opacity pulse when a simulation state changes, without an expanding halo. */
+@keyframes live-ping {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 0.35; }
+}
+.live-ping {
+  animation: live-ping 800ms var(--an-motion-ease) both;
+}
+
+/* Chat typing indicator dots */
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.45;
+  }
+  30% {
+    opacity: 0.85;
+  }
+}
+.typing-dot {
+  animation: typing-dot 900ms var(--an-motion-ease) infinite;
+}
+.typing-dot-2 {
+  animation-delay: 140ms;
+}
+.typing-dot-3 {
+  animation-delay: 280ms;
+}
+
+/* A brief settling highlight on the three affected records. */
+@keyframes record-settle {
+  from { opacity: 0.72; }
+  to { opacity: 1; }
+}
+.domino-pulse,
+.domino-pulse-amber {
+  animation: record-settle 360ms var(--an-motion-ease);
+}
+
+/* Animated dashed flow connector for the Domino cascade */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+.dash-flow {
+  stroke-dasharray: 6 8;
+  animation: dash-flow 700ms linear;
+}
+
+/* Shimmer scan bar for claim validator & knowledge extraction */
+@keyframes scan-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+.scan-sweep {
+  opacity: 0.35;
+  animation: scan-sweep 600ms var(--an-motion-ease) both;
+}
+
+/* A one-pixel lift on precise pointers, with no extra glow or shadow. */
+.card-lift {
+  transition:
+    transform 160ms var(--an-motion-ease),
+    border-color 160ms var(--an-motion-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-lift:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--an-text-primary) 12%, var(--an-border));
+  }
+}
+@media (width < 48rem) {
+  .hero-grid-pattern { opacity: 0.14; }
+}
+
+/* Custom range slider for the interactive Missed-Revenue calculator */
+.pivoris-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+.pivoris-slider:focus-visible {
+  outline: 2px solid var(--an-navigation-selected);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.pivoris-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.2);
+}
+.pivoris-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.2);
+}
+.pivoris-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: var(--an-navigation-selected);
+  border: 2px solid var(--an-navigation);
+}
+.pivoris-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--an-navigation-selected);
+  border: 2px solid var(--an-navigation);
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
+  .card-lift:hover { transform: none; }
   *,
   *::before,
   *::after {

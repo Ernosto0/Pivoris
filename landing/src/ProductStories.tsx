@@ -80,10 +80,10 @@ const storiesCopy: Record<Lang, StoryCopy> = {
       {
         tab: 'Tek değişiklik, güncel bilgi',
         label: 'Telegram’dan talimatınız',
-        question: '“Aylık üyelik artık 7.000 TL.”',
-        work: 'Bilgi güncellendiğinde sonraki yanıtları yeni fiyatla hazırlar; eski bilgiye bağlı bekleyen işleri kontrol eder.',
-        reply: 'Fiyat güncellendi. Eski fiyatı kullanan planlı içerik inceleme için bekletildi.',
-        result: 'Yanıtlar ve planlı içerikler aynı bilgi kaynağına bağlı kalır.',
+        question: '“Reformer paketini 6.500 TL yapalım. Eski fiyatla paylaşım çıkmasın.”',
+        work: 'Eski fiyatı kullanan bekleyen müşteri yanıtını ve Cuma paylaşımını bulur. Değişikliği uygulamadan önce onayınızı ister.',
+        reply: 'Paket fiyatı 6.500 TL olarak güncellendi. Müşteri yanıtı yeni fiyatla hazırlandı. Cuma 19:00 paylaşımı incelemenizi bekliyor; eski fiyatla yayımlanmayacak.',
+        result: 'Tek onayla güncel yanıt; eski fiyatlı paylaşıma dur.',
         note: 'Bilgi değişikliği doğrulandıktan sonra uygulanır. Etkilenen yanıtlar yeniden hazırlanır, planlı içerikler incelemeye alınır.',
       },
       {
@@ -173,10 +173,10 @@ const storiesCopy: Record<Lang, StoryCopy> = {
       {
         tab: 'One update, current details',
         label: 'Your Telegram instruction',
-        question: '“Monthly membership is now $210.”',
-        work: 'After the fact is updated, future replies use the new price and pending work using the previous version is checked.',
-        reply: 'Price updated. Scheduled content using the old price is held for review.',
-        result: 'Replies and scheduled content share one source of truth.',
+        question: '“Make the reformer package $195. Don’t let the next post go out with the old price.”',
+        work: 'Finds the pending customer reply and Friday’s post using the old price, then asks for your approval before making the change.',
+        reply: 'Package price updated to $195. The customer reply now uses the new price. Friday’s 19:00 post is waiting for your review; it won’t publish with the old price.',
+        result: 'One approval updates the reply and stops the outdated post.',
         note: 'Fact changes take effect after confirmation. Affected replies are redrafted and scheduled content is held for review.',
       },
       {
@@ -294,12 +294,12 @@ export function JourneySection({ lang }: { lang: Lang }) {
   const [selected, setSelected] = useState(0)
   const story = t.stories[selected]
   return (
-    <section id="otomasyon" className="mt-16 bg-band py-20 text-band-text md:py-24">
+    <section id="otomasyon" className="band-glow mt-8 bg-band py-20 text-band-text md:py-24">
       <div className="gutter mx-auto max-w-[76rem]">
         <div className="max-w-[48rem]">
           <p className="text-sm font-semibold text-band-accent">{t.eyebrow}</p>
           <h2 className="type-title mt-4 text-white dark:text-primary">{t.title}</h2>
-          <p className="mt-5 text-lg leading-relaxed">{t.body}</p>
+          <p className="mt-5 text-lg leading-relaxed text-band-text/85">{t.body}</p>
         </div>
         <div role="group" aria-label={t.title} className="mt-8 flex flex-wrap gap-2">
           {t.stories.map((s, i) => (
@@ -314,29 +314,35 @@ export function JourneySection({ lang }: { lang: Lang }) {
             </button>
           ))}
         </div>
-        <div className="mt-6 rounded-frame border border-band-text/20 bg-canvas p-5 text-primary sm:p-8">
+        <div className="mt-6 rounded-frame border border-band-text/20 bg-canvas p-5 text-primary shadow-frame sm:p-8">
           <div className="mb-6 flex justify-end">
             <ExampleLabel>{t.example}</ExampleLabel>
           </div>
           <div key={selected} className="pop-in grid gap-6 lg:grid-cols-[1fr_1fr_1.1fr] lg:gap-8">
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                <span className="grid size-6 place-items-center rounded-full bg-surface-subtle text-xs font-semibold text-primary">
+                  1
+                </span>
                 <ChatIcon />
                 {story.label}
               </p>
-              <p className="mt-4 rounded-panel border border-border bg-surface p-4 text-lg font-medium leading-relaxed">
+              <p className="mt-4 rounded-panel border border-border bg-surface p-4 text-lg leading-relaxed font-medium">
                 {story.question}
               </p>
             </div>
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-action">
+                <span className="grid size-6 place-items-center rounded-full bg-assistant text-xs font-semibold text-action">
+                  2
+                </span>
                 <SettingsIcon />
                 {t.working}
               </p>
               <p className="mt-4 text-base leading-relaxed text-secondary">{story.work}</p>
             </div>
-            <div className="rounded-panel bg-assistant p-5">
-              <p className="text-base leading-relaxed">{story.reply}</p>
+            <div className="rounded-panel border border-action/20 bg-assistant p-5">
+              <p className="text-base leading-relaxed font-medium text-primary">{story.reply}</p>
               <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-action">
                 <CheckIcon />
                 {t.result}
@@ -369,7 +375,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
       <div className="gutter mx-auto max-w-[76rem]">
         <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
-          <article className="rounded-frame border border-border bg-assistant p-6 sm:p-8 lg:row-span-2">
+          <article className="card-lift rounded-frame border border-border bg-assistant p-6 sm:p-8 lg:row-span-2">
             <h3 className="font-heading text-2xl font-semibold">{t.languageTitle}</h3>
             <p className="mt-4 text-base leading-relaxed text-secondary">{t.languageBody}</p>
             <div role="group" aria-label={t.languageTitle} className="mt-6 flex flex-wrap gap-2">
@@ -402,7 +408,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
             </div>
           </article>
           {t.cards.map((card, i) => (
-            <article key={card.title} className="rounded-frame border border-border bg-canvas p-6">
+            <article key={card.title} className="card-lift rounded-frame border border-border bg-canvas p-6">
               <span
                 aria-hidden
                 className="grid size-10 place-items-center rounded-panel bg-assistant text-xl text-action"

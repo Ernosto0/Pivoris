@@ -66,15 +66,19 @@ export const SunIcon = (p: IconProps) => (
 )
 export const PencilIcon = (p: IconProps) => <Svg {...p}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></Svg>
 export const RotateIcon = (p: IconProps) => <Svg {...p}><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></Svg>
+export const PlayIcon = (p: IconProps) => <Svg {...p}><polygon points="6 4 20 12 6 20 6 4" /></Svg>
+export const GlobeIcon = (p: IconProps) => (
+  <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></Svg>
+)
 
 export type Tone = 'neutral' | 'attention' | 'info' | 'success' | 'danger' | 'brand'
 
 const TONES: Record<Tone, string> = {
   neutral: 'bg-surface-subtle text-primary ring-border',
-  attention: 'bg-attention-subtle text-attention ring-attention/40',
-  info: 'bg-info-subtle text-info ring-info/40',
-  success: 'bg-success-subtle text-success ring-success/40',
-  danger: 'bg-danger-subtle text-danger ring-danger/40',
+  attention: 'bg-attention-subtle text-attention ring-transparent',
+  info: 'bg-info-subtle text-info ring-transparent',
+  success: 'bg-success-subtle text-success ring-transparent',
+  danger: 'bg-danger-subtle text-danger ring-transparent',
   brand: 'bg-fact text-on-fact ring-transparent',
 }
 

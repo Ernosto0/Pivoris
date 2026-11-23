@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import type { Copy, Lang } from './copy'
 import { AlertIcon, CheckIcon, ChatIcon, buttonLarge, buttonPrimary } from './ui'
 import { getWhatsAppContactUrl, isValidEmail, submitWaitlist, type SubmitResult } from './waitlist'
 
-type Props = { t: Copy['form']; pilot: Copy['pilot']; lang: Lang }
+type Props = { t: Copy['form']; pilot: Copy['pilot']; lang: Lang; initialCategoryIdx?: number }
 
 type Field = 'business' | 'instagram' | 'contact' | 'city'
 type Values = Record<Field, string>
@@ -15,12 +15,17 @@ type Status =
 
 const empty: Values = { business: '', instagram: '', contact: '', city: '' }
 
-export function WaitlistForm({ t, pilot, lang }: Props) {
-  const [categoryIdx, setCategoryIdx] = useState<number>(0)
+export function WaitlistForm({ t, pilot, lang, initialCategoryIdx = 0 }: Props) {
+  const [categoryIdx, setCategoryIdx] = useState<number>(initialCategoryIdx)
+  const [userPickedCategory, setUserPickedCategory] = useState(false)
   const [values, setValues] = useState<Values>(empty)
   const [consent, setConsent] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<Field | 'consent', string>>>({})
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
+
+  useEffect(() => {
+    if (!userPickedCategory) setCategoryIdx(initialCategoryIdx)
+  }, [initialCategoryIdx, userPickedCategory])
 
   const selectedCategory = t.categories[categoryIdx] ?? t.categories[0] ?? ''
   const whatsappUrl = getWhatsAppContactUrl(pilot.whatsappPrefill)
@@ -105,7 +110,10 @@ export function WaitlistForm({ t, pilot, lang }: Props) {
               key={cat}
               type="button"
               aria-pressed={categoryIdx === idx}
-              onClick={() => setCategoryIdx(idx)}
+              onClick={() => {
+                setCategoryIdx(idx)
+                setUserPickedCategory(true)
+              }}
               className="min-h-9 rounded-control border border-border bg-surface px-3 text-sm text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-transparent aria-pressed:bg-band aria-pressed:font-medium aria-pressed:text-band-text"
             >
               {cat}

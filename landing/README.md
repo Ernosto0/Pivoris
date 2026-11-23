@@ -17,11 +17,18 @@ npm run typecheck
   status tags. Tokens live in `src/index.css`; shared pieces (icons, badges, buttons) in `src/ui.tsx`.
   Verified reply values use a dotted source marker (`.source-fact`) and open the existing source
   details locally. The hero has one brief entrance; sections remain visible without scroll animations.
+  The business selector sits with the product preview. Decorative effects stay deliberately faint:
+  a masked grid, low-contrast highlights, a single pulse on simulation updates and a 1px card lift
+  on precise pointers only. Reduced motion disables the lift and motion feedback. Source tracing
+  supports keyboard focus and touch as well as hover; the calculator labels its conversion assumption.
   Polish guided by [unslop](https://github.com/heydamir/unslop) by Damir Sokolovsky, CC BY 4.0.
-- **Copy** for both languages lives in `src/copy.ts`; operational stories, channel previews and
-  the five-language demo live in `src/ProductStories.tsx`. The page leads with automatic routine
-  DM and eligible comment replies, then shows comment-to-private-reply, calendar requests,
-  shared business facts, customer memory, media context, lead lists and content formats.
+- **Copy & interactive demos**: copy for both languages lives in `src/copy.ts`; multi-business
+  scenarios (`pilates`, `beauty`, `cafe`, `boutique`, `clinic`) live in `src/scenarios.ts` and
+  synchronise `HeroPreview.tsx` (auto-playing night-shift simulation), `DominoSandbox.tsx`
+  (interactive price-change cascade), `DraftDemo.tsx` (interactive teach-the-assistant flow),
+  `KnowledgePreview.tsx` (highlighted extraction), `MissedRevenueCalculator.tsx` and the default
+  category in `WaitlistForm.tsx`. Operational stories, channel previews and the five-language demo
+  live in `src/ProductStories.tsx`, and the before/after night comparison lives in `src/ChaosToCalm.tsx`.
   Telegram supports owner commands, photos, tasks and answers; optional WhatsApp supports
   notifications, summaries and in-window approval buttons, not free-text commands. Calendar
   changes and publication retain the current pilot decision requirements. Provider permissions,
