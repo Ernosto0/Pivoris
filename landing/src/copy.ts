@@ -798,7 +798,7 @@ export const copy: Record<Lang, Copy> = {
       time: '23:47',
       message: 'Hi, how much is a monthly membership?',
       reply: ['Hi! A monthly membership is ', '. ', ''],
-      facts: ['₺6,000', ''],
+      facts: ['$180', ''],
       source: 'Monthly membership · Verified price',
       sent: 'Answered automatically',
       showSource: 'See the reply’s source',
@@ -858,7 +858,7 @@ export const copy: Record<Lang, Copy> = {
       body: 'Import suggested details from your website and Instagram profile, or paste a price message you already use. Verified prices, hours and services become the shared source for replies and content.',
       pasteLabel: 'The text you paste',
       pasteSample:
-        'Reformer Pilates Studio · Weekdays 08:00–21:00 · Monthly membership (2x/week) ₺6,000. Your first trial class is free. Address: Bahçelievler Mah. No: 12',
+        'Reformer Pilates Studio · Weekdays 08:00–21:00 · Monthly membership (2x/week) $180. Your first trial class is free. Address: Bahçelievler Mah. No: 12',
       pasteNote: 'Picking out a fact never verifies it.',
       ledgerTitle: 'Your fact cards',
       progress: '{n} of {total} verified',
@@ -869,7 +869,7 @@ export const copy: Record<Lang, Copy> = {
       usageNote:
         'Updated facts carry into future replies; content that depends on the old version is flagged for review.',
       facts: [
-        { category: 'Price', label: 'Monthly membership (2x/week)', value: '₺6,000' },
+        { category: 'Price', label: 'Monthly membership (2x/week)', value: '$180' },
         { category: 'Offer', label: 'First trial class', value: 'Free' },
         { category: 'Hours', label: 'Weekday opening hours', value: '08:00 – 21:00' },
         { category: 'Address', label: 'Studio location', value: 'Bahçelievler Mah. No: 12' },
@@ -904,7 +904,7 @@ export const copy: Record<Lang, Copy> = {
         draft: ['Hi! A monthly membership is ', '. ', ''],
         facts: [
           {
-            value: '₺6,000',
+            value: '$180',
             source: 'Monthly membership · Price · verified 12 Oct',
           },
         ],
@@ -996,8 +996,8 @@ export const copy: Record<Lang, Copy> = {
           action: 'Change time',
         },
         {
-          ask: 'Monthly membership is now ₺7,000.',
-          answer: 'Update the monthly membership to ₺7,000? I’ll also check content using the old price.',
+          ask: 'Monthly membership is now $210.',
+          answer: 'Update the monthly membership to $210? I’ll also check content using the old price.',
           action: 'Update price',
         },
         {
@@ -1014,7 +1014,7 @@ export const copy: Record<Lang, Copy> = {
       note: 'Scheduled does not mean published. You hear when a post actually goes out, and if it fails, you hear why.',
       example: 'Example',
       heading: 'This week',
-      heldReason: 'Put on hold automatically because the price changed from ₺6,000 to ₺7,000.',
+      heldReason: 'Put on hold automatically because the price changed from $180 to $210.',
       posts: [
         {
           day: 'Mon',
@@ -1071,8 +1071,8 @@ export const copy: Record<Lang, Copy> = {
           body: 'Wake up to a single summary of overnight DMs, pending approvals, assistant questions and today’s scheduled posts.',
         },
         {
-          title: 'Missed-customer report (₺)',
-          body: 'See after-hours DMs and unanswered conversations alongside a transparent TRY estimate calculated from your verified prices.',
+          title: 'Missed-customer report ($)',
+          body: 'See after-hours DMs and unanswered conversations alongside a transparent $ revenue estimate calculated from your verified prices.',
         },
       ],
     },
@@ -1134,9 +1134,9 @@ export const copy: Record<Lang, Copy> = {
           body: 'The privacy policy, the terms and a data-deletion page are in the app. We hand you the KVKK information-notice template for your customers and a draft data processing agreement during setup. They have not been through a lawyer’s review yet; before you publish them under your company name, we recommend your own lawyer approves them.',
         },
         {
-          title: 'Invoiced in Turkish lira',
+          title: 'Simple, transparent billing',
           badge: 'Planned',
-          body: 'The pilot is free and nothing is charged automatically. If you move to a paid plan, billing will be in Turkish lira (₺); the payment and invoice arrangement (e-archive invoice, bank transfer or a payment link) is agreed with you before it starts.',
+          body: 'The pilot is free and nothing is charged automatically. If you move to a paid plan, pricing is billed in US dollars ($) and the invoice and payment arrangement is agreed with you before it starts.',
         },
         {
           title: 'Set up in person or by video',

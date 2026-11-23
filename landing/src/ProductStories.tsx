@@ -157,7 +157,7 @@ const storiesCopy: Record<Lang, StoryCopy> = {
         label: 'Instagram comment',
         question: '“How much is a monthly membership?”',
         work: 'Recognises the pricing question and sends the verified price through an eligible private reply.',
-        reply: 'Hi! A monthly membership is ₺6,000.',
+        reply: 'Hi! A monthly membership is $180.',
         result: 'Interest under a post becomes a private conversation.',
         note: 'Requires an eligible comment, account permissions and private-reply authority. Prices are not shared in public comments.',
       },
@@ -173,7 +173,7 @@ const storiesCopy: Record<Lang, StoryCopy> = {
       {
         tab: 'One update, current details',
         label: 'Your Telegram instruction',
-        question: '“Monthly membership is now ₺7,000.”',
+        question: '“Monthly membership is now $210.”',
         work: 'After the fact is updated, future replies use the new price and pending work using the previous version is checked.',
         reply: 'Price updated. Scheduled content using the old price is held for review.',
         result: 'Replies and scheduled content share one source of truth.',
@@ -239,28 +239,55 @@ const storiesCopy: Record<Lang, StoryCopy> = {
   },
 }
 
-const languages = [
-  { code: 'tr', name: 'Türkçe', question: 'Aylık üyelik ne kadar?', reply: 'Aylık üyeliğimiz 6.000 ₺.' },
-  {
-    code: 'en',
-    name: 'English',
-    question: 'How much is a monthly membership?',
-    reply: 'A monthly membership is ₺6,000.',
-  },
-  {
-    code: 'de',
-    name: 'Deutsch',
-    question: 'Wie viel kostet die Monatsmitgliedschaft?',
-    reply: 'Die Monatsmitgliedschaft kostet 6.000 ₺.',
-  },
-  {
-    code: 'ru',
-    name: 'Русский',
-    question: 'Сколько стоит месячный абонемент?',
-    reply: 'Месячный абонемент стоит 6 000 ₺.',
-  },
-  { code: 'ar', name: 'العربية', question: 'كم سعر الاشتراك الشهري؟', reply: 'سعر الاشتراك الشهري 6,000 ₺.' },
-]
+const languagesByLocale: Record<
+  Lang,
+  { code: string; name: string; question: string; reply: string }[]
+> = {
+  tr: [
+    { code: 'tr', name: 'Türkçe', question: 'Aylık üyelik ne kadar?', reply: 'Aylık üyeliğimiz 6.000 ₺.' },
+    {
+      code: 'en',
+      name: 'English',
+      question: 'How much is a monthly membership?',
+      reply: 'A monthly membership is ₺6,000.',
+    },
+    {
+      code: 'de',
+      name: 'Deutsch',
+      question: 'Wie viel kostet die Monatsmitgliedschaft?',
+      reply: 'Die Monatsmitgliedschaft kostet 6.000 ₺.',
+    },
+    {
+      code: 'ru',
+      name: 'Русский',
+      question: 'Сколько стоит месячный абонемент?',
+      reply: 'Месячный абонемент стоит 6 000 ₺.',
+    },
+    { code: 'ar', name: 'العربية', question: 'كم سعر الاشتراك الشهري؟', reply: 'سعر الاشتراك الشهري 6,000 ₺.' },
+  ],
+  en: [
+    { code: 'tr', name: 'Türkçe', question: 'Aylık üyelik ne kadar?', reply: 'Aylık üyeliğimiz $180.' },
+    {
+      code: 'en',
+      name: 'English',
+      question: 'How much is a monthly membership?',
+      reply: 'A monthly membership is $180.',
+    },
+    {
+      code: 'de',
+      name: 'Deutsch',
+      question: 'Wie viel kostet die Monatsmitgliedschaft?',
+      reply: 'Die Monatsmitgliedschaft kostet $180.',
+    },
+    {
+      code: 'ru',
+      name: 'Русский',
+      question: 'Сколько стоит месячный абонемент?',
+      reply: 'Месячный абонемент стоит $180.',
+    },
+    { code: 'ar', name: 'العربية', question: 'كم سعر الاشتراك الشهري؟', reply: 'سعر الاشتراك الشهري $180.' },
+  ],
+}
 
 export function JourneySection({ lang }: { lang: Lang }) {
   const t = storiesCopy[lang]
@@ -329,6 +356,7 @@ export function JourneySection({ lang }: { lang: Lang }) {
 export function CapabilitiesSection({ lang }: { lang: Lang }) {
   const t = storiesCopy[lang].capabilities
   const [selected, setSelected] = useState(0)
+  const languages = languagesByLocale[lang]
   const language = languages[selected]
   const icons = [
     <ImageIcon key="image" />,

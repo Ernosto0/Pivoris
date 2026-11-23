@@ -41,18 +41,28 @@ import {
 } from './ui'
 import { WaitlistForm } from './WaitlistForm'
 
-const LANG_KEY = 'landing.lang'
+const LANG_KEY = 'landing.lang.choice'
 const THEME_KEY = 'landing.theme'
 type Theme = 'light' | 'dark'
+
+const TURKEY_TIMEZONES = new Set(['Europe/Istanbul', 'Asia/Istanbul'])
 
 function initialLang(): Lang {
   try {
     const saved = localStorage.getItem(LANG_KEY)
     if (saved === 'tr' || saved === 'en') return saved
   } catch {
-    // Storage can be blocked; fall back to the browser language.
+    // Storage can be blocked; fall back to browser locale and timezone.
   }
-  return navigator.language.toLowerCase().startsWith('tr') ? 'tr' : 'en'
+  const locales = navigator.languages?.length ? navigator.languages : [navigator.language]
+  if (locales.some((locale) => locale?.toLowerCase().startsWith('tr'))) return 'tr'
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    if (TURKEY_TIMEZONES.has(tz)) return 'tr'
+  } catch {
+    // Intl timezone lookup can fail in restricted environments.
+  }
+  return 'en'
 }
 
 // index.html already applied the saved choice (or the OS preference) before first paint.
@@ -63,9 +73,18 @@ function initialTheme(): Theme {
 const container = 'gutter mx-auto w-full max-w-[76rem]'
 
 export function App() {
-  const [lang, setLang] = useState<Lang>(initialLang)
+  const [lang, setLangState] = useState<Lang>(initialLang)
   const [theme, setTheme] = useState<Theme>(initialTheme)
   const t = copy[lang]
+
+  const setLang = (next: Lang) => {
+    setLangState(next)
+    try {
+      localStorage.setItem(LANG_KEY, next)
+    } catch {
+      // Not remembering the choice is fine.
+    }
+  }
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -84,11 +103,6 @@ export function App() {
     document.documentElement.lang = lang
     document.title = t.meta.title
     document.querySelector('meta[name="description"]')?.setAttribute('content', t.meta.description)
-    try {
-      localStorage.setItem(LANG_KEY, lang)
-    } catch {
-      // Not remembering the choice is fine.
-    }
   }, [lang, t.meta.title, t.meta.description])
 
   const heroRef = useRef<HTMLElement>(null)
