@@ -141,6 +141,7 @@ export type Copy = {
     asOf: string
     metrics: { label: string; value: string }[]
     footerNote: string
+    highlights: Titled[]
   }
   trust: {
     eyebrow: string
@@ -302,7 +303,7 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           title: 'Otomasyonu seçin',
-          body: 'Rutin DM ve yorum yanıtlarını otomatiğe alın. Üslubu ve asistanınızın yapabileceği işleri belirleyin.',
+          body: 'İsterseniz onayla başlayın, isterseniz rutin DM ve yorum yanıtlarını otomatiğe alın. 20’den fazla temiz onaydan sonra uygun konuları otomatiğe almayı önerir.',
         },
         {
           title: 'Asistanınız çalışsın',
@@ -310,7 +311,7 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           title: 'Sohbetten takip edin',
-          body: 'Telegram’dan görev verin. Günlük özetler ve önemli gelişmeler uygulama, Telegram veya WhatsApp’ınıza gelsin.',
+          body: 'Telegram’dan görev verin. Sabah özetleri, günlük raporlar ve önemli gelişmeler uygulama (Web Push), Telegram veya WhatsApp’ınıza gelsin.',
         },
       ],
     },
@@ -398,8 +399,8 @@ export const copy: Record<Lang, Copy> = {
           body: 'Günlük özetler, önemli bildirimler ve desteklenen mesajlaşma süresi içinde onay/ret butonları. Serbest metinle komut verme Telegram’da.',
         },
         {
-          title: 'Web uygulaması',
-          body: 'Gelen kutusu, içerik takvimi, müşteri listeleri ve asistan ayarları. Telefonunuzdan veya bilgisayarınızdan.',
+          title: 'Web uygulaması (PWA)',
+          body: 'Gelen kutusu, içerik takvimi, müşteri listeleri ve asistan ayarları. Telefonunuzun ana ekranına ekleyip Telegram veya WhatsApp olmadan da Web Push bildirimleri alın.',
         },
       ],
       note: 'Rutin müşteri iletişimi otomatik ilerler. Randevu değişiklikleri, yayınlama ve özel talepler gibi karar gerektiren işler size gelir. Kullanılabilir kanallar ve işlemler hesap bağlantınıza bağlıdır.',
@@ -528,6 +529,16 @@ export const copy: Record<Lang, Copy> = {
         { label: 'Sıradaki paylaşım', value: 'Yarın 19:00' },
       ],
       footerNote: 'Planlanan paylaşım, Instagram yayınlandığını doğrulayana kadar “yayınlanan” sayılmaz.',
+      highlights: [
+        {
+          title: 'Sabah özeti',
+          body: 'Gece boyunca gelen DM’leri, bekleyen onayları, asistan sorularını ve günün planlı paylaşımlarını sabah tek özetle görün.',
+        },
+        {
+          title: 'Kaçan müşteri raporu (₺)',
+          body: 'Mesai dışı gelen DM’leri ve yanıtsız konuşmaları görün; doğrulanmış fiyatlarınız üzerinden şeffaf bir ₺ etki tahminiyle takip edin.',
+        },
+      ],
     },
     trust: {
       eyebrow: 'Kontrol ve güvenlik',
@@ -537,7 +548,7 @@ export const copy: Record<Lang, Copy> = {
       control: [
         {
           title: 'Otomasyonun kapsamını seçin',
-          body: 'Rutin DM ve uygun yorum yanıtlarını otomatik çalıştırın. İşlem bazında otomatik, bana sor veya kapalı seçeneklerini belirleyin.',
+          body: 'Her işlem için otomatik, bana sor veya kapalı seçeneğini belirleyin. Onayla başlayabilirsiniz; 20’den fazla temiz onay verdiğiniz uygun konular için otomasyon önerisi alırsınız.',
         },
         {
           title: 'İstediğiniz an devralın',
@@ -616,7 +627,7 @@ export const copy: Record<Lang, Copy> = {
       items: [
         {
           q: 'Her mesajı tek tek onaylamam gerekiyor mu?',
-          a: 'Hayır. Otomasyonu etkinleştirdiğinizde selamlama, çalışma saati, adres, hizmet ve uygun standart fiyat soruları otomatik yanıtlanabilir. Özel teklifler, randevu değişiklikleri, sesli mesaj yanıtları ve hassas konular ayrıca değerlendirilir. Asistanın kapsamını siz belirlersiniz.',
+          a: 'Hayır. Dilerseniz onayla başlayabilirsiniz; saat, adres veya hizmet gibi uygun bir konuda 20’den fazla yanıtı değiştirmeden onayladığınızda Pivoris o konuyu otomatiğe almayı önerir. Özel teklifler, randevu değişiklikleri, sesli mesaj yanıtları, müşteri fotoğrafları ve hassas konular ayrı değerlendirilir.',
         },
         {
           q: 'Telegram ile WhatsApp arasında ne fark var?',
@@ -829,7 +840,7 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           title: 'Choose your automation',
-          body: 'Enable automatic routine DM and comment replies. Set the voice and the tasks your assistant can handle.',
+          body: 'Start with approval or enable automatic routine DM and comment replies. After 20+ clean approvals on an eligible topic, Pivoris suggests turning it automatic.',
         },
         {
           title: 'Let your assistant work',
@@ -837,7 +848,7 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           title: 'Stay in touch through chat',
-          body: 'Give tasks on Telegram. Get daily summaries and important updates in the app, Telegram or WhatsApp.',
+          body: 'Give tasks on Telegram. Get morning briefings, daily summaries and important updates via the app (Web Push), Telegram or WhatsApp.',
         },
       ],
     },
@@ -925,8 +936,8 @@ export const copy: Record<Lang, Copy> = {
           body: 'Daily summaries, important notifications and approve/reject buttons within the supported messaging window. Free-text commands are available on Telegram.',
         },
         {
-          title: 'Web app',
-          body: 'Your inbox, content calendar, customer lists and assistant settings. On your phone or computer.',
+          title: 'Web app (PWA)',
+          body: 'Your inbox, content calendar, customer lists and assistant settings. Add it to your phone’s home screen and receive Web Push notifications even without Telegram or WhatsApp.',
         },
       ],
       note: 'Routine customer conversations run automatically. Decisions such as calendar changes, publication and special requests come to you. Available channels and actions depend on your connected account.',
@@ -1054,6 +1065,16 @@ export const copy: Record<Lang, Copy> = {
         { label: 'Next post', value: 'Tomorrow 19:00' },
       ],
       footerNote: 'A scheduled post is not counted as published until Instagram confirms it went live.',
+      highlights: [
+        {
+          title: 'Overnight morning briefing',
+          body: 'Wake up to a single summary of overnight DMs, pending approvals, assistant questions and today’s scheduled posts.',
+        },
+        {
+          title: 'Missed-customer report (₺)',
+          body: 'See after-hours DMs and unanswered conversations alongside a transparent TRY estimate calculated from your verified prices.',
+        },
+      ],
     },
     trust: {
       eyebrow: 'Control and security',
@@ -1063,7 +1084,7 @@ export const copy: Record<Lang, Copy> = {
       control: [
         {
           title: 'Choose what runs automatically',
-          body: 'Enable automatic routine DM and eligible comment replies. Set individual actions to automatic, ask me or off.',
+          body: 'Set each action to automatic, ask me or off. You can start with approval—after 20+ clean approvals on an eligible topic, Pivoris suggests switching it to automatic.',
         },
         {
           title: 'Step in at any time',
@@ -1142,7 +1163,7 @@ export const copy: Record<Lang, Copy> = {
       items: [
         {
           q: 'Do I need to approve every message?',
-          a: 'No. With automation enabled, greetings, opening hours, location, services and eligible standard pricing questions can be answered automatically. Custom offers, calendar changes, voice-note replies and sensitive topics need separate attention. You choose your assistant’s scope.',
+          a: 'No. You can start with approval—once you approve 20+ replies cleanly on an eligible topic such as hours, location or services, Pivoris suggests turning it automatic. Custom offers, calendar changes, voice-note replies, customer photos and sensitive topics remain separate.',
         },
         {
           q: 'How are Telegram and WhatsApp different?',

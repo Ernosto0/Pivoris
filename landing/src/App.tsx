@@ -636,6 +636,14 @@ function ContentAndReport({ t }: { t: Copy }) {
               {t.report.footerNote}
             </p>
           </figure>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {t.report.highlights.map((item) => (
+              <li key={item.title} className="rounded-panel border border-border bg-canvas p-4">
+                <h4 className="font-heading text-sm font-semibold">{item.title}</h4>
+                <p className="mt-1.5 text-sm leading-relaxed text-secondary">{item.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Section>

@@ -86,19 +86,28 @@ const storiesCopy: Record<Lang, StoryCopy> = {
         result: 'Yanıtlar ve planlı içerikler aynı bilgi kaynağına bağlı kalır.',
         note: 'Bilgi değişikliği doğrulandıktan sonra uygulanır. Etkilenen yanıtlar yeniden hazırlanır, planlı içerikler incelemeye alınır.',
       },
+      {
+        tab: 'Story yanıtı ve etiket',
+        label: 'Yayınladığınız Story’ye yanıt',
+        question: '“Bu deneme dersi hangi günler oluyor?”',
+        work: 'Yayınladığınız Story’nin başlığını ve içeriğini bağlama alarak yanıt hazırlar. Story etiketlemelerinde sizin yazdığınız teşekkür şablonunu onayınıza sunar.',
+        reply: 'Merhaba! Ücretsiz deneme dersimiz hafta içi 08:00–21:00 arası müsait saatlerde yapılıyor.',
+        result: 'Story etkileşimleri bağlamını kaybetmeden konuşmaya dönüşür.',
+        note: 'Yalnızca işletmenizin yayınladığı Story’lerin bağlamı kullanılır. Etiket teşekkürleri sizin belirlediğiniz şablonla ve onayınızla gönderilir.',
+      },
     ],
     capabilities: {
       eyebrow: 'İşletmenizi tanıyan asistan',
       title: 'Hazır yanıtlardan çok daha fazlası.',
-      body: 'Müşterinizin dili, konuşmanın geçmişi, gönderdiği fotoğraf… Pivoris bütün bunları işin bağlamında ele alır.',
+      body: 'Müşterinizin dili, konuşmanın geçmişi, gönderdiği ses veya fotoğraf… Pivoris bütün bunları işin bağlamında ele alır.',
       languageTitle: 'Müşteriniz hangi dilde yazıyor?',
       languageBody:
         'Türkçe, İngilizce, Almanca, Rusça ve Arapça. İşletmeniz için yanıt dillerini seçin; müşterinizle kendi dilinde iletişim kurun.',
       cards: [
         {
-          title: 'Sesi ve görseli bağlama dahil eder',
-          body: 'Sesli mesajları yazıya çevirir, fotoğrafları açıklayarak konuşmanın bağlamına ekler. Sesli mesaj yanıtları incelemenizle gönderilir.',
-          tag: 'Sesli mesaj + görsel',
+          title: 'Sesli mesajları ve fotoğrafları anlaşılır kılar',
+          body: 'Sesli mesajları yazıya çevirir; sesli mesaj yanıtları her zaman onayınızla gönderilir. Müşteri fotoğraflarını sizin incelemeniz için özetler ve otomatik yanıtlamak yerine size yönlendirir.',
+          tag: 'Sesli mesaj + görsel özeti',
         },
         {
           title: 'Müşteriyi ve sizin üslubunuzu hatırlar',
@@ -129,9 +138,10 @@ const storiesCopy: Record<Lang, StoryCopy> = {
         'Gelen kutusu ve konuşmalar',
         'İçerik takvimi ve yayınlar',
         'Randevular ve müşteri listesi',
-        'Bilgi kartları ve asistan ayarları',
+        'Ana ekrana eklenebilir (PWA) ve Web Push bildirimleri',
       ],
-      appNote: 'Telefon ve bilgisayarınızdan açın. İsterseniz bildirimleri yalnızca uygulamadan alın.',
+      appNote:
+        'Telefonunuzun ana ekranına uygulama gibi ekleyin; Telegram veya WhatsApp olmadan da anlık Web Push bildirimleri alın.',
     },
   },
   en: {
@@ -169,19 +179,28 @@ const storiesCopy: Record<Lang, StoryCopy> = {
         result: 'Replies and scheduled content share one source of truth.',
         note: 'Fact changes take effect after confirmation. Affected replies are redrafted and scheduled content is held for review.',
       },
+      {
+        tab: 'Story reply & mention',
+        label: 'Reply to your published Story',
+        question: '“Which days do you run this trial class?”',
+        work: 'Uses your published Story’s title and overlay details to draft a grounded reply. For Story mentions, prepares your own thank-you template for approval.',
+        reply: 'Hi! Our free trial class runs weekdays between 08:00 and 21:00 subject to availability.',
+        result: 'Story engagement turns into a grounded conversation.',
+        note: 'Only context from Stories published by your business is used. Mention thank-yous use your own template and go through approval.',
+      },
     ],
     capabilities: {
       eyebrow: 'An assistant that knows your business',
       title: 'Much more than canned replies.',
-      body: 'Your customer’s language, the conversation history, a photo they sent… Pivoris brings them into context.',
+      body: 'Your customer’s language, the conversation history, a voice note or photo they sent… Pivoris handles them safely in context.',
       languageTitle: 'What language does your customer speak?',
       languageBody:
         'Turkish, English, German, Russian and Arabic. Enable the reply languages your business needs and meet customers in their own language.',
       cards: [
         {
-          title: 'Brings voice and images into context',
-          body: 'Transcribes voice notes and adds image descriptions to the conversation. Voice-based replies are sent after your review.',
-          tag: 'Voice notes + images',
+          title: 'Makes voice notes and photos easy to review',
+          body: 'Transcribes voice notes (voice-based replies always require your review). Summarises customer photos for you to review and hands them to a person instead of replying automatically.',
+          tag: 'Voice notes + photo summaries',
         },
         {
           title: 'Remembers customers and your voice',
@@ -212,9 +231,10 @@ const storiesCopy: Record<Lang, StoryCopy> = {
         'Inbox and conversations',
         'Content calendar and publications',
         'Appointments and customer list',
-        'Business facts and assistant settings',
+        'Installable on your home screen (PWA) with Web Push',
       ],
-      appNote: 'Open on your phone or computer. Choose app-only notifications if you prefer.',
+      appNote:
+        'Add it to your phone’s home screen like an app and receive Web Push notifications even without Telegram or WhatsApp.',
     },
   },
 }
