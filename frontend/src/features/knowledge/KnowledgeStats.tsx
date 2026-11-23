@@ -59,7 +59,7 @@ export function KnowledgeStats({ data }: { data: Overview | null }) {
       data-tour="knowledge-stats"
       className="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface lg:flex-row"
     >
-      <div className="flex min-w-0 flex-col justify-center gap-0.5 px-5 pt-3 pb-2.5 lg:w-56 lg:shrink-0 lg:border-r lg:border-border lg:py-3 xl:w-64">
+      <div className="flex min-w-0 flex-col justify-center gap-0.5 px-5 pt-4 pb-3 lg:w-56 lg:shrink-0 lg:border-r lg:border-border lg:py-4 xl:w-64">
         <h2 id="knowledge-stats-title" className="font-heading text-base font-semibold tracking-tight text-primary">
           {t("knowledge.stats.title")}
         </h2>
@@ -79,7 +79,7 @@ export function KnowledgeStats({ data }: { data: Overview | null }) {
               <div
                 key={cell.id}
                 data-testid={`knowledge-stat-${cell.id}`}
-                className={`relative flex min-w-0 flex-col justify-center bg-surface px-5 py-3 ${cell.to ? "transition-colors hover:bg-surface-subtle/70" : ""}`}
+                className={`relative flex min-w-0 flex-col justify-center bg-surface px-5 py-4 ${cell.to ? "transition-colors hover:bg-surface-subtle/70" : ""}`}
               >
                 <dt className="truncate text-xs font-medium text-secondary">{label}</dt>
                 <dd className="font-heading text-[1.625rem] leading-8 font-bold tracking-tight tabular-nums">

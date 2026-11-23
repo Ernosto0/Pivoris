@@ -48,7 +48,7 @@ export function AppShell() {
 
   return <DirtyForms><div className="flex min-h-dvh flex-col bg-canvas text-primary md:flex-row">
     <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-control focus:bg-surface focus:p-3 focus:outline-2 focus:outline-focus">{t("app.skipToContent")}</a>
-    <aside data-testid="desktop-sidebar" className={`sticky top-0 hidden h-dvh shrink-0 flex-col overflow-y-auto border-r border-navigation-selected bg-navigation px-3 py-6 text-navigation-text shadow-sm md:flex min-[1200px]:w-60 ${expanded ? "w-60" : "w-24"}`}>
+    <aside data-testid="desktop-sidebar" className={`sticky top-0 hidden h-dvh shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-navigation px-3 py-6 text-navigation-text md:flex min-[1200px]:w-60 ${expanded ? "w-60" : "w-24"}`}>
       <Link to={prefix} aria-label={productName} className="mb-6 flex min-w-0 items-center gap-3 rounded-control px-3 focus-visible:outline-2 focus-visible:outline-focus-inverse">
         <Brand variant="monogram" size="lg" tone="dark" />
         <div className={`min-w-0 flex flex-col ${expanded ? "" : "hidden min-[1200px]:flex"}`}>

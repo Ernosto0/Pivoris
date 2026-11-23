@@ -33,7 +33,7 @@ export function KnowledgePage() {
   const attention = kb.loaded && settled ? attentionItems(kb.loaded.facts, kb.candidates.data, kb.readiness.data) : null;
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
+    <div className="pop-in flex min-w-0 flex-col gap-6">
       <PageHeader title={t("knowledge.title")} description={t("knowledge.intro")} />
 
       {kb.error ? <ErrorMessage error={kb.error} /> : null}

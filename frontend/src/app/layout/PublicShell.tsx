@@ -14,7 +14,7 @@ export function PublicShell({ title, description, children, action, onLanguageCh
   const meta = useMeta();
   const name = meta.data?.product_name ?? t("app.name");
   return <div className="min-h-dvh bg-canvas text-primary lg:grid lg:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
-    <aside aria-label={t("entry.brandRegion")} className="relative hidden min-h-dvh flex-col justify-between bg-navigation border-r border-navigation-selected p-12 text-navigation-text lg:flex xl:p-16 overflow-hidden">
+    <aside aria-label={t("entry.brandRegion")} className="relative hidden min-h-dvh flex-col justify-between bg-navigation border-r border-white/10 p-12 text-navigation-text lg:flex xl:p-16 overflow-hidden">
       <Brand size="lg" tone="dark" label={name} className="relative z-10" />
       <div className="my-16 max-w-md relative z-10">
         <p className="font-heading text-4xl leading-tight font-bold tracking-tight xl:text-5xl text-white">{t("entry.brandTitle")}</p>

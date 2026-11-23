@@ -13,8 +13,8 @@ export function FactStatusChip({ state, quiet = false }: { state: ChipState; qui
   return (
     <span
       data-state={state}
-      className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs leading-5 font-semibold ${
-        quiet ? TONE_TEXT[tone] : `rounded-full px-2 ${TONE_PILL[tone]}`
+      className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs leading-5 font-medium ${
+        quiet ? TONE_TEXT[tone] : `rounded-md px-2 py-px ${TONE_PILL[tone]}`
       }`}
     >
       <Icon className="text-[0.8125rem]" />

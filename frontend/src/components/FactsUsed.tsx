@@ -37,9 +37,9 @@ export function FactsUsed({
         {facts.map((fact, index) => {
           const date = fact.verified_at ? formatVerifiedDate(fact.verified_at, i18n.language, timeZone) : "";
           return (
-            <li key={`${fact.label}:${index}`} data-testid="fact-used" className="min-w-0 rounded-control border border-success/40 bg-success-subtle px-3 py-2 text-body">
-              <span className="font-semibold text-success [overflow-wrap:anywhere]">{fact.display}</span>
-              <span className="block text-metadata text-secondary [overflow-wrap:anywhere]">
+            <li key={`${fact.label}:${index}`} data-testid="fact-used" className="source-record pop-in min-w-0 text-body">
+              <span className="font-semibold text-on-fact [overflow-wrap:anywhere]">{fact.display}</span>
+              <span className="block text-metadata text-on-fact/80 [overflow-wrap:anywhere]">
                 {date ? t("factsUsed.line", { label: fact.label, date }) : t("factsUsed.lineNoDate", { label: fact.label })}
               </span>
             </li>

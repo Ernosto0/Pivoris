@@ -46,9 +46,9 @@ export type StatusTone = "success" | "attention" | "neutral";
 
 /** Pill colours per tone. Text colour alone is never the signal: each state has an icon and a word. */
 export const TONE_PILL: Record<StatusTone, string> = {
-  success: "bg-success-subtle text-success",
-  attention: "bg-attention-subtle text-attention",
-  neutral: "bg-surface-subtle text-secondary",
+  success: "bg-success-subtle text-success ring-1 ring-inset ring-success/40",
+  attention: "bg-attention-subtle text-attention ring-1 ring-inset ring-attention/40",
+  neutral: "bg-surface-subtle text-secondary ring-1 ring-inset ring-border",
 };
 
 export const TONE_TEXT: Record<StatusTone, string> = {

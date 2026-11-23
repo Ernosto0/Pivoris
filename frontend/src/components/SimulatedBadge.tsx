@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next";
  */
 export function SimulatedBadge({ className = "", compact = false }: { className?: string; compact?: boolean }) {
   const { t } = useTranslation();
-  const size = compact ? "px-1.5 py-px text-[11px] leading-4" : "px-2 py-1 text-metadata";
+  const size = compact ? "px-1.5 py-px text-[11px] leading-4" : "px-2 py-0.5 text-xs leading-5";
   return (
     <span
       data-testid="simulated-badge"
-      className={`inline-flex shrink-0 items-center rounded-full bg-simulation-subtle font-semibold tracking-wide text-simulation ring-1 ring-simulation ring-inset ${size} ${className}`}
+      className={`inline-flex shrink-0 items-center rounded-md bg-simulation-subtle font-semibold tracking-wide text-simulation ring-1 ring-simulation/40 ring-inset ${size} ${className}`}
     >
       {t("badge.simulated")}
     </span>

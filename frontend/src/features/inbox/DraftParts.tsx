@@ -29,14 +29,14 @@ export function FactChip({ fact }: { fact: ChipFact }) {
         data-testid="fact-chip"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="rounded-control bg-success-subtle px-1.5 py-0.5 font-semibold text-success border border-success/40 transition-colors hover:bg-success-subtle/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="source-fact"
       >
         {fact.display}
       </button>
       {open ? (
         <span
           role="status"
-          className="absolute top-full left-0 z-20 mt-1.5 w-60 rounded-control bg-navigation p-2.5 text-metadata font-normal text-navigation-text shadow-sm border border-navigation-selected/20"
+          className="source-record pop-in absolute top-full left-0 z-20 mt-1.5 w-60 text-metadata font-normal shadow-float"
         >
           {date
             ? t("convo.draft.sourceOn", { label: fact.label, date })

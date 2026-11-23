@@ -22,11 +22,11 @@ type Tone = "grey" | "amber" | "orange" | "blue" | "green" | "red";
 
 const TONES: Record<Tone, string> = {
   grey: "bg-surface-subtle text-primary ring-border",
-  amber: "bg-attention-subtle text-attention ring-attention",
-  orange: "bg-attention-subtle text-attention ring-attention",
-  blue: "bg-info-subtle text-info ring-info",
-  green: "bg-success-subtle text-success ring-success",
-  red: "bg-danger-subtle text-danger ring-danger",
+  amber: "bg-attention-subtle text-attention ring-attention/40",
+  orange: "bg-attention-subtle text-attention ring-attention/40",
+  blue: "bg-info-subtle text-info ring-info/40",
+  green: "bg-success-subtle text-success ring-success/40",
+  red: "bg-danger-subtle text-danger ring-danger/40",
 };
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -68,8 +68,8 @@ export function StatusBadge({ status, simulated = false, params, className = "",
     <span className={`inline-flex flex-wrap items-center gap-1.5 ${className}`}>
       <span
         data-status={status}
-        className={`inline-flex items-center rounded-full font-medium ring-1 ring-inset ${
-          compact ? "gap-1 px-2 py-px text-xs leading-5" : "gap-1.5 px-2.5 py-1 text-sm"
+        className={`inline-flex items-center rounded-md font-medium ring-1 ring-inset ${
+          compact ? "gap-1 px-2 py-px text-xs leading-5" : "gap-1.5 px-2.5 py-0.5 text-[0.8125rem] leading-6"
         } ${TONES[tone]}`}
       >
         <Icon className={`shrink-0 ${spins ? "motion-safe:animate-spin" : ""}`} />

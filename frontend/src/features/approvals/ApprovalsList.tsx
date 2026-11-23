@@ -19,7 +19,7 @@ function Row({ approval, onOpen }: { approval: Approval; onOpen: () => void }) {
         type="button"
         onClick={onOpen}
         data-approval-id={approval.id}
-        className="group flex min-h-16 w-full items-center justify-between gap-4 bg-surface p-4 sm:p-5 text-left transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+        className="group flex min-h-16 w-full items-center justify-between gap-4 bg-surface p-5 sm:px-6 text-left transition-colors hover:bg-surface-subtle/70 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
       >
         <ApprovalSummary approval={approval} />
         <div className="flex shrink-0 items-center pl-2 text-secondary/50 group-hover:translate-x-0.5 group-hover:text-primary transition-transform">
@@ -83,7 +83,7 @@ export function ApprovalsList() {
           />
         ) : null}
         {shown.length > 0 ? (
-          <ul className="overflow-hidden rounded-panel border border-border bg-surface divide-y divide-border" aria-label={t("approvals.tabs.label")}>
+          <ul key={tab} className="pop-in overflow-hidden rounded-panel border border-border bg-surface divide-y divide-border" aria-label={t("approvals.tabs.label")}>
             {shown.map((approval) => (
               <Row key={approval.id} approval={approval} onOpen={() => setOpenId(approval.id)} />
             ))}

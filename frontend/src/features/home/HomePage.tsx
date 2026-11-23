@@ -31,7 +31,7 @@ export function HomePage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 pb-4">
+    <div className="pop-in flex flex-col gap-6 pb-4">
       <PageHeader
         title={t("home.welcome", { name: me.data?.user.display_name ?? "" })}
         description={t("home.subtitle")}

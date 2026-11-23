@@ -100,12 +100,12 @@ export function ApprovalDetailSheet({
     decide.mutate({ approval, decision }, { onSuccess: onClose });
 
   const statusTone = pending
-    ? "text-attention bg-attention-subtle border border-attention/30"
+    ? "text-attention bg-attention-subtle ring-attention/40"
     : approval.status === "approved"
-      ? "text-success bg-success-subtle border border-success/30"
+      ? "text-success bg-success-subtle ring-success/40"
       : approval.status === "rejected"
-        ? "text-danger bg-danger-subtle border border-danger/30"
-        : "text-secondary bg-surface-subtle border border-border";
+        ? "text-danger bg-danger-subtle ring-danger/40"
+        : "text-secondary bg-surface-subtle ring-border";
 
   return (
     <BottomSheet
@@ -155,7 +155,7 @@ export function ApprovalDetailSheet({
             </span>
             {approval.is_simulated ? <SimulatedBadge /> : null}
           </div>
-          <span className={`inline-flex items-center rounded-control px-2.5 py-0.5 text-xs font-medium ${statusTone}`}>
+          <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs leading-5 font-medium ring-1 ring-inset ${statusTone}`}>
             {t(`approvals.status.${approval.status}`)}
           </span>
         </div>

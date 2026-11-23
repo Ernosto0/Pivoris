@@ -14,7 +14,7 @@ export function UsageNotice() {
   const { t, i18n } = useTranslation();
   const { workspace } = useCurrentWorkspace();
   const usage = useReplyUsage().data;
-  if (!usage || usage.state === "normal") return null;
+  if (!usage || !usage.state || usage.state === "normal") return null;
 
   const paused = usage.state === "paused";
   const number = new Intl.NumberFormat(i18n.language);
