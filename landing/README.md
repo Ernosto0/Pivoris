@@ -52,13 +52,13 @@ npm run typecheck
   route answers cross-origin requests. `VITE_WAITLIST_WHATSAPP` (digits or an `https://` link)
   shows a "message us on WhatsApp" fallback under the form for visitors who prefer a phone number;
   unset, it is hidden.
+- **Legal pages (`/privacy`, `/terms`, `/kvkk`)**: bilingual (Turkish and English) Privacy Policy and Terms of Use pages, plus a Turkish-only KVKK Aydınlatma Metni page (`/kvkk`, linked in Turkish mode only), live directly in this static site (`src/LegalPage.tsx`, copy in `src/legalCopy.ts`) and are linked in the footer, `#paket` section, and waitlist form. `Caddyfile` serves `index.html` for those SPA routes.
 - **Local package** (`#paket`, copy `localPackage` in `src/copy.ts`): language, KVKK documents, TRY invoice, setup and the
   verified-price guarantee. Each claim is checked against the code and `docs/legal/`; see
   `docs/implementation/features-phase-4-before-self-service/s03-landing-report.md`. Two optional build-time
   variables: `VITE_PACKAGE_PRICE` (shown verbatim as the package price; **unset by default, and then no price is
-  rendered**, because pricing is not settled) and `VITE_APP_URL` (the web app's `https://` origin; the privacy,
-  terms and data-deletion pages live in the app at `/privacy`, `/terms`, `/data-deletion`, and are linked only when
-  this is set).
+  rendered**, because pricing is not settled) and `VITE_APP_URL` (the web app's `https://` origin; used to link the
+  interactive `/data-deletion` status lookup page in the app when set).
 - **Fonts** are the app's self-hosted WOFF2 files (`src/assets/fonts/`, notices in `public/fonts/`),
   so visitors' browsers make no request to a font CDN.
 - **Theme**: `public/theme.js` applies the saved choice before first paint; light is the default, whatever the OS

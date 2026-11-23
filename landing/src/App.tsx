@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { PRODUCT_NAME } from './brand'
 import { Brand } from './BrandIdentity'
 import { ChaosToCalm } from './ChaosToCalm'
@@ -8,6 +8,8 @@ import { DominoSandbox } from './DominoSandbox'
 import { DraftDemo } from './DraftDemo'
 import { HeroPreview } from './HeroPreview'
 import { KnowledgePreview } from './KnowledgePreview'
+import { kvkkDocument, legalCopy } from './legalCopy'
+import { LegalPage, type Route } from './LegalPage'
 import { MissedRevenueCalculator } from './MissedRevenueCalculator'
 import { OwnerChat } from './OwnerChat'
 import { CapabilitiesSection, ChannelPreview, JourneySection } from './ProductStories'
@@ -52,7 +54,39 @@ type Theme = 'light' | 'dark'
 
 const TURKEY_TIMEZONES = new Set(['Europe/Istanbul', 'Asia/Istanbul'])
 
+function routeFromLocation(): Route {
+  const path = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/'
+  const hash = window.location.hash.toLowerCase().replace(/^#\/?/, '/')
+  for (const candidate of [path, hash]) {
+    if (candidate === '/privacy' || candidate === '/gizlilik' || candidate === '/en/privacy' || candidate === '/tr/privacy' || candidate === '/tr/gizlilik') {
+      return 'privacy'
+    }
+    if (
+      candidate === '/terms' ||
+      candidate === '/kullanim-kosullari' ||
+      candidate === '/en/terms' ||
+      candidate === '/tr/terms' ||
+      candidate === '/tr/kullanim-kosullari'
+    ) {
+      return 'terms'
+    }
+    if (candidate === '/kvkk' || candidate === '/kvkk-aydinlatma-metni' || candidate === '/tr/kvkk') {
+      return 'kvkk'
+    }
+  }
+  return 'home'
+}
+
 function initialLang(): Lang {
+  try {
+    const paramLang = new URLSearchParams(window.location.search).get('lang')?.toLowerCase()
+    if (paramLang === 'tr' || paramLang === 'en') return paramLang
+  } catch {
+    // Ignore malformed query strings.
+  }
+  const path = window.location.pathname.toLowerCase()
+  if (path.startsWith('/en/')) return 'en'
+  if (path.startsWith('/tr/')) return 'tr'
   try {
     const saved = localStorage.getItem(LANG_KEY)
     if (saved === 'tr' || saved === 'en') return saved
@@ -78,12 +112,55 @@ function initialTheme(): Theme {
 const container = 'gutter mx-auto w-full max-w-[76rem]'
 
 export function App() {
+  const [route, setRoute] = useState<Route>(routeFromLocation)
   const [lang, setLangState] = useState<Lang>(initialLang)
   const [theme, setTheme] = useState<Theme>(initialTheme)
   const [businessId, setBusinessId] = useState<BusinessId>('pilates')
   const t = copy[lang]
   const scenarios = getScenarios(lang)
   const scenario = getScenario(lang, businessId)
+  const pendingHashRef = useRef<string | null>(null)
+
+  const navigate = useCallback((nextRoute: Route, hash?: string) => {
+    const basePath =
+      nextRoute === 'privacy'
+        ? '/privacy'
+        : nextRoute === 'terms'
+          ? '/terms'
+          : nextRoute === 'kvkk'
+            ? '/kvkk'
+            : '/'
+    const targetUrl = hash ? `${basePath}#${hash}` : basePath
+    if (window.location.pathname + window.location.hash !== targetUrl) {
+      window.history.pushState(null, '', targetUrl)
+    }
+    pendingHashRef.current = hash ?? null
+    setRoute(nextRoute)
+    if (!hash) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    }
+  }, [])
+
+  useEffect(() => {
+    const onPopState = () => setRoute(routeFromLocation())
+    window.addEventListener('popstate', onPopState)
+    window.addEventListener('hashchange', onPopState)
+    return () => {
+      window.removeEventListener('popstate', onPopState)
+      window.removeEventListener('hashchange', onPopState)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (route !== 'home') return
+    const targetId = pendingHashRef.current ?? (window.location.hash.startsWith('#') ? window.location.hash.slice(1) : null)
+    pendingHashRef.current = null
+    if (!targetId) return
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView()
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [route])
 
   const setLang = (next: Lang) => {
     setLangState(next)
@@ -108,16 +185,25 @@ export function App() {
   }, [theme])
 
   useEffect(() => {
-    document.documentElement.lang = lang
-    document.title = t.meta.title
-    document.querySelector('meta[name="description"]')?.setAttribute('content', t.meta.description)
-  }, [lang, t.meta.title, t.meta.description])
+    document.documentElement.lang = route === 'kvkk' ? 'tr' : lang
+    const meta =
+      route === 'home'
+        ? t.meta
+        : route === 'kvkk'
+          ? { title: kvkkDocument.metaTitle, description: kvkkDocument.metaDescription }
+          : {
+              title: legalCopy[lang][route].metaTitle,
+              description: legalCopy[lang][route].metaDescription,
+            }
+    document.title = meta.title
+    document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description)
+  }, [lang, route, t.meta])
 
   const heroRef = useRef<HTMLElement>(null)
   const pilotRef = useRef<HTMLElement>(null)
-  const heroVisible = useInView(heroRef)
-  const pilotVisible = useInView(pilotRef)
-  const active = useActiveSection(t.nav.links.map((l) => l.id).concat('pilot'))
+  const heroVisible = useInView(heroRef, route === 'home')
+  const pilotVisible = useInView(pilotRef, route === 'home')
+  const active = useActiveSection(t.nav.links.map((l) => l.id).concat('pilot'), route === 'home')
 
   return (
     <div>
@@ -128,91 +214,110 @@ export function App() {
         {t.nav.skip}
       </a>
 
-      <SiteHeader t={t} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} active={active} />
+      <SiteHeader
+        t={t}
+        lang={lang}
+        setLang={setLang}
+        theme={theme}
+        setTheme={setTheme}
+        active={route === 'home' ? active : null}
+        route={route}
+        onNavigate={navigate}
+      />
 
       <main id="main" tabIndex={-1} className="outline-none">
-        <Hero
-          t={t}
-          lang={lang}
-          heroRef={heroRef}
-          scenarios={scenarios}
-          scenario={scenario}
-          onSelectBusiness={setBusinessId}
-        />
+        {route === 'home' ? (
+          <>
+            <Hero
+              t={t}
+              lang={lang}
+              heroRef={heroRef}
+              scenarios={scenarios}
+              scenario={scenario}
+              onSelectBusiness={setBusinessId}
+            />
 
-        <Reveal>
-          <Promises t={t} />
-        </Reveal>
+            <Reveal>
+              <Promises t={t} />
+            </Reveal>
 
-        <Reveal>
-          <ChaosToCalm lang={lang} />
-        </Reveal>
+            <Reveal>
+              <ChaosToCalm lang={lang} />
+            </Reveal>
 
-        <Reveal>
-          <DominoSandbox lang={lang} scenario={scenario} />
-        </Reveal>
+            <Reveal>
+              <DominoSandbox lang={lang} scenario={scenario} />
+            </Reveal>
 
-        <JourneySection lang={lang} />
+            <JourneySection lang={lang} />
 
-        <Section id="demo" tone="surface">
-          <Reveal>
-            <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
-              <div>
-                <SectionHeader eyebrow={t.demo.eyebrow} title={t.demo.title} body={t.demo.body} />
-                <ul className="mt-10 flex flex-col gap-5">
-                  {t.demo.points.map((point, i) => (
-                    <li key={point.title} className="flex gap-4">
-                      <span
-                        aria-hidden
-                        className="grid size-10 shrink-0 place-items-center rounded-panel bg-assistant text-lg text-action"
-                      >
-                        {[<TagIcon key="t" />, <CheckIcon key="c" />, <HandIcon key="h" />][i]}
-                      </span>
-                      <div>
-                        <h3 className="font-heading text-base font-semibold">{point.title}</h3>
-                        <p className="mt-0.5 text-base leading-relaxed text-secondary">{point.body}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <DraftDemo t={t.demo} lang={lang} scenario={scenario} />
-              </div>
-            </div>
-          </Reveal>
-        </Section>
+            <Section id="demo" tone="surface">
+              <Reveal>
+                <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
+                  <div>
+                    <SectionHeader eyebrow={t.demo.eyebrow} title={t.demo.title} body={t.demo.body} />
+                    <ul className="mt-10 flex flex-col gap-5">
+                      {t.demo.points.map((point, i) => (
+                        <li key={point.title} className="flex gap-4">
+                          <span
+                            aria-hidden
+                            className="grid size-10 shrink-0 place-items-center rounded-panel bg-assistant text-lg text-action"
+                          >
+                            {[<TagIcon key="t" />, <CheckIcon key="c" />, <HandIcon key="h" />][i]}
+                          </span>
+                          <div>
+                            <h3 className="font-heading text-base font-semibold">{point.title}</h3>
+                            <p className="mt-0.5 text-base leading-relaxed text-secondary">{point.body}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <DraftDemo t={t.demo} lang={lang} scenario={scenario} />
+                  </div>
+                </div>
+              </Reveal>
+            </Section>
 
-        <OwnerSection t={t.owner} lang={lang} />
+            <OwnerSection t={t.owner} lang={lang} />
 
-        <Reveal>
-          <CapabilitiesSection lang={lang} />
-        </Reveal>
+            <Reveal>
+              <CapabilitiesSection lang={lang} />
+            </Reveal>
 
-        <HowItWorks t={t} lang={lang} scenario={scenario} />
+            <HowItWorks t={t} lang={lang} scenario={scenario} />
 
-        <ContentAndReport t={t} />
+            <ContentAndReport t={t} />
 
-        <Reveal>
-          <MissedRevenueCalculator lang={lang} scenario={scenario} />
-        </Reveal>
+            <Reveal>
+              <MissedRevenueCalculator lang={lang} scenario={scenario} />
+            </Reveal>
 
-        <Trust t={t.trust} />
+            <Trust t={t.trust} />
 
-        <LocalPackage t={t.localPackage} />
+            <LocalPackage t={t.localPackage} onNavigate={navigate} />
 
-        <Faq t={t.faq} />
+            <Faq t={t.faq} />
 
-        <Pilot t={t} lang={lang} pilotRef={pilotRef} scenario={scenario} />
+            <Pilot t={t} lang={lang} pilotRef={pilotRef} scenario={scenario} onNavigate={navigate} />
+          </>
+        ) : (
+          <LegalPage kind={route} lang={lang} onNavigate={navigate} />
+        )}
       </main>
 
-      <SiteFooter t={t} />
-      <MobileCta t={t} hidden={heroVisible || pilotVisible} />
+      <SiteFooter t={t} route={route} onNavigate={navigate} />
+      <MobileCta t={t} hidden={route !== 'home' || heroVisible || pilotVisible} />
     </div>
   )
 }
 
 /* ------------------------------------------------------------------ header */
+
+function isPlainLeftClick(e: MouseEvent<HTMLAnchorElement>) {
+  return !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0
+}
 
 function SiteHeader({
   t,
@@ -221,6 +326,8 @@ function SiteHeader({
   theme,
   setTheme,
   active,
+  route,
+  onNavigate,
 }: {
   t: Copy
   lang: Lang
@@ -228,6 +335,8 @@ function SiteHeader({
   theme: Theme
   setTheme: (t: Theme) => void
   active: string | null
+  route: Route
+  onNavigate: (r: Route, hash?: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -246,6 +355,14 @@ function SiteHeader({
     return () => document.removeEventListener('keydown', onKey)
   }, [open])
 
+  const sectionHref = (id: string) => (route === 'home' ? `#${id}` : `/#${id}`)
+  const handleHomeNav = (e: MouseEvent<HTMLAnchorElement>, id?: string) => {
+    if (route === 'home') return
+    if (!isPlainLeftClick(e)) return
+    e.preventDefault()
+    onNavigate('home', id)
+  }
+
   return (
     <header
       className={`sticky top-0 z-40 border-b transition-colors ${
@@ -253,7 +370,16 @@ function SiteHeader({
       }`}
     >
       <div className={`${container} flex h-16 items-center gap-4`}>
-        <a href="#" className="flex items-center gap-3 rounded-control" aria-label={PRODUCT_NAME}>
+        <a
+          href={route === 'home' ? '#' : '/'}
+          onClick={(e) => {
+            if (route === 'home' || !isPlainLeftClick(e)) return
+            e.preventDefault()
+            onNavigate('home')
+          }}
+          className="flex items-center gap-3 rounded-control"
+          aria-label={PRODUCT_NAME}
+        >
           <Brand className="pivoris-brand--navigation" />
         </a>
 
@@ -261,7 +387,8 @@ function SiteHeader({
           {t.nav.links.map((link) => (
             <a
               key={link.id}
-              href={`#${link.id}`}
+              href={sectionHref(link.id)}
+              onClick={(e) => handleHomeNav(e, link.id)}
               aria-current={active === link.id ? 'true' : undefined}
               className="rounded-control px-3 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary aria-[current]:bg-surface-subtle aria-[current]:text-primary"
             >
@@ -282,7 +409,11 @@ function SiteHeader({
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
           <span className="ml-1.5 hidden sm:block">
-            <a href="#pilot" className={`${buttonPrimary} whitespace-nowrap`}>
+            <a
+              href={sectionHref('pilot')}
+              onClick={(e) => handleHomeNav(e, 'pilot')}
+              className={`${buttonPrimary} whitespace-nowrap`}
+            >
               {t.nav.cta}
             </a>
           </span>
@@ -315,14 +446,24 @@ function SiteHeader({
             {t.nav.links.map((link) => (
               <a
                 key={link.id}
-                href={`#${link.id}`}
-                onClick={() => setOpen(false)}
+                href={sectionHref(link.id)}
+                onClick={(e) => {
+                  setOpen(false)
+                  handleHomeNav(e, link.id)
+                }}
                 className="flex min-h-12 items-center justify-between border-b border-border text-base font-medium last:border-b-0"
               >
                 {link.label}
               </a>
             ))}
-            <a href="#pilot" onClick={() => setOpen(false)} className={`${buttonPrimary} mt-3 w-full`}>
+            <a
+              href={sectionHref('pilot')}
+              onClick={(e) => {
+                setOpen(false)
+                handleHomeNav(e, 'pilot')
+              }}
+              className={`${buttonPrimary} mt-3 w-full`}
+            >
               {t.nav.cta}
             </a>
           </div>
@@ -809,7 +950,13 @@ function Trust({ t }: { t: Copy['trust'] }) {
   )
 }
 
-function LocalPackage({ t }: { t: Copy['localPackage'] }) {
+function LocalPackage({
+  t,
+  onNavigate,
+}: {
+  t: Copy['localPackage']
+  onNavigate: (r: Route, hash?: string) => void
+}) {
   const icons = [
     <ChatIcon key="l" />,
     <ShieldCheckIcon key="k" />,
@@ -847,7 +994,15 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
                   <p className="text-xs font-semibold text-secondary">{t.legalLabel}</p>
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {t.legal.map((doc) => {
-                      const href = appLink(doc.path)
+                      const localRoute: Route | null =
+                        doc.path === '/privacy'
+                          ? 'privacy'
+                          : doc.path === '/terms'
+                            ? 'terms'
+                            : doc.path === '/kvkk'
+                              ? 'kvkk'
+                              : null
+                      const href = localRoute ? doc.path : appLink(doc.path)
                       const chip =
                         'inline-flex min-h-9 items-center rounded-control border border-border bg-surface px-3 text-sm font-medium'
                       return (
@@ -855,6 +1010,11 @@ function LocalPackage({ t }: { t: Copy['localPackage'] }) {
                           {href ? (
                             <a
                               href={href}
+                              onClick={(e) => {
+                                if (!localRoute || !isPlainLeftClick(e)) return
+                                e.preventDefault()
+                                onNavigate(localRoute)
+                              }}
                               className={`${chip} text-action hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`}
                             >
                               {doc.label}
@@ -924,11 +1084,13 @@ function Pilot({
   lang,
   pilotRef,
   scenario,
+  onNavigate,
 }: {
   t: Copy
   lang: Lang
   pilotRef: RefObject<HTMLElement | null>
   scenario: BusinessScenario
+  onNavigate: (r: Route, hash?: string) => void
 }) {
   return (
     <section
@@ -978,6 +1140,12 @@ function Pilot({
             pilot={t.pilot}
             lang={lang}
             initialCategoryIdx={scenario.waitlistCategoryIdx}
+            legalLinks={{
+              privacy: t.footer.privacy,
+              terms: t.footer.terms,
+              kvkk: t.footer.kvkk,
+              onNavigate,
+            }}
           />
         </div>
       </div>
@@ -987,24 +1155,90 @@ function Pilot({
 
 /* ------------------------------------------------------------------ footer */
 
-function SiteFooter({ t }: { t: Copy }) {
+function SiteFooter({
+  t,
+  route,
+  onNavigate,
+}: {
+  t: Copy
+  route: Route
+  onNavigate: (r: Route, hash?: string) => void
+}) {
+  const sectionHref = (id: string) => (route === 'home' ? `#${id}` : `/#${id}`)
+  const handleHomeNav = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (route === 'home' || !isPlainLeftClick(e)) return
+    e.preventDefault()
+    onNavigate('home', id)
+  }
+
   return (
-    <footer className="border-t border-border bg-canvas pb-24 md:pb-0">
+    <footer className={`border-t border-border bg-canvas ${route === 'home' ? 'pb-24 md:pb-0' : ''}`}>
       <div className={`${container} grid gap-8 py-12 md:grid-cols-[minmax(0,1fr)_auto] md:items-start`}>
         <div className="max-w-md">
           <Brand label={PRODUCT_NAME} />
           <p className="mt-3 text-sm text-secondary">{t.footer.tagline}</p>
         </div>
-        <nav aria-label={t.nav.menu} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          {t.nav.links.map((link) => (
-            <a key={link.id} href={`#${link.id}`} className="text-secondary hover:text-primary">
-              {link.label}
+        <div className="flex flex-col gap-3 md:items-end">
+          <nav aria-label={t.nav.menu} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {t.nav.links.map((link) => (
+              <a
+                key={link.id}
+                href={sectionHref(link.id)}
+                onClick={(e) => handleHomeNav(e, link.id)}
+                className="text-secondary hover:text-primary"
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href={sectionHref('pilot')}
+              onClick={(e) => handleHomeNav(e, 'pilot')}
+              className="font-semibold text-action hover:underline"
+            >
+              {t.nav.cta}
             </a>
-          ))}
-          <a href="#pilot" className="font-semibold text-action hover:underline">
-            {t.nav.cta}
-          </a>
-        </nav>
+          </nav>
+          <nav aria-label={t.footer.legalNav} className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
+            <a
+              href="/privacy"
+              aria-current={route === 'privacy' ? 'page' : undefined}
+              onClick={(e) => {
+                if (!isPlainLeftClick(e)) return
+                e.preventDefault()
+                onNavigate('privacy')
+              }}
+              className="text-secondary hover:text-primary aria-[current=page]:font-semibold aria-[current=page]:text-action"
+            >
+              {t.footer.privacy}
+            </a>
+            <a
+              href="/terms"
+              aria-current={route === 'terms' ? 'page' : undefined}
+              onClick={(e) => {
+                if (!isPlainLeftClick(e)) return
+                e.preventDefault()
+                onNavigate('terms')
+              }}
+              className="text-secondary hover:text-primary aria-[current=page]:font-semibold aria-[current=page]:text-action"
+            >
+              {t.footer.terms}
+            </a>
+            {t.footer.kvkk && (
+              <a
+                href="/kvkk"
+                aria-current={route === 'kvkk' ? 'page' : undefined}
+                onClick={(e) => {
+                  if (!isPlainLeftClick(e)) return
+                  e.preventDefault()
+                  onNavigate('kvkk')
+                }}
+                className="text-secondary hover:text-primary aria-[current=page]:font-semibold aria-[current=page]:text-action"
+              >
+                {t.footer.kvkk}
+              </a>
+            )}
+          </nav>
+        </div>
       </div>
       <div
         className={`${container} flex flex-col gap-3 border-t border-border py-6 text-xs text-secondary md:flex-row md:items-center md:justify-between`}
@@ -1012,7 +1246,15 @@ function SiteFooter({ t }: { t: Copy }) {
         <p className="max-w-3xl leading-relaxed">{t.footer.trademark}</p>
         <div className="flex shrink-0 items-center gap-4">
           <span>© 2026 {PRODUCT_NAME}</span>
-          <a href="#" className="inline-flex items-center gap-1 hover:text-primary">
+          <a
+            href="#"
+            onClick={(e) => {
+              if (!isPlainLeftClick(e)) return
+              e.preventDefault()
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+            className="inline-flex items-center gap-1 hover:text-primary"
+          >
             <ArrowUpIcon aria-hidden /> {t.footer.top}
           </a>
         </div>
@@ -1045,23 +1287,28 @@ function MobileCta({ t, hidden }: { t: Copy; hidden: boolean }) {
 
 /* ------------------------------------------------------------------- hooks */
 
-function useInView(ref: RefObject<HTMLElement | null>) {
+function useInView(ref: RefObject<HTMLElement | null>, enabled = true) {
   const [inView, setInView] = useState(true)
   useEffect(() => {
+    if (!enabled) return
     const el = ref.current
     if (!el || !('IntersectionObserver' in window)) return
     const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [ref])
+  }, [ref, enabled])
   return inView
 }
 
 /** The section in the upper part of the viewport, for the header's current-section marker. */
-function useActiveSection(ids: string[]) {
+function useActiveSection(ids: string[], enabled = true) {
   const [active, setActive] = useState<string | null>(null)
   const key = ids.join(',')
   useEffect(() => {
+    if (!enabled) {
+      setActive(null)
+      return
+    }
     if (!('IntersectionObserver' in window)) return
     const visible = new Map<string, boolean>()
     const observer = new IntersectionObserver(
@@ -1076,6 +1323,6 @@ function useActiveSection(ids: string[]) {
       if (el) observer.observe(el)
     }
     return () => observer.disconnect()
-  }, [key])
+  }, [key, enabled])
   return active
 }

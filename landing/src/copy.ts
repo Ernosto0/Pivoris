@@ -197,7 +197,15 @@ export type Copy = {
     failed: string
   }
   mobileCta: { label: string; sub: string }
-  footer: { tagline: string; trademark: string; top: string }
+  footer: {
+    tagline: string
+    trademark: string
+    top: string
+    privacy: string
+    terms: string
+    kvkk?: string
+    legalNav: string
+  }
 }
 
 export const copy: Record<Lang, Copy> = {
@@ -595,7 +603,7 @@ export const copy: Record<Lang, Copy> = {
         {
           title: 'KVKK belgeleri hazırlandı',
           badge: 'Taslak · hukuki inceleme bekliyor',
-          body: 'Gizlilik politikası, kullanım koşulları ve veri silme sayfası uygulamada yer alır. Müşterilerinize göstereceğiniz KVKK aydınlatma metni şablonunu ve veri işleme sözleşmesi taslağını kurulumda size veririz. Belgeler henüz avukat incelemesinden geçmedi; kendi unvanınızla yayınlamadan önce kendi avukatınıza da onaylatmanızı öneririz.',
+          body: 'Gizlilik politikası ve kullanım koşulları bu sitede ve uygulamada yer alır; veri silme sayfası uygulamada bulunur. Müşterilerinize göstereceğiniz KVKK aydınlatma metni şablonunu ve veri işleme sözleşmesi taslağını kurulumda size veririz. Belgeler henüz avukat incelemesinden geçmedi; kendi unvanınızla yayınlamadan önce kendi avukatınıza da onaylatmanızı öneririz.',
         },
         {
           title: 'Türk lirasıyla fatura',
@@ -611,10 +619,11 @@ export const copy: Record<Lang, Copy> = {
           body: 'Yanıttaki fiyat, saat, tarih ve telefon gibi değerler yalnızca sizin doğruladığınız bilgi kartlarından gelir. Kartlarda olmayan bir değer içeren taslak müşteriye gönderilmez, konuşma size kalır. Uygulamada her değerin hangi karttan ve hangi tarihte doğrulandığı görünür; günlük özet “gönderilen doğrulanmamış değer” sayısını da gösterir. Bilgi kartlarının doğru ve güncel olması sizin sorumluluğunuzdadır.',
         },
       ],
-      legalLabel: 'Uygulamadaki belgeler',
+      legalLabel: 'Yasal belgeler',
       legal: [
         { label: 'Gizlilik politikası', path: '/privacy' },
         { label: 'Kullanım koşulları', path: '/terms' },
+        { label: 'KVKK aydınlatma metni', path: '/kvkk' },
         { label: 'Veri silme', path: '/data-deletion' },
       ],
       priceLabel: 'Paket fiyatı',
@@ -736,6 +745,10 @@ export const copy: Record<Lang, Copy> = {
       trademark:
         'Instagram ve WhatsApp, Meta Platforms, Inc.’in ticari markalarıdır; Telegram, sahibinin ticari markasıdır. Bu ürün bu şirketlerle bağlantılı değildir.',
       top: 'Başa dön',
+      privacy: 'Gizlilik Politikası',
+      terms: 'Kullanım Koşulları',
+      kvkk: 'KVKK Aydınlatma Metni',
+      legalNav: 'Yasal belgeler',
     },
   },
   en: {
@@ -1131,7 +1144,7 @@ export const copy: Record<Lang, Copy> = {
         {
           title: 'KVKK documents prepared',
           badge: 'Draft · awaiting legal review',
-          body: 'The privacy policy, the terms and a data-deletion page are in the app. We hand you the KVKK information-notice template for your customers and a draft data processing agreement during setup. They have not been through a lawyer’s review yet; before you publish them under your company name, we recommend your own lawyer approves them.',
+          body: 'The privacy policy and terms of use are available on this site and in the app; a data-deletion page is in the app. We hand you the KVKK information-notice template for your customers and a draft data processing agreement during setup. They have not been through a lawyer’s review yet; before you publish them under your company name, we recommend your own lawyer approves them.',
         },
         {
           title: 'Simple, transparent billing',
@@ -1147,7 +1160,7 @@ export const copy: Record<Lang, Copy> = {
           body: 'Prices, hours, dates and phone numbers in a reply come only from the business facts you have verified. A draft that contains a value that is not in your facts is not sent; the conversation is left to you. The app shows which fact each value came from and when it was verified, and the daily summary shows how many unverified values were sent. Keeping your facts correct and up to date is your responsibility.',
         },
       ],
-      legalLabel: 'Documents in the app',
+      legalLabel: 'Legal documents',
       legal: [
         { label: 'Privacy policy', path: '/privacy' },
         { label: 'Terms of use', path: '/terms' },
@@ -1271,6 +1284,9 @@ export const copy: Record<Lang, Copy> = {
       trademark:
         'Instagram and WhatsApp are trademarks of Meta Platforms, Inc.; Telegram is a trademark of its owner. This product is not affiliated with these companies.',
       top: 'Back to top',
+      privacy: 'Privacy Policy',
+      terms: 'Terms of Use',
+      legalNav: 'Legal documents',
     },
   },
 }

@@ -12,8 +12,8 @@ export const PACKAGE_PRICE = read(import.meta.env.VITE_PACKAGE_PRICE)
 
 /**
  * The origin of the web app (for example https://app.example.com), without a trailing slash.
- * The legal pages live in the app (/privacy, /terms, /data-deletion), not on this static site,
- * so the links to them are drawn only when this is set. Unset: the documents are named, not linked.
+ * Privacy and terms are served directly on this landing site (/privacy, /terms); the interactive
+ * data-deletion status lookup (/data-deletion) lives in the app and is linked when this is set.
  */
 export const APP_URL = read(import.meta.env.VITE_APP_URL).replace(/\/+$/, '')
 

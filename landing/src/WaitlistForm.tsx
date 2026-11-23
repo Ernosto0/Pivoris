@@ -1,9 +1,21 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { Copy, Lang } from './copy'
+import type { Route } from './LegalPage'
 import { AlertIcon, CheckIcon, ChatIcon, buttonLarge, buttonPrimary } from './ui'
 import { getWhatsAppContactUrl, isValidEmail, submitWaitlist, type SubmitResult } from './waitlist'
 
-type Props = { t: Copy['form']; pilot: Copy['pilot']; lang: Lang; initialCategoryIdx?: number }
+type Props = {
+  t: Copy['form']
+  pilot: Copy['pilot']
+  lang: Lang
+  initialCategoryIdx?: number
+  legalLinks?: {
+    privacy: string
+    terms: string
+    kvkk?: string
+    onNavigate: (r: Route, hash?: string) => void
+  }
+}
 
 type Field = 'business' | 'instagram' | 'contact' | 'city'
 type Values = Record<Field, string>
@@ -15,7 +27,7 @@ type Status =
 
 const empty: Values = { business: '', instagram: '', contact: '', city: '' }
 
-export function WaitlistForm({ t, pilot, lang, initialCategoryIdx = 0 }: Props) {
+export function WaitlistForm({ t, pilot, lang, initialCategoryIdx = 0, legalLinks }: Props) {
   const [categoryIdx, setCategoryIdx] = useState<number>(initialCategoryIdx)
   const [userPickedCategory, setUserPickedCategory] = useState(false)
   const [values, setValues] = useState<Values>(empty)
@@ -176,6 +188,49 @@ export function WaitlistForm({ t, pilot, lang, initialCategoryIdx = 0 }: Props) 
           <p id="wl-consent-error" className="ml-8 flex items-center gap-1.5 text-xs font-medium text-danger">
             <AlertIcon aria-hidden />
             {errors.consent}
+          </p>
+        )}
+        {legalLinks && (
+          <p className="ml-8 flex flex-wrap gap-x-3 gap-y-1 text-xs text-secondary">
+            <a
+              href="/privacy"
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+                e.preventDefault()
+                legalLinks.onNavigate('privacy')
+              }}
+              className="underline underline-offset-4 hover:text-primary"
+            >
+              {legalLinks.privacy}
+            </a>
+            <span aria-hidden>·</span>
+            <a
+              href="/terms"
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+                e.preventDefault()
+                legalLinks.onNavigate('terms')
+              }}
+              className="underline underline-offset-4 hover:text-primary"
+            >
+              {legalLinks.terms}
+            </a>
+            {legalLinks.kvkk && (
+              <>
+                <span aria-hidden>·</span>
+                <a
+                  href="/kvkk"
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+                    e.preventDefault()
+                    legalLinks.onNavigate('kvkk')
+                  }}
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  {legalLinks.kvkk}
+                </a>
+              </>
+            )}
           </p>
         )}
       </div>
