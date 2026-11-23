@@ -114,6 +114,10 @@ _LOCALIZED_NOTIFICATION_TEXT: dict[str, dict[str, tuple[str, str]]] = {
         "tr": ("Günlük rapor hazır", "Günlük özet raporunuzu uygulamada görüntüleyebilirsiniz."),
         "en": ("Daily report ready", "Your daily summary report is ready in the app."),
     },
+    "report.morning_briefing_ready": {
+        "tr": ("Sabah özeti hazır", "Dün akşamki özeti uygulamada görüntüleyebilirsiniz."),
+        "en": ("Morning briefing ready", "Your overnight summary is ready in the app."),
+    },
     "report.missed_customers_ready": {
         "tr": (
             "Kaçırılan müşteri raporu hazır",
@@ -1030,6 +1034,73 @@ def _deliver_owner_question_notification(
     )
 
 
+def _deliver_briefing_notification(
+    client: TelegramClient,
+    session: Session,
+    clock: Clock,
+    delivery: NotificationDelivery,
+    recipient: ChannelRecipient,
+    notification: Notification,
+) -> DeliveryResult:
+    """Format and send a natural-language morning/evening briefing to Telegram."""
+    chat_id = recipient.channel_chat_id or recipient.channel_user_id
+    if not chat_id:
+        return _terminal("Recipient missing Telegram chat ID", send_state="not_sent")
+
+    is_tr = (recipient.ui_locale or "tr").lower().startswith("tr")
+    lang = "tr" if is_tr else "en"
+    params = notification.params if isinstance(notification.params, dict) else {}
+    narrated = (
+        params.get(f"narrated_{lang}") or params.get("narrated_tr") or params.get("narrated_en")
+    )
+
+    sim_badge = (
+        "🧪 <b>[SİMÜLASYON]</b>\n"
+        if (notification.is_simulated and is_tr)
+        else ("🧪 <b>[SIMULATED]</b>\n" if notification.is_simulated else "")
+    )
+    if isinstance(narrated, str) and narrated.strip():
+        text = f"{sim_badge}{html.escape(narrated.strip())}"
+    else:
+        text = _format_notification_text(notification, recipient.ui_locale)
+
+    settings = get_settings()
+    origin = settings.frontend_origin.rstrip("/")
+    ws_id = str(delivery.workspace_id)
+    local_date = params.get("local_date")
+    report_url = (
+        f"{origin}/w/{ws_id}/more/reports?date={local_date}"
+        if isinstance(local_date, str) and local_date
+        else f"{origin}/w/{ws_id}/more/reports"
+    )
+    buttons: list[dict[str, str]] = [
+        {"text": "📊 Raporu Aç" if is_tr else "📊 Open Report", "url": report_url}
+    ]
+    pending_approvals = params.get("pending_approvals")
+    if (
+        isinstance(pending_approvals, int)
+        and not isinstance(pending_approvals, bool)
+        and pending_approvals > 0
+    ):
+        buttons.append(
+            {
+                "text": "✅ Onayları Aç" if is_tr else "✅ Open Approvals",
+                "url": f"{origin}/w/{ws_id}/approvals",
+            }
+        )
+    reply_markup = {"inline_keyboard": [buttons]}
+
+    return _send_with_ledger_fence(
+        client,
+        session,
+        clock,
+        delivery,
+        chat_id=str(chat_id),
+        text=text,
+        reply_markup=reply_markup,
+    )
+
+
 class TelegramChannel(OwnerChannel):
     """Owner channel adapter for Telegram Bot API (ADR-012 §5.1)."""
 
@@ -1113,6 +1184,16 @@ class TelegramChannel(OwnerChannel):
                     notification=notification,
                     question=question,
                 )
+
+        if notification.type in ("report.morning_briefing_ready", "report.daily_ready"):
+            return _deliver_briefing_notification(
+                client=self.client,
+                session=session,
+                clock=clock,
+                delivery=delivery,
+                recipient=recipient,
+                notification=notification,
+            )
 
         chat_id = recipient.channel_chat_id or recipient.channel_user_id
         if not chat_id:

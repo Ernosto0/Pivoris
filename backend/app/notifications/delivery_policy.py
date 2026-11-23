@@ -34,6 +34,7 @@ QUIET_HOURS_TYPES: frozenset[str] = frozenset(
         "quota.grace",
         "quota.paused",
         "report.daily_ready",
+        "report.morning_briefing_ready",
         "report.missed_customers_ready",
         "content.scheduled",
         "content.on_hold",

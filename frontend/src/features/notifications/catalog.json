@@ -81,6 +81,10 @@
       "severity": "info"
     },
     {
+      "type": "report.morning_briefing_ready",
+      "severity": "info"
+    },
+    {
       "type": "report.missed_customers_ready",
       "severity": "info"
     },

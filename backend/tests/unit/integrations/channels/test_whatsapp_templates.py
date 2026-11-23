@@ -43,7 +43,15 @@ def test_templates_follow_meta_rules(template: templates.WhatsAppTemplate) -> No
 
 @pytest.mark.parametrize("template", templates.ALL_TEMPLATES, ids=lambda t: t.name)
 def test_variables_are_numbers_or_a_date_never_text(template: templates.WhatsAppTemplate) -> None:
-    allowed = {"local_date", "inbound_messages", "replies_sent", "pending_approvals"}
+    allowed = {
+        "local_date",
+        "inbound_messages",
+        "replies_sent",
+        "pending_approvals",
+        "customers_talked",
+        "questions_answered",
+        "booking_enquiries",
+    }
     assert set(template.variables) <= allowed
 
 

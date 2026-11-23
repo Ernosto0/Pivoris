@@ -11,6 +11,7 @@ import { useCurrentWorkspace } from "@/features/workspaces/context";
 import { useUpdateWorkspace } from "@/features/workspaces/hooks";
 import { timezoneOptions } from "@/features/workspaces/wizardDefaults";
 import { BrandSection } from "./BrandSection";
+import { BriefingSettings } from "./BriefingSettings";
 import { FollowUpSettings } from "./FollowUpSettings";
 import { useMembers } from "./hooks";
 import { DetailRow, LinkRow, PanelTitle, SettingsPanel, SettingsSection, TEXT_ACTION } from "./SettingsParts";
@@ -37,6 +38,7 @@ export function WorkspaceSection() {
     <SettingsSection id="workspace" title={t("settings.nav.workspace")} description={t("settings.workspace.description")}>
       <WorkspaceDetails canEdit={role === "owner"} />
       <BrandSection />
+      <BriefingSettings />
       <FollowUpSettings />
 
       <SettingsPanel aria-label={t("settings.workspace.adminTitle")}>

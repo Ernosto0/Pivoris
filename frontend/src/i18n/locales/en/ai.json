@@ -218,6 +218,7 @@
       "content_published": "“{{title}}” was published.",
       "content_failed": "“{{title}}” could not be published: {{what}}",
       "report_daily_ready": "The daily report for {{date}} is ready",
+      "report_morning_briefing_ready": "Your morning briefing for {{date}} is ready",
       "report_missed_customers_ready": "Weekly missed-customer report: {{count}} messages came after hours, {{unanswered}} conversations got no reply",
       "account_permission_missing": "Instagram permission missing: {{what}}",
       "account_degraded": "Instagram connection is unstable. Sending and publishing pause for a few minutes and resume automatically.",

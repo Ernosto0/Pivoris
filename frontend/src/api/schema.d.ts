@@ -7951,6 +7951,16 @@ export interface components {
              */
             daily_report_hour: number;
             /**
+             * Morning Briefing Enabled
+             * @default true
+             */
+            morning_briefing_enabled: boolean;
+            /**
+             * Morning Briefing Hour
+             * @default 9
+             */
+            morning_briefing_hour: number;
+            /**
              * Disclosure Enabled
              * @default true
              */
@@ -7980,6 +7990,10 @@ export interface components {
         WorkspaceSettingsPatch: {
             /** Daily Report Hour */
             daily_report_hour?: number | null;
+            /** Morning Briefing Enabled */
+            morning_briefing_enabled?: boolean | null;
+            /** Morning Briefing Hour */
+            morning_briefing_hour?: number | null;
             /** Disclosure Enabled */
             disclosure_enabled?: boolean | null;
             disclosure_text?: components["schemas"]["DisclosureText"] | null;

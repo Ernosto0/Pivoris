@@ -274,6 +274,15 @@
     "systemHealth": "Sistem durumu"
   },
   "settings": {
+    "briefings": {
+      "title": "Sabah özeti ve günlük rapor",
+      "description": "Her sabah dün akşamki konuşmaların doğal dilde özetini, akşamları ise günlük raporu Telegram, WhatsApp ve uygulama içinden alın.",
+      "morningEnabled": "Sabah özetini gönder",
+      "morningHour": "Sabah özeti saati",
+      "eveningHour": "Akşam raporu saati",
+      "saved": "Özet saatleri kaydedildi.",
+      "ownerOnly": "Özet saatlerini yalnızca çalışma alanı sahibi değiştirebilir."
+    },
     "followUp": {
       "ownerOnly": "Takip mesajı ayarlarını yalnızca sahip değiştirebilir.",
       "title": "Müşteri takip mesajı",

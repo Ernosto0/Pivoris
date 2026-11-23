@@ -42,6 +42,8 @@ export function workspace(id: string, overrides: Partial<Workspace> = {}): Works
       follow_up_text: { tr: "", en: "" },
       disclosure_text: { tr: "", en: "", ru: "", de: "", ar: "" },
       daily_report_hour: 20,
+      morning_briefing_enabled: true,
+      morning_briefing_hour: 9,
       publish_max_delay_minutes: 1440,
     },
     created_at: "2026-10-15T12:00:00Z",

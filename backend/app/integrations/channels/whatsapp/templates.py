@@ -112,8 +112,7 @@ _TEMPLATES = (
         "quota.grace",
         "Pivoris: Yapay zeka yanıt hakkınıza ulaşıldı. "
         "Taslaklar %10 ek hakla devam eder, sonra duraklar.",
-        "Pivoris: AI reply allowance reached. Drafting continues within an extra 10%, "
-        "then pauses.",
+        "Pivoris: AI reply allowance reached. Drafting continues within an extra 10%, then pauses.",
     ),
     _t(
         "pivoris_quota_paused_v1",
@@ -131,6 +130,16 @@ _TEMPLATES = (
         "Pivoris daily summary for {{1}}: {{2}} new messages, {{3}} replies sent, "
         "{{4}} approvals waiting. Details are in the app.",
         ("local_date", "inbound_messages", "replies_sent", "pending_approvals"),
+    ),
+    _t(
+        "pivoris_morning_briefing_v1",
+        "report.morning_briefing_ready",
+        "Günaydın! Dün akşam siz yokken {{1}} müşteriyle konuştum, {{2}} soruyu yanıtladım, "
+        "{{3}} kişi randevu sordu ve {{4}} onay bekliyor. Ayrıntılar uygulamada.",
+        "Good morning! While you were away last night, I spoke with {{1}} customers, answered "
+        "{{2}} questions, {{3}} asked about appointments, and {{4}} approvals are waiting. "
+        "Details are in the app.",
+        ("customers_talked", "questions_answered", "booking_enquiries", "pending_approvals"),
     ),
 )
 

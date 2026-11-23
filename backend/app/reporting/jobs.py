@@ -15,6 +15,8 @@ from pydantic import BaseModel
 from sqlalchemy import exists, select
 from sqlalchemy.orm import Session
 
+from app.ai.runtime import runner_deps
+from app.ai.tasks.narrate_briefing import narrate_briefing_text
 from app.core.clock import Clock
 from app.core.context import ActorRef, WorkspaceContext
 from app.identity.models import Workspace
@@ -22,9 +24,12 @@ from app.jobs.models import Job
 from app.jobs.queue import enqueue
 from app.jobs.registry import JobContext, job_handler
 from app.jobs.scheduler import register_periodic
-from app.reporting import missed_customers, service
+from app.notifications import service as notifications
+from app.reporting import missed_customers, overnight, service
 
 DEFAULT_REPORT_HOUR = 20
+DEFAULT_MORNING_BRIEFING_HOUR = 9
+MORNING_BRIEFING_READY = "report.morning_briefing_ready"
 # The weekly missed-customer report of the week that just ended is made on Monday from 09:00 local.
 MISSED_CUSTOMER_REPORT_HOUR = 9
 
@@ -34,8 +39,17 @@ class GenerateDailyReportPayload(BaseModel):
     local_date: date
 
 
+class GenerateMorningBriefingPayload(BaseModel):
+    workspace_id: uuid.UUID
+    local_date: date
+
+
 def dedup_key(workspace_id: uuid.UUID, local_date: date) -> str:
     return f"daily_report:{workspace_id}:{local_date.isoformat()}"
+
+
+def morning_briefing_dedup_key(workspace_id: uuid.UUID, local_date: date) -> str:
+    return f"morning_briefing:{workspace_id}:{local_date.isoformat()}"
 
 
 def report_hour(settings: dict[str, object] | None) -> int:
@@ -44,6 +58,20 @@ def report_hour(settings: dict[str, object] | None) -> int:
     if isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 23:
         return value
     return DEFAULT_REPORT_HOUR
+
+
+def morning_briefing_enabled(settings: dict[str, object] | None) -> bool:
+    """Whether the workspace wants overnight morning briefings (defaults to True)."""
+    value = (settings or {}).get("morning_briefing_enabled", True)
+    return value if isinstance(value, bool) else True
+
+
+def morning_briefing_hour(settings: dict[str, object] | None) -> int:
+    """The workspace's ``morning_briefing_hour`` (5-12); a missing or invalid value means 9."""
+    value = (settings or {}).get("morning_briefing_hour", DEFAULT_MORNING_BRIEFING_HOUR)
+    if isinstance(value, int) and not isinstance(value, bool) and 5 <= value <= 12:
+        return value
+    return DEFAULT_MORNING_BRIEFING_HOUR
 
 
 @job_handler("generate_daily_report", GenerateDailyReportPayload, max_attempts=3)
@@ -63,8 +91,154 @@ def generate_daily_report(job: JobContext) -> None:
             workspace.default_locale,
             workspace.is_demo,
         )
-        service.generate_daily_report(session, job.clock, ctx, payload.local_date, scheduled=True)
+        report = service.generate_daily_report(
+            session, job.clock, ctx, payload.local_date, scheduled=True, notify=False
+        )
+        post_times, _ = overnight.today_scheduled_post_times(
+            session, ctx, payload.local_date, job.clock.now()
+        )
         session.commit()
+
+    # Narrate outside any DB transaction (no external LLM call inside a DB tx).
+    evening_facts = {
+        "local_date": report.local_date.isoformat(),
+        "inbound_messages": int(report.value("inbound_messages") or 0),
+        "conversations": int(report.value("conversations_with_inbound") or 0),
+        "replies_sent": int(report.value("replies_sent") or 0),
+        "pending_approvals": int(report.value("pending_approvals_now") or 0),
+        "content_published": int(report.value("content_published") or 0),
+        "content_scheduled_next_24h": int(report.value("content_scheduled_next_24h") or 0),
+        "scheduled_post_times": list(post_times),
+    }
+    deps = runner_deps(job.session_factory, job.clock)
+    narrated_tr = narrate_briefing_text(
+        deps,
+        ctx,
+        briefing_kind="evening",
+        locale="tr",
+        local_date=report.local_date.isoformat(),
+        facts=evening_facts,
+    )
+    narrated_en = narrate_briefing_text(
+        deps,
+        ctx,
+        briefing_kind="evening",
+        locale="en",
+        local_date=report.local_date.isoformat(),
+        facts=evening_facts,
+    )
+
+    with job.session_factory() as session:
+        service.announce_daily_report(
+            session,
+            job.clock,
+            ctx,
+            report,
+            extra_params={"narrated_tr": narrated_tr, "narrated_en": narrated_en},
+        )
+        session.commit()
+
+
+@job_handler("generate_morning_briefing", GenerateMorningBriefingPayload, max_attempts=3)
+def generate_morning_briefing(job: JobContext) -> None:
+    payload = job.payload
+    if not isinstance(payload, GenerateMorningBriefingPayload):
+        return
+    with job.session_factory() as session:
+        workspace = session.get(Workspace, payload.workspace_id)
+        if workspace is None or workspace.status != "active":
+            return
+        if not morning_briefing_enabled(workspace.settings):
+            return
+        ctx = WorkspaceContext(
+            workspace.id,
+            ActorRef.system("reporting.morning_briefing"),
+            None,
+            workspace.timezone,
+            workspace.default_locale,
+            workspace.is_demo,
+        )
+        facts = overnight.compute_overnight_facts(
+            session,
+            job.clock,
+            ctx,
+            daily_report_hour=report_hour(workspace.settings),
+        )
+        if facts.is_quiet:
+            return  # Quiet night (0 activity, 0 pending, 0 scheduled posts today): skip noise.
+
+    # Narrate outside any DB transaction.
+    narration_params = facts.to_narration_params()
+    deps = runner_deps(job.session_factory, job.clock)
+    narrated_tr = narrate_briefing_text(
+        deps,
+        ctx,
+        briefing_kind="morning",
+        locale="tr",
+        local_date=facts.local_date.isoformat(),
+        facts=narration_params,
+    )
+    narrated_en = narrate_briefing_text(
+        deps,
+        ctx,
+        briefing_kind="morning",
+        locale="en",
+        local_date=facts.local_date.isoformat(),
+        facts=narration_params,
+    )
+
+    with job.session_factory() as session:
+        notifications.notify_permission_holders(
+            session,
+            job.clock,
+            ctx,
+            permission="reports.view",
+            type=MORNING_BRIEFING_READY,
+            severity="info",
+            params={
+                **narration_params,
+                "narrated_tr": narrated_tr,
+                "narrated_en": narrated_en,
+            },
+            subject_type="morning_briefing",
+            subject_id=None,
+            dedup_key=f"morning-briefing:{facts.local_date.isoformat()}",
+            is_simulated=facts.has_simulated_data,
+        )
+        session.commit()
+
+
+@register_periodic
+def enqueue_morning_briefings(session: Session, clock: Clock) -> int:
+    """Enqueue one morning briefing per active workspace once local time reaches its hour."""
+    now = clock.now()
+    rows = session.execute(
+        select(Workspace.id, Workspace.timezone, Workspace.settings).where(
+            Workspace.status == "active"
+        )
+    ).all()
+    enqueued = 0
+    for workspace_id, timezone, settings in rows:
+        if not morning_briefing_enabled(settings):
+            continue
+        local_now = now.astimezone(ZoneInfo(timezone))
+        if local_now.hour < morning_briefing_hour(settings):
+            continue
+        local_date = local_now.date()
+        key = morning_briefing_dedup_key(workspace_id, local_date)
+        if session.scalar(select(exists().where(Job.dedup_key == key))):
+            continue
+        enqueue(
+            session,
+            "generate_morning_briefing",
+            GenerateMorningBriefingPayload(workspace_id=workspace_id, local_date=local_date),
+            workspace_id=workspace_id,
+            correlation_id=None,
+            dedup_key=key,
+            clock=clock,
+        )
+        enqueued += 1
+    return enqueued
 
 
 @register_periodic

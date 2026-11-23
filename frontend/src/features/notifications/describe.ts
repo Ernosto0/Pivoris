@@ -77,8 +77,18 @@ export function describeNotification(
         what: t(`notifications.capability.${known ? capability : "unknown"}`),
       });
     }
-    case "report.daily_ready":
+    case "report.daily_ready": {
+      const lang = language.toLowerCase().startsWith("tr") ? "tr" : "en";
+      const narrated = params[`narrated_${lang}`] ?? params.narrated_tr ?? params.narrated_en;
+      if (typeof narrated === "string" && narrated.trim() !== "") return narrated.trim();
       return t("notifications.type.report_daily_ready", { date: String(params.local_date ?? "") });
+    }
+    case "report.morning_briefing_ready": {
+      const lang = language.toLowerCase().startsWith("tr") ? "tr" : "en";
+      const narrated = params[`narrated_${lang}`] ?? params.narrated_tr ?? params.narrated_en;
+      if (typeof narrated === "string" && narrated.trim() !== "") return narrated.trim();
+      return t("notifications.type.report_morning_briefing_ready", { date: String(params.local_date ?? "") });
+    }
     case "report.missed_customers_ready":
       return t("notifications.type.report_missed_customers_ready", {
         count: Number(params.after_hours_dms ?? 0),

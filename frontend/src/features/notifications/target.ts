@@ -35,7 +35,7 @@ export function notificationTarget(workspaceId: string, notification: AppNotific
       : `${base}/more/reports/missed-customers`;
   }
   if (notification.type === "member.joined") return `${base}/more/settings/members`;
-  if (notification.type === "report.daily_ready") {
+  if (notification.type === "report.daily_ready" || notification.type === "report.morning_briefing_ready") {
     const day = params.local_date;
     return typeof day === "string" ? `${base}/more/reports?date=${day}` : `${base}/more/reports`;
   }

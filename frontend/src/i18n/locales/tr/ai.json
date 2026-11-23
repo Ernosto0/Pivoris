@@ -218,6 +218,7 @@
       "content_published": "“{{title}}” yayınlandı.",
       "content_failed": "“{{title}}” yayınlanamadı: {{what}}",
       "report_daily_ready": "{{date}} günlük raporu hazır",
+      "report_morning_briefing_ready": "{{date}} sabah özetiniz hazır",
       "report_missed_customers_ready": "Haftalık kaçan müşteri raporu: {{count}} mesaj mesai dışında geldi, {{unanswered}} konuşma yanıtsız kaldı",
       "account_permission_missing": "Instagram izni eksik: {{what}}",
       "account_degraded": "Instagram bağlantısı kararsız. Gönderim ve paylaşım birkaç dakika duraklatıldı, otomatik devam edecek.",

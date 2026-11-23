@@ -136,12 +136,20 @@ class WhatsAppChannel:
             return _terminal("recipient_not_linked")
         to = link.channel_chat_id or link.channel_user_id
         locale = templates.normalize_locale(recipient.ui_locale)
-        values = templates.variable_values(template, dict(notification.params or {}), locale)
+        params_dict = dict(notification.params or {})
+        values = templates.variable_values(template, params_dict, locale)
         if values is None:
             return _terminal("template_variables_missing")
         body = template.render(locale, values)
 
         mode = window.choose_send_mode(link.last_inbound_at, clock.now())
+        if mode == "session" and notification.type in {
+            "report.morning_briefing_ready",
+            "report.daily_ready",
+        }:
+            narrated = params_dict.get(f"narrated_{locale}")
+            if isinstance(narrated, str) and narrated.strip():
+                body = narrated.strip()[:1000]
         cost = cost_metadata(mode, template.name, locale, template.category)
         if mode == "template" and not self.settings.whatsapp_templates_approved:
             return _terminal("whatsapp_templates_not_approved", cost=cost)

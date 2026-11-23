@@ -208,6 +208,7 @@ def generate_daily_report(
     *,
     scheduled: bool,
     if_missing: bool = False,
+    notify: bool = True,
 ) -> Report:
     """Capture a new immutable generation; retained-out sources refuse regeneration.
 
@@ -265,21 +266,39 @@ def generate_daily_report(
         is_simulated=report.has_simulated_data,
         clock=clock,
     )
-    if scheduled:
-        notifications.notify_permission_holders(
-            session,
-            clock,
-            ctx,
-            permission="reports.view",
-            type=DAILY_READY,
-            severity="info",
-            params={"local_date": local_date.isoformat(), **_summary_counts(report)},
-            subject_type="daily_report",
-            subject_id=report_id,
-            dedup_key=f"report:{local_date.isoformat()}",
-            is_simulated=report.has_simulated_data,
-        )
+    if scheduled and notify:
+        announce_daily_report(session, clock, ctx, report)
     return report
+
+
+def announce_daily_report(
+    session: Session,
+    clock: Clock,
+    ctx: WorkspaceContext,
+    report: Report,
+    *,
+    extra_params: dict[str, Any] | None = None,
+) -> None:
+    """Announce a scheduled daily report to all ``reports.view`` holders."""
+    params: dict[str, Any] = {
+        "local_date": report.local_date.isoformat(),
+        **_summary_counts(report),
+    }
+    if extra_params:
+        params.update(extra_params)
+    notifications.notify_permission_holders(
+        session,
+        clock,
+        ctx,
+        permission="reports.view",
+        type=DAILY_READY,
+        severity="info",
+        params=params,
+        subject_type="daily_report",
+        subject_id=report.snapshot_id,
+        dedup_key=f"report:{report.local_date.isoformat()}",
+        is_simulated=report.has_simulated_data,
+    )
 
 
 # The three numbers the WhatsApp daily-summary template carries. Counts only, never text.

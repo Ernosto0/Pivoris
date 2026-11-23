@@ -274,6 +274,15 @@
     "systemHealth": "System health"
   },
   "settings": {
+    "briefings": {
+      "title": "Morning briefing & daily report",
+      "description": "Receive a natural-language overnight summary each morning and a daily wrap-up each evening on Telegram, WhatsApp, and in the app.",
+      "morningEnabled": "Send overnight morning briefing",
+      "morningHour": "Morning briefing time",
+      "eveningHour": "Evening report time",
+      "saved": "Briefing schedule saved.",
+      "ownerOnly": "Only the workspace owner can change the briefing schedule."
+    },
     "followUp": {
       "ownerOnly": "Only the owner can change follow-up settings.",
       "title": "Customer follow-up",

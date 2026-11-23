@@ -329,3 +329,192 @@ def _narrate_activity_summary(params: dict[str, Any], locale: str, user_query: s
 
         tail_str = f" ({', '.join(tail)})." if tail else "."
         return f"{base}{tail_str}"
+
+
+_TIME_PATTERN = re.compile(r"\b([01]?\d|2[0-3])[:.]([0-5]\d)\b")
+
+
+def validate_briefing_grounding(narrated_text: str, facts: dict[str, Any]) -> list[str]:
+    """Verify INV-08 for morning/evening briefings: every number and clock time is grounded."""
+    if not narrated_text or not narrated_text.strip():
+        return ["Briefing narration is empty"]
+
+    allowed_numbers: set[int] = set()
+    allowed_times: set[str] = set()
+
+    for key, val in facts.items():
+        if key == "scheduled_post_times" and isinstance(val, (list, tuple)):
+            for raw_t in val:
+                if isinstance(raw_t, str):
+                    m = _TIME_PATTERN.fullmatch(raw_t.strip())
+                    if m:
+                        hh, mm = int(m.group(1)), int(m.group(2))
+                        allowed_times.add(f"{hh:02d}:{mm:02d}")
+                        allowed_numbers.add(hh)
+                        allowed_numbers.add(mm)
+        elif isinstance(val, (int, float)) and not isinstance(val, bool):
+            allowed_numbers.add(int(val))
+        elif isinstance(val, str):
+            for n in _extract_numbers(val):
+                allowed_numbers.add(n)
+
+    problems: list[str] = []
+
+    # Check every clock time like 18:00 or 18.00 is explicitly in scheduled_post_times.
+    for match in _TIME_PATTERN.finditer(narrated_text):
+        hh, mm = int(match.group(1)), int(match.group(2))
+        normalized = f"{hh:02d}:{mm:02d}"
+        if normalized not in allowed_times:
+            problems.append(
+                f"Time {match.group(0)} in briefing is not in scheduled_post_times "
+                f"{sorted(allowed_times)}"
+            )
+
+    # Check every integer token is grounded in facts.
+    for match in re.finditer(r"\b(\d+)\b", narrated_text):
+        num = int(match.group(1))
+        if num not in allowed_numbers:
+            problems.append(
+                f"Number {num} in briefing is not grounded in facts {sorted(allowed_numbers)}"
+            )
+
+    return problems
+
+
+def _format_post_times_tr(times: list[str]) -> str:
+    formatted = [t.replace(":", ".") for t in times]
+    if len(formatted) == 1:
+        return f"Bugünkü Instagram paylaşımınız saat {formatted[0]}'e planlandı."
+    joined = ", ".join(formatted[:-1]) + f" ve {formatted[-1]}"
+    return f"Bugün {len(formatted)} Instagram paylaşımınız saat {joined} için planlandı."
+
+
+def _format_post_times_en(times: list[str]) -> str:
+    if len(times) == 1:
+        return f"Today's Instagram post is scheduled for {times[0]}."
+    joined = ", ".join(times[:-1]) + f" and {times[-1]}"
+    return f"You have {len(times)} Instagram posts scheduled today at {joined}."
+
+
+def narrate_briefing_fallback(
+    briefing_kind: str,
+    facts: dict[str, Any],
+    user_locale: str = "tr",
+) -> str:
+    """Deterministic, warm natural-language briefing used for fake LLM and error fallback."""
+    locale = "tr" if user_locale.lower().startswith("tr") else "en"
+    post_times = [str(t) for t in (facts.get("scheduled_post_times") or []) if isinstance(t, str)]
+
+    if briefing_kind == "morning":
+        customers = int(facts.get("customers_talked") or 0)
+        answered = int(facts.get("questions_answered") or 0)
+        bookings = int(facts.get("booking_enquiries") or 0)
+        pricing = int(facts.get("pricing_enquiries") or 0)
+        approvals = int(facts.get("pending_approvals") or 0)
+        questions = int(facts.get("pending_owner_questions") or 0)
+
+        if locale == "tr":
+            lines = ["Günaydın! 🌤️"]
+            if customers > 0:
+                lines.append(f"Dün akşam siz yokken {customers} müşteriyle konuştum.")
+            if answered > 0:
+                lines.append(f"{answered} kişinin sorusunu yanıtladım.")
+            if bookings > 0:
+                lines.append(f"{bookings} kişi randevu hakkında bilgi istedi.")
+            if pricing > 0:
+                lines.append(f"{pricing} kişi fiyat hakkında bilgi sordu.")
+            if approvals > 0:
+                lines.append(f"{approvals} konuşma için onayınızı bekliyorum.")
+            if questions > 0:
+                lines.append(f"{questions} soru için cevabınızı bekliyorum.")
+            if post_times:
+                lines.append(_format_post_times_tr(post_times))
+            if len(lines) == 1:
+                lines.append("Dün akşam yeni bir hareket olmadı, her şey yolunda.")
+            return "\n\n".join(lines)
+
+        lines = ["Good morning! 🌤️"]
+        if customers > 0:
+            noun = "customer" if customers == 1 else "customers"
+            lines.append(f"While you were away last night, I spoke with {customers} {noun}.")
+        if answered > 0:
+            noun = "question" if answered == 1 else "questions"
+            lines.append(f"I answered {answered} {noun}.")
+        if bookings > 0:
+            noun = "person" if bookings == 1 else "people"
+            lines.append(f"{bookings} {noun} asked about appointments.")
+        if pricing > 0:
+            noun = "person" if pricing == 1 else "people"
+            lines.append(f"{pricing} {noun} asked about pricing.")
+        if approvals > 0:
+            noun = "item is" if approvals == 1 else "items are"
+            lines.append(f"{approvals} {noun} waiting for your approval.")
+        if questions > 0:
+            noun = "question is" if questions == 1 else "questions are"
+            lines.append(f"{questions} {noun} waiting for your answer.")
+        if post_times:
+            lines.append(_format_post_times_en(post_times))
+        if len(lines) == 1:
+            lines.append("It was a quiet night with no new activity—everything is caught up.")
+        return "\n\n".join(lines)
+
+    # Evening daily report narration
+    inbound = int(facts.get("inbound_messages") or 0)
+    conversations = int(facts.get("conversations") or 0)
+    replies_sent = int(facts.get("replies_sent") or 0)
+    approvals = int(facts.get("pending_approvals") or 0)
+    published = int(facts.get("content_published") or 0)
+    scheduled_24h = int(facts.get("content_scheduled_next_24h") or 0)
+
+    if locale == "tr":
+        lines = ["İyi akşamlar! 🌙"]
+        if inbound > 0 or replies_sent > 0:
+            if conversations > 0:
+                lines.append(
+                    f"Bugün {conversations} müşteriyle toplam {inbound} mesaj aldık "
+                    f"ve {replies_sent} yanıt gönderdim."
+                )
+            else:
+                lines.append(
+                    f"Bugün toplam {inbound} yeni mesaj geldi ve {replies_sent} yanıt gönderildi."
+                )
+        else:
+            lines.append("Bugün yeni bir müşteri mesajı gelmedi.")
+        if published > 0:
+            lines.append(f"Bugün {published} Instagram paylaşımı yayınlandı.")
+        if approvals > 0:
+            lines.append(f"Şu an onayınızı bekleyen {approvals} işlem var.")
+        if post_times:
+            lines.append(_format_post_times_tr(post_times))
+        elif scheduled_24h > 0:
+            lines.append(f"Önümüzdeki 24 saat için {scheduled_24h} paylaşım planlandı.")
+        return "\n\n".join(lines)
+
+    lines = ["Good evening! 🌙"]
+    if inbound > 0 or replies_sent > 0:
+        if conversations > 0:
+            c_noun = "customer" if conversations == 1 else "customers"
+            m_noun = "message" if inbound == 1 else "messages"
+            r_noun = "reply" if replies_sent == 1 else "replies"
+            lines.append(
+                f"Today we received {inbound} {m_noun} across {conversations} {c_noun} "
+                f"and sent {replies_sent} {r_noun}."
+            )
+        else:
+            m_noun = "message" if inbound == 1 else "messages"
+            r_noun = "reply" if replies_sent == 1 else "replies"
+            lines.append(f"Today we received {inbound} {m_noun} and sent {replies_sent} {r_noun}.")
+    else:
+        lines.append("No new customer messages arrived today.")
+    if published > 0:
+        p_noun = "post was" if published == 1 else "posts were"
+        lines.append(f"{published} Instagram {p_noun} published today.")
+    if approvals > 0:
+        a_noun = "item is" if approvals == 1 else "items are"
+        lines.append(f"{approvals} {a_noun} waiting for your approval right now.")
+    if post_times:
+        lines.append(_format_post_times_en(post_times))
+    elif scheduled_24h > 0:
+        s_noun = "post is" if scheduled_24h == 1 else "posts are"
+        lines.append(f"{scheduled_24h} {s_noun} scheduled in the next 24 hours.")
+    return "\n\n".join(lines)

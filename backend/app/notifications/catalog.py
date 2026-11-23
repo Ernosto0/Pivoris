@@ -106,6 +106,12 @@ _SPECS = (
     ),
     NotificationSpec("report.daily_ready", INFO, "reports.view", "report:{local_date}"),
     NotificationSpec(
+        "report.morning_briefing_ready",
+        INFO,
+        "reports.view",
+        "morning-briefing:{local_date}",
+    ),
+    NotificationSpec(
         "report.missed_customers_ready", INFO, "reports.view", "missed-customers:{week_start}"
     ),
     NotificationSpec("member.joined", INFO, "owners", "member.joined:{user_id}"),
@@ -139,7 +145,10 @@ PUSH_TYPES: dict[str, str] = {
 # WhatsApp (F-06, ADR-027): the same types as Web Push plus the daily summary. Linking the number is
 # the opt-in (there is no per-category preference yet). The text is fixed per type, in
 # ``integrations/channels/whatsapp/templates.py``; customer text is never included.
-WHATSAPP_TYPES: frozenset[str] = frozenset(PUSH_TYPES) | {"report.daily_ready"}
+WHATSAPP_TYPES: frozenset[str] = frozenset(PUSH_TYPES) | {
+    "report.daily_ready",
+    "report.morning_briefing_ready",
+}
 
 # Telegram (ADR-012, Session 01): approvals, owner questions, operational failures, quota
 # warnings and existing report-ready notifications. Routine info notifications and weekly
@@ -161,6 +170,7 @@ TELEGRAM_TYPES: frozenset[str] = frozenset(
         "quota.grace",
         "quota.paused",
         "report.daily_ready",
+        "report.morning_briefing_ready",
         "report.missed_customers_ready",
     }
 )

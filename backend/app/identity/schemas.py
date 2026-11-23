@@ -60,6 +60,8 @@ class WorkspaceSettings(StrictModel):
     follow_up_text: FollowUpText = Field(default_factory=FollowUpText)
     disclosure_text: DisclosureText = Field(default_factory=DisclosureText)
     daily_report_hour: int = Field(default=20, ge=0, le=23)
+    morning_briefing_enabled: bool = True
+    morning_briefing_hour: int = Field(default=9, ge=5, le=12)
     publish_max_delay_minutes: int = Field(default=1440, ge=1, le=1440)
     # Set by the server from the injected Clock when the owner reviews the automation policies
     # (POST /automation-policies/review); read-only for clients.
@@ -72,6 +74,8 @@ class WorkspaceSettingsPatch(StrictModel):
     disclosure_enabled: bool | None = None
     disclosure_text: DisclosureText | None = None
     daily_report_hour: int | None = Field(default=None, ge=0, le=23)
+    morning_briefing_enabled: bool | None = None
+    morning_briefing_hour: int | None = Field(default=None, ge=5, le=12)
     publish_max_delay_minutes: int | None = Field(default=None, ge=1, le=1440)
 
 
