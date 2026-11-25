@@ -57,7 +57,7 @@ export function MissedRevenueCalculator({ lang, scenario }: { lang: Lang; scenar
 
   return (
     <section className="band-glow bg-band py-20 text-band-text md:py-24">
-      <div className="gutter mx-auto max-w-[76rem]">
+      <div className="gutter mx-auto max-w-[86rem]">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
           <div>
             <p className="type-eyebrow inline-flex items-center gap-1.5 text-band-accent">

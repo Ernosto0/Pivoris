@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Brand } from './BrandIdentity'
 import type { Lang } from './copy'
 import type { BusinessScenario } from './scenarios'
@@ -61,7 +61,15 @@ const dominoUi = {
   },
 } as const
 
-export function DominoSandbox({ lang, scenario }: { lang: Lang; scenario: BusinessScenario }) {
+export function DominoSandbox({
+  lang,
+  scenario,
+  switcher,
+}: {
+  lang: Lang
+  scenario: BusinessScenario
+  switcher?: ReactNode
+}) {
   // stage: 0 = initial, 1 = fact updated, 2 = DM redrafted, 3 = scheduled post held
   const [stage, setStage] = useState<0 | 1 | 2 | 3>(0)
   const timersRef = useRef<number[]>([])
@@ -96,7 +104,7 @@ export function DominoSandbox({ lang, scenario }: { lang: Lang; scenario: Busine
 
   return (
     <section id="zincir" className="relative overflow-hidden border-y border-border bg-surface py-20 md:py-28">
-      <div className="gutter mx-auto max-w-[76rem]">
+      <div className="gutter mx-auto max-w-[86rem]">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <header className="max-w-[44rem]">
             <p className="type-eyebrow text-action">{ui.eyebrow}</p>
@@ -105,6 +113,8 @@ export function DominoSandbox({ lang, scenario }: { lang: Lang; scenario: Busine
           </header>
           <ExampleLabel>{ui.example}</ExampleLabel>
         </div>
+
+        {switcher && <div className="mt-8">{switcher}</div>}
 
         {/* Instruction hint bar */}
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-canvas px-4 py-3 text-sm">

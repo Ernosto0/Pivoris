@@ -10,21 +10,27 @@ npm run build      # static files in dist/, deployable to any static host
 npm run typecheck
 ```
 
-- **Look**: the light colour tokens, fonts (Manrope headings, Inter text), radii, buttons and status
+- **Look**: the light colour tokens, fonts (Manrope headings, Inter text; the hero headline alone uses
+  self-hosted Instrument Serif), radii, buttons and status
   vocabulary come from the app (`frontend/src/index.css`, `StatusBadge`, `Button`), so the page and the
   product read as one thing. The page adds larger display type, a dark theme and the dark-green brand
-  band. Marketing uses lighter headings, sentence-case section labels, 16px panel radii and compact
+  band, plus one landing-only accent, neon lime (`--an-accent`, dark text on it for contrast), reserved
+  for primary CTAs (`buttonPrimary`) and the hand-drawn stroke under the hero's emphasised words
+  (`.hero-accent`); keep it to one or two elements per screen. Marketing uses lighter headings, sentence-case section labels, 16px panel radii and compact
   status tags. Tokens live in `src/index.css`; shared pieces (icons, badges, buttons) in `src/ui.tsx`.
   Verified reply values use a dotted source marker (`.source-fact`) and open the existing source
   details locally. The hero has one brief entrance; sections remain visible without scroll animations.
-  The business selector sits with the product preview. Decorative effects stay deliberately faint:
+  The hero stays minimal and fills the first viewport: headline, a two-sentence lead, one primary CTA
+  and a single-conversation preview.
+  The business selector sits at the top of the price-change simulation (`#zincir`). Decorative effects stay deliberately faint:
   a masked grid, low-contrast highlights, a single pulse on simulation updates and a 1px card lift
   on precise pointers only. Reduced motion disables the lift and motion feedback. Source tracing
   supports keyboard focus and touch as well as hover; the calculator labels its conversion assumption.
   Polish guided by [unslop](https://github.com/heydamir/unslop) by Damir Sokolovsky, CC BY 4.0.
 - **Copy & interactive demos**: copy for both languages lives in `src/copy.ts`; multi-business
   scenarios (`pilates`, `beauty`, `cafe`, `boutique`, `clinic`) live in `src/scenarios.ts` and
-  synchronise `HeroPreview.tsx` (auto-playing night-shift simulation), `DominoSandbox.tsx`
+  feed `HeroPreview.tsx` (auto-playing tour of one studio's night: three Instagram moments, then the
+  owner's Telegram summary and a content approval; independent of the selector) and synchronise `DominoSandbox.tsx`
   (interactive price-change cascade), `DraftDemo.tsx` (interactive teach-the-assistant flow),
   `KnowledgePreview.tsx` (highlighted extraction), `MissedRevenueCalculator.tsx` and the default
   category in `WaitlistForm.tsx`. Operational stories, channel previews and the five-language demo

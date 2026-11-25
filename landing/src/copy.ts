@@ -30,7 +30,6 @@ export type Copy = {
     menu: string
   }
   hero: {
-    badge: string
     title: string
     accent: string
     lead: string
@@ -218,10 +217,6 @@ export const copy: Record<Lang, Copy> = {
     nav: {
       links: [
         {
-          id: 'otomasyon',
-          label: 'Otomasyon',
-        },
-        {
           id: 'yonetim',
           label: 'Sohbetten yönetim',
         },
@@ -246,12 +241,11 @@ export const copy: Record<Lang, Copy> = {
       menu: 'Menü',
     },
     hero: {
-      badge: 'Ücretsiz pilot programı · Başvurular açık',
-      title: 'Müşteri soruları,',
-      accent: 'mesai dışında da yanıtlansın',
-      lead: 'Pivoris, Instagram sorularını doğrulanmış işletme bilgilerinizle yanıtlar, yorumları özel sohbete taşır, içerik hazırlar ve planlar. Telegram’dan talimat verin; önemli gelişmeleri seçtiğiniz kanaldan takip edin.',
+      title: 'Instagram hesabınız',
+      accent: 'siz yokken de çalışsın',
+      lead: 'Pivoris müşterilerinize doğrulanmış bilgilerle yanıt verir ve içeriğinizi hazırlar. Siz her şeyi Telegram’dan takip eder, gerektiğinde onay verirsiniz.',
       cta: 'Ücretsiz pilota başvurun',
-      secondary: 'Otomasyonu keşfedin',
+      secondary: 'Simülasyonu deneyin',
       points: ['30 gün ücretsiz', 'Kart bilgisi yok', 'Kurulum 30 dakika'],
     },
     preview: {
@@ -760,10 +754,6 @@ export const copy: Record<Lang, Copy> = {
     nav: {
       links: [
         {
-          id: 'otomasyon',
-          label: 'Automation',
-        },
-        {
           id: 'yonetim',
           label: 'Chat control',
         },
@@ -788,12 +778,11 @@ export const copy: Record<Lang, Copy> = {
       menu: 'Menu',
     },
     hero: {
-      badge: 'Free pilot programme · Applications open',
-      title: 'Customer questions,',
-      accent: 'answered after hours',
-      lead: 'Pivoris answers Instagram questions from your verified business details, moves comments into private conversations, and prepares and schedules content. Give instructions on Telegram; follow important updates on your chosen channel.',
+      title: 'Your Instagram keeps working',
+      accent: 'while you’re away',
+      lead: 'Pivoris answers your customers from verified details and prepares your content. You follow everything on Telegram and approve when it matters.',
       cta: 'Apply for the free pilot',
-      secondary: 'Explore the automation',
+      secondary: 'Try the simulation',
       points: ['Free for 30 days', 'No card needed', '30-minute setup'],
     },
     preview: {

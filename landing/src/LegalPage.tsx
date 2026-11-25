@@ -19,7 +19,7 @@ type Props = {
   onNavigate: (route: Route, hash?: string) => void
 }
 
-const container = 'gutter mx-auto w-full max-w-[76rem]'
+const container = 'gutter mx-auto w-full max-w-[86rem]'
 
 export function LegalPage({ kind, lang, onNavigate }: Props) {
   const ui = legalCopy[lang]

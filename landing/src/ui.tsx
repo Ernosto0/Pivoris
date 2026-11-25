@@ -146,6 +146,6 @@ export function SectionHeader({
 // Button looks shared with the app's Button: 44 px minimum, control radius, semibold primary.
 export const buttonBase =
   'inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-4 py-2 text-[0.9375rem] font-semibold transition-colors duration-150 [&>svg]:shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60'
-export const buttonPrimary = `${buttonBase} bg-action text-on-action hover:bg-action-hover`
+export const buttonPrimary = `${buttonBase} bg-accent text-on-accent shadow-[inset_0_0_0_1px_var(--an-accent-edge)] hover:bg-accent-hover`
 export const buttonSecondary = `${buttonBase} border border-border bg-surface text-primary hover:bg-surface-subtle`
 export const buttonLarge = 'min-h-13 px-6 text-base'

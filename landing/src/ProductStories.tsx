@@ -295,7 +295,7 @@ export function JourneySection({ lang }: { lang: Lang }) {
   const story = t.stories[selected]
   return (
     <section id="otomasyon" className="band-glow mt-8 bg-band py-20 text-band-text md:py-24">
-      <div className="gutter mx-auto max-w-[76rem]">
+      <div className="gutter mx-auto max-w-[86rem]">
         <div className="max-w-[48rem]">
           <p className="text-sm font-semibold text-band-accent">{t.eyebrow}</p>
           <h2 className="type-title mt-4 text-white dark:text-primary">{t.title}</h2>
@@ -372,7 +372,7 @@ export function CapabilitiesSection({ lang }: { lang: Lang }) {
   ]
   return (
     <section id="yetenekler" className="border-y border-border bg-surface py-20 md:py-28">
-      <div className="gutter mx-auto max-w-[76rem]">
+      <div className="gutter mx-auto max-w-[86rem]">
         <SectionHeader eyebrow={t.eyebrow} title={t.title} body={t.body} />
         <div className="mt-12 grid gap-4 lg:grid-cols-3">
           <article className="card-lift rounded-frame border border-border bg-assistant p-6 sm:p-8 lg:row-span-2">

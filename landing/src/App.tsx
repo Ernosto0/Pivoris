@@ -43,7 +43,6 @@ import {
   UsersIcon,
   buttonLarge,
   buttonPrimary,
-  buttonSecondary,
   type Tone,
 } from './ui'
 import { WaitlistForm } from './WaitlistForm'
@@ -109,7 +108,7 @@ function initialTheme(): Theme {
   return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
 }
 
-const container = 'gutter mx-auto w-full max-w-[76rem]'
+const container = 'gutter mx-auto w-full max-w-[86rem]'
 
 export function App() {
   const [route, setRoute] = useState<Route>(routeFromLocation)
@@ -233,8 +232,6 @@ export function App() {
               lang={lang}
               heroRef={heroRef}
               scenarios={scenarios}
-              scenario={scenario}
-              onSelectBusiness={setBusinessId}
             />
 
             <Reveal>
@@ -246,7 +243,18 @@ export function App() {
             </Reveal>
 
             <Reveal>
-              <DominoSandbox lang={lang} scenario={scenario} />
+              <DominoSandbox
+                lang={lang}
+                scenario={scenario}
+                switcher={
+                  <BusinessSwitcher
+                    lang={lang}
+                    scenarios={scenarios}
+                    scenario={scenario}
+                    onSelect={setBusinessId}
+                  />
+                }
+              />
             </Reveal>
 
             <JourneySection lang={lang} />
@@ -505,19 +513,12 @@ function Hero({
   lang,
   heroRef,
   scenarios,
-  scenario,
-  onSelectBusiness,
 }: {
   t: Copy
   lang: Lang
   heroRef: RefObject<HTMLElement | null>
   scenarios: BusinessScenario[]
-  scenario: BusinessScenario
-  onSelectBusiness: (id: BusinessId) => void
 }) {
-  const switcherLabel =
-    lang === 'tr' ? 'Örnekleri işletmenize göre görün' : 'See the demos for your business'
-
   return (
     <section ref={heroRef} className="relative overflow-hidden">
       {/* Faint texture behind the product; the headline stays on calm space. */}
@@ -525,64 +526,73 @@ function Hero({
       <div aria-hidden className="hero-grid-pattern pointer-events-none absolute inset-0" />
 
       <div
-        className={`${container} hero-enter relative grid items-center gap-12 pt-12 pb-16 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.04fr)] lg:gap-12`}
+        className={`${container} hero-enter relative grid items-center gap-12 pt-12 pb-16 md:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:gap-14 lg:py-12`}
       >
-        <div className="min-w-0 max-w-[40rem]">
-          <p className="type-eyebrow flex items-center gap-2 text-secondary">
-            <span className="size-1.5 rounded-full bg-success" aria-hidden />
-            {t.hero.badge}
-          </p>
-
-          <h1 className="type-display mt-6">
-            {t.hero.title} <span className="block">{t.hero.accent}</span>
+        <div className="min-w-0">
+          <h1 className="type-hero">
+            {t.hero.title}
+            <br />
+            <span className="hero-accent italic">{t.hero.accent}</span>
           </h1>
 
-          <p className="mt-6 max-w-[32rem] text-lg leading-relaxed text-secondary">
+          <p className="mt-7 max-w-[30rem] text-lg leading-relaxed text-secondary">
             {t.hero.lead}
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <a href="#pilot" className={`${buttonPrimary} ${buttonLarge}`}>
               {t.hero.cta}
             </a>
-            <a href="#zincir" className={`${buttonSecondary} ${buttonLarge}`}>
-              {lang === 'tr' ? 'Simülasyonu deneyin' : 'Try the simulation'}
+            <a
+              href="#zincir"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-control text-base font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              {t.hero.secondary}
+              <span aria-hidden>→</span>
             </a>
           </div>
 
-          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-secondary">
-            {t.hero.points.map((point) => (
-              <li key={point} className="flex items-center gap-2">
-                <CheckIcon aria-hidden />
-                {point}
-              </li>
-            ))}
-          </ul>
-
+          <p className="mt-5 text-sm text-secondary">{t.hero.points.join(' · ')}</p>
         </div>
 
         <div className="min-w-0">
-          {/* One selection adapts Hero, Domino, Draft, Knowledge, calculator and waitlist. */}
-          <div className="mb-6">
-            <p className="text-xs font-medium text-secondary">{switcherLabel}</p>
-            <div role="group" aria-label={switcherLabel} className="mt-3 flex flex-wrap gap-2">
-              {scenarios.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={scenario.id === item.id}
-                  onClick={() => onSelectBusiness(item.id)}
-                  className="min-h-9 rounded-control border border-border bg-surface px-3 text-xs font-medium text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-control aria-pressed:bg-surface-subtle aria-pressed:text-primary"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <HeroPreview t={t.preview} lang={lang} scenario={scenario} />
+          <HeroPreview t={t.preview} lang={lang} scenarios={scenarios} />
         </div>
       </div>
     </section>
+  )
+}
+
+/** One selection adapts Domino, Draft, Knowledge, calculator and waitlist. */
+function BusinessSwitcher({
+  lang,
+  scenarios,
+  scenario,
+  onSelect,
+}: {
+  lang: Lang
+  scenarios: BusinessScenario[]
+  scenario: BusinessScenario
+  onSelect: (id: BusinessId) => void
+}) {
+  const label = lang === 'tr' ? 'Örnekleri işletmenize göre görün' : 'See the demos for your business'
+  return (
+    <div>
+      <p className="text-xs font-medium text-secondary">{label}</p>
+      <div role="group" aria-label={label} className="mt-3 flex flex-wrap gap-2">
+        {scenarios.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={scenario.id === item.id}
+            onClick={() => onSelect(item.id)}
+            className="min-h-9 rounded-control border border-border bg-canvas px-3 text-xs font-medium text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-control aria-pressed:bg-surface-subtle aria-pressed:text-primary"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 

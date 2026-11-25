@@ -65,7 +65,7 @@ export function ChaosToCalm({ lang }: { lang: Lang }) {
 
   return (
     <section className="py-16 md:py-20">
-      <div className="gutter mx-auto max-w-[76rem]">
+      <div className="gutter mx-auto max-w-[86rem]">
         <div className="overflow-hidden rounded-frame border border-border bg-surface shadow-frame">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-canvas/70 px-5 py-5 sm:px-8">
             <div>

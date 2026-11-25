@@ -41,6 +41,44 @@
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Instrument Serif (OFL 1.1, @fontsource/instrument-serif 5.3.0): the hero headline only. */
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/instrument-serif-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/instrument-serif-latin-ext-400-italic.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/instrument-serif-latin-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Light values are the app's tokens (frontend/src/index.css), unchanged, so the page and the
    product read as one thing. Marketing adds only the dark theme and the brand band. */
 :root {
@@ -73,6 +111,11 @@
   /* A verified fact inside running text: the app's selected-navigation pair. */
   --an-fact: #d1e4b7;
   --an-on-fact: #1d3328;
+  /* Landing-only accent: primary CTAs and the hero's emphasised words, nothing else. */
+  --an-accent: #c6f24e;
+  --an-accent-hover: #b4e434;
+  --an-on-accent: #10261a;
+  --an-accent-edge: rgb(16 38 26 / 0.16);
   --an-shadow: 0 1px 2px rgb(0 0 0 / 0.03), 0 8px 24px rgb(0 0 0 / 0.035);
   --an-dot: rgb(37 59 49 / 0.09);
   --an-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -106,6 +149,10 @@
   --an-info-subtle: #142c38;
   --an-fact: #2a4130;
   --an-on-fact: #d6ebbd;
+  --an-accent: #c6f24e;
+  --an-accent-hover: #d6f97a;
+  --an-on-accent: #10261a;
+  --an-accent-edge: transparent;
   --an-shadow: none;
   --an-dot: rgb(198 223 166 / 0.07);
 }
@@ -124,6 +171,9 @@
   --color-action: var(--an-action);
   --color-action-hover: var(--an-action-hover);
   --color-on-action: var(--an-on-action);
+  --color-accent: var(--an-accent);
+  --color-accent-hover: var(--an-accent-hover);
+  --color-on-accent: var(--an-on-accent);
   --color-border: var(--an-border);
   --color-control: var(--an-control);
   --color-focus: var(--an-focus);
@@ -140,6 +190,7 @@
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-heading: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 
   --radius-control: 0.5rem;
   --radius-panel: 0.75rem;
@@ -200,6 +251,46 @@ body {
 @utility dot-field {
   background-image: radial-gradient(var(--an-dot) 1.2px, transparent 1.2px);
   background-size: 20px 20px;
+}
+
+/* Hero emphasis: the words keep the text colour; a hand-drawn accent stroke is drawn beneath each
+   line once on load. The stroke colour is literal because a data-URI SVG cannot read variables;
+   keep it equal to --an-accent. */
+.hero-accent {
+  color: var(--an-action);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 30' preserveAspectRatio='none'%3E%3Cpath d='M4 23 C 95 9, 255 2, 397 8 C 399 11, 397 14, 392 14 C 262 13, 128 18, 10 29 C 4 29, 1 26, 4 23 Z' fill='%23c6f24e'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.26em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.04em 0.06em;
+  animation: hero-swash 900ms var(--an-motion-ease) 350ms both;
+}
+:root[data-theme='dark'] .hero-accent {
+  color: var(--an-text-primary);
+}
+@keyframes hero-swash {
+  from {
+    background-size: 0% 0.26em;
+  }
+  to {
+    background-size: 100% 0.26em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-accent {
+    animation: none;
+  }
+}
+
+/* Hero headline only: large editorial serif. */
+@utility type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 1.6rem + 5.6vw, 6.75rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
 }
 
 @utility type-display {
