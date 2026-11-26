@@ -116,7 +116,7 @@ const uiText = {
   },
 } as const satisfies Record<Lang, unknown>
 
-const OWNER_PHOTO = './preview/studio.jpg'
+const OWNER_PHOTO = `${import.meta.env.BASE_URL}preview/studio.jpg`
 
 // One business's night: three customer moments on Instagram, then the owner's morning on Telegram.
 function buildSlides(lang: Lang, scenario: BusinessScenario | undefined): Slide[] {

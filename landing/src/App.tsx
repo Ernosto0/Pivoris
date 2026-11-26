@@ -889,7 +889,7 @@ function PostThumb({ index }: { index: number }) {
         className="relative h-12 w-9 shrink-0 overflow-hidden rounded-md ring-1 ring-black/10"
       >
         <img
-          src={index === 0 ? './preview/movement.jpg' : './preview/studio.jpg'}
+          src={`${import.meta.env.BASE_URL}preview/${index === 0 ? 'movement' : 'studio'}.jpg`}
           alt=""
           loading="lazy"
           className="size-full object-cover"
@@ -1189,7 +1189,7 @@ function SiteFooter({
           <p className="mt-3 text-sm text-secondary">{t.footer.tagline}</p>
         </div>
         <div className="flex flex-col gap-3 md:items-end">
-          <nav aria-label={t.nav.menu} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          <nav aria-label={t.footer.siteNav} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
             {t.nav.links.map((link) => (
               <a
                 key={link.id}

@@ -203,6 +203,7 @@ export type Copy = {
     privacy: string
     terms: string
     kvkk?: string
+    siteNav: string
     legalNav: string
   }
 }
@@ -626,7 +627,7 @@ export const copy: Record<Lang, Copy> = {
     faq: {
       eyebrow: 'Sorular',
       title: 'Sık sorulanlar',
-      body: 'Cevabını bulamadığınız bir şey varsa pilot formuna yazın, sizi arayalım.',
+      body: 'Cevabını bulamadığınız bir şey varsa pilot formuna yazın, size e-postayla dönelim.',
       items: [
         {
           q: 'Her mesajı tek tek onaylamam gerekiyor mu?',
@@ -696,7 +697,7 @@ export const copy: Record<Lang, Copy> = {
       ],
       nextStepsTitle: 'Başvurudan sonra',
       nextSteps: [
-        { title: '24 saat içinde', body: 'Sizi kısaca arar ya da mesaj atarız.' },
+        { title: '24 saat içinde', body: 'Size e-postayla döner, kısa bir görüşme planlarız.' },
         { title: 'Uygun bir günde', body: 'Kurulumu 30 dakikada birlikte tamamlarız.' },
         { title: 'Sonrasında', body: 'Asistanınız rutin soruları karşılar, günün özeti telefonunuza gelir.' },
       ],
@@ -742,6 +743,7 @@ export const copy: Record<Lang, Copy> = {
       privacy: 'Gizlilik Politikası',
       terms: 'Kullanım Koşulları',
       kvkk: 'KVKK Aydınlatma Metni',
+      siteNav: 'Sayfa bölümleri',
       legalNav: 'Yasal belgeler',
     },
   },
@@ -1161,7 +1163,7 @@ export const copy: Record<Lang, Copy> = {
     faq: {
       eyebrow: 'Questions',
       title: 'Frequently asked',
-      body: 'Something not covered here? Write it in the pilot form and we will call you.',
+      body: 'Something not covered here? Write it in the pilot form and we will email you.',
       items: [
         {
           q: 'Do I need to approve every message?',
@@ -1230,7 +1232,7 @@ export const copy: Record<Lang, Copy> = {
       ],
       nextStepsTitle: 'After you apply',
       nextSteps: [
-        { title: 'Within 24 hours', body: 'We call or message you briefly.' },
+        { title: 'Within 24 hours', body: 'We email you to set up a short call.' },
         { title: 'On a day that suits you', body: 'We finish the 30-minute setup together.' },
         { title: 'From then on', body: 'Your assistant handles routine questions and sends your daily summary.' },
       ],
@@ -1275,6 +1277,7 @@ export const copy: Record<Lang, Copy> = {
       top: 'Back to top',
       privacy: 'Privacy Policy',
       terms: 'Terms of Use',
+      siteNav: 'Page sections',
       legalNav: 'Legal documents',
     },
   },

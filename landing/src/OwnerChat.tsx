@@ -200,7 +200,7 @@ function Story({ kicker, title, note }: { kicker: string; title: string; note: s
   return (
     <div className="relative mb-2 flex h-32 flex-col justify-end overflow-hidden rounded-xl bg-[#253b31] p-3 font-heading text-white">
       <img
-        src="./preview/movement.jpg"
+        src={`${import.meta.env.BASE_URL}preview/movement.jpg`}
         alt=""
         loading="lazy"
         className="absolute inset-0 size-full object-cover opacity-80"

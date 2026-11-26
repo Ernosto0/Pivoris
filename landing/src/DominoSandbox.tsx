@@ -322,7 +322,7 @@ export function DominoSandbox({
 
               <div className="mt-3 flex items-center gap-4">
                 <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/10">
-                  <img src="./preview/studio.jpg" alt="" loading="lazy" className="size-full object-cover" />
+                  <img src={`${import.meta.env.BASE_URL}preview/studio.jpg`} alt="" loading="lazy" className="size-full object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs text-secondary">
