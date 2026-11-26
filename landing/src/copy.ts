@@ -417,16 +417,16 @@ export const copy: Record<Lang, Copy> = {
           from: 'owner',
           time: '09:12',
           attachment: {
-            kicker: 'Reformer Pilates',
-            title: 'Deneme dersi',
-            note: 'ücretsiz',
+            kicker: 'Yoga Atölyesi',
+            title: 'Gün batımı yogası',
+            note: 'Cumartesi 19:00',
           },
-          text: 'Bu fotoğrafla deneme dersi için bir story hazırla.',
+          text: 'Bu fotoğrafla cumartesi etkinliği için bir story hazırla.',
         },
         {
           from: 'assistant',
           time: '09:12',
-          text: 'Fotoğrafı aldım. Deneme dersi bilginizle bir Story taslağı hazırlıyorum.',
+          text: 'Fotoğrafı aldım. Etkinlik bilgilerinizle bir Story taslağı hazırlıyorum.',
         },
         {
           from: 'owner',
@@ -448,7 +448,7 @@ export const copy: Record<Lang, Copy> = {
             '14 mesaj geldi. 11 konuşma otomatik yanıtlandı, 2 konuşma size iletildi; 1 mesaj yanıt bekliyor.',
         },
         {
-          ask: 'Deneme dersi için bir story hazırla.',
+          ask: 'Cumartesi etkinliği için bir story hazırla.',
           answer:
             'İşletme bilgilerinizden bir Story taslağı hazırlıyorum. İçerik ekranında inceleyebilirsiniz.',
         },
@@ -463,9 +463,9 @@ export const copy: Record<Lang, Copy> = {
           action: 'Saati değiştir',
         },
         {
-          ask: 'Reformer paketini 6.500 TL yapalım. Eski fiyatla paylaşım çıkmasın.',
+          ask: 'Cumartesi artık 10:00’da açıyoruz.',
           answer:
-            'Eski fiyatı kullanan 1 müşteri yanıtı ve Cuma 19:00’a planlı bir paylaşım buldum. Onayınızla paket fiyatını 6.500 TL yapıp yanıtı yenileyeceğim; paylaşımı da incelemeniz için beklemeye alacağım. Onaylıyor musunuz?',
+            'Cumartesi açılış saatini 10:00 yapayım mı? Eski saati kullanan 1 bekleyen yanıt yeniden hazırlanacak, 1 planlı paylaşım da incelemenize alınacak.',
           action: 'Onayla ve güncelle',
         },
         {
@@ -481,13 +481,13 @@ export const copy: Record<Lang, Copy> = {
       note: 'Planlandı, yayınlandı demek değildir. Paylaşım gerçekten yayınlanınca haber verir, yayınlanamazsa nedenini söyler.',
       example: 'Örnek',
       heading: 'Bu hafta',
-      heldReason: 'Fiyat 6.000 ₺ → 6.500 ₺ olarak değiştiği için kendiliğinden beklemeye alındı.',
+      heldReason: 'Cumartesi açılış saati değiştiği için kendiliğinden beklemeye alındı.',
       posts: [
         {
           day: 'Pzt',
           time: '19:00',
           kind: 'Story · Fiyat kartı',
-          title: 'Deneme dersi',
+          title: 'Gün batımı yogası',
           status: 'Yayınlandı',
           state: 'published',
         },
@@ -503,7 +503,7 @@ export const copy: Record<Lang, Copy> = {
           day: 'Cum',
           time: '19:00',
           kind: 'Carousel',
-          title: 'Üyelik seçenekleri',
+          title: 'Hafta sonu ders programı',
           status: 'Beklemede',
           state: 'held',
         },
@@ -511,7 +511,7 @@ export const copy: Record<Lang, Copy> = {
           day: 'Paz',
           time: '10:00',
           kind: 'Gönderi',
-          title: 'Hafta sonu saatleri',
+          title: 'Yeni başlayanlar atölyesi',
           status: 'Taslak hazır',
           state: 'pending',
         },
@@ -955,16 +955,16 @@ export const copy: Record<Lang, Copy> = {
           from: 'owner',
           time: '09:12',
           attachment: {
-            kicker: 'Reformer Pilates',
-            title: 'Trial class',
-            note: 'free',
+            kicker: 'Yoga Studio',
+            title: 'Sunset yoga',
+            note: 'Saturday 19:00',
           },
-          text: 'Prepare a trial-class story with this photo.',
+          text: 'Prepare a story for Saturday’s event with this photo.',
         },
         {
           from: 'assistant',
           time: '09:12',
-          text: 'Photo received. I’m preparing a Story draft using your trial-class details.',
+          text: 'Photo received. I’m preparing a Story draft using your event details.',
         },
         {
           from: 'owner',
@@ -986,7 +986,7 @@ export const copy: Record<Lang, Copy> = {
             '14 messages received. 11 conversations answered automatically, 2 passed to you and 1 message waiting for a reply.',
         },
         {
-          ask: 'Prepare a story for our trial class.',
+          ask: 'Prepare a story for Saturday’s event.',
           answer: 'I’m preparing a Story draft using your business details. You can review it in Content.',
         },
         {
@@ -1000,8 +1000,8 @@ export const copy: Record<Lang, Copy> = {
           action: 'Change time',
         },
         {
-          ask: 'Make the reformer package $195. Don’t let the next post go out with the old price.',
-          answer: 'I found 1 pending customer reply and a post scheduled for Friday at 19:00 using the old price. With your approval, I’ll set the package to $195, redraft the reply and hold the post for your review. Shall I go ahead?',
+          ask: 'We open at 10:00 on Saturdays now.',
+          answer: 'Shall I set Saturday opening to 10:00? 1 pending reply using the old time will be redrafted and 1 scheduled post held for your review.',
           action: 'Approve & update',
         },
         {
@@ -1018,13 +1018,13 @@ export const copy: Record<Lang, Copy> = {
       note: 'Scheduled does not mean published. You hear when a post actually goes out, and if it fails, you hear why.',
       example: 'Example',
       heading: 'This week',
-      heldReason: 'Put on hold automatically because the price changed from $180 to $195.',
+      heldReason: 'Put on hold automatically because Saturday opening time changed.',
       posts: [
         {
           day: 'Mon',
           time: '19:00',
           kind: 'Story · Price card',
-          title: 'Trial class',
+          title: 'Sunset yoga',
           status: 'Published',
           state: 'published',
         },
@@ -1040,7 +1040,7 @@ export const copy: Record<Lang, Copy> = {
           day: 'Fri',
           time: '19:00',
           kind: 'Carousel',
-          title: 'Membership options',
+          title: 'Weekend class schedule',
           status: 'On hold',
           state: 'held',
         },
@@ -1048,7 +1048,7 @@ export const copy: Record<Lang, Copy> = {
           day: 'Sun',
           time: '10:00',
           kind: 'Feed post',
-          title: 'Weekend hours',
+          title: 'Beginners’ workshop',
           status: 'Draft ready',
           state: 'pending',
         },

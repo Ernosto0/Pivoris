@@ -44,7 +44,7 @@ const uiText = {
         ask: 'Dün gece neler oldu?',
         reply: {
           before:
-            'Gece 17 mesaj geldi, 13’ünü yanıtladım. 3 soru sizi bekliyor; biri hamile pilatesi hakkında.',
+            'Gece 17 mesaj geldi, 13’ünü yanıtladım. 3 soru kararınızı bekliyor.',
         },
         status: 'Günün özeti hazır',
         tone: 'success',
@@ -88,7 +88,7 @@ const uiText = {
         ask: 'What happened last night?',
         reply: {
           before:
-            '17 messages came in overnight and I answered 13. 3 questions are waiting for you, one about prenatal Pilates.',
+            '17 messages came in overnight and I answered 13. 3 questions are waiting for your decision.',
         },
         status: 'Your daily summary is ready',
         tone: 'success',

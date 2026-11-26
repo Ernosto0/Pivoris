@@ -33,7 +33,11 @@ npm run typecheck
   owner's Telegram summary and a content approval; independent of the selector) and synchronise `DominoSandbox.tsx`
   (interactive price-change cascade), `DraftDemo.tsx` (interactive teach-the-assistant flow),
   `KnowledgePreview.tsx` (highlighted extraction), `MissedRevenueCalculator.tsx` and the default
-  category in `WaitlistForm.tsx`. Operational stories, channel previews and the five-language demo
+  category in `WaitlistForm.tsx`. Until the visitor picks a business, each of those demos shows a
+  different sector (price change: pilates, teach flow: beauty, knowledge cards: clinic, calculator:
+  cafe; set in `App.tsx`) so the page never repeats one studio's prices; a pick makes them all follow
+  it. Keep each concrete example (a price, a price change, an unanswered question) in one place, and
+  give the fixed sections their own sectors. Operational stories, channel previews and the five-language demo
   live in `src/ProductStories.tsx`, and the before/after night comparison lives in `src/ChaosToCalm.tsx`.
   Telegram supports owner commands, photos, tasks and answers; optional WhatsApp supports
   notifications, summaries and in-window approval buttons, not free-text commands. Calendar

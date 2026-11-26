@@ -114,10 +114,13 @@ export function App() {
   const [route, setRoute] = useState<Route>(routeFromLocation)
   const [lang, setLangState] = useState<Lang>(initialLang)
   const [theme, setTheme] = useState<Theme>(initialTheme)
-  const [businessId, setBusinessId] = useState<BusinessId>('pilates')
+  // Null until the visitor picks a business; until then each demo shows a different sector,
+  // so the page does not repeat one studio's prices. A pick makes every demo follow it.
+  const [businessId, setBusinessId] = useState<BusinessId | null>(null)
   const t = copy[lang]
   const scenarios = getScenarios(lang)
-  const scenario = getScenario(lang, businessId)
+  const demoScenario = (fallback: BusinessId) => getScenario(lang, businessId ?? fallback)
+  const scenario = demoScenario('pilates')
   const pendingHashRef = useRef<string | null>(null)
 
   const navigate = useCallback((nextRoute: Route, hash?: string) => {
@@ -250,7 +253,7 @@ export function App() {
                   <BusinessSwitcher
                     lang={lang}
                     scenarios={scenarios}
-                    scenario={scenario}
+                    selected={businessId}
                     onSelect={setBusinessId}
                   />
                 }
@@ -282,7 +285,7 @@ export function App() {
                     </ul>
                   </div>
                   <div>
-                    <DraftDemo t={t.demo} lang={lang} scenario={scenario} />
+                    <DraftDemo t={t.demo} lang={lang} scenario={demoScenario('beauty')} />
                   </div>
                 </div>
               </Reveal>
@@ -294,12 +297,12 @@ export function App() {
               <CapabilitiesSection lang={lang} />
             </Reveal>
 
-            <HowItWorks t={t} lang={lang} scenario={scenario} />
+            <HowItWorks t={t} lang={lang} scenario={demoScenario('clinic')} />
 
             <ContentAndReport t={t} />
 
             <Reveal>
-              <MissedRevenueCalculator lang={lang} scenario={scenario} />
+              <MissedRevenueCalculator lang={lang} scenario={demoScenario('cafe')} />
             </Reveal>
 
             <Trust t={t.trust} />
@@ -567,12 +570,12 @@ function Hero({
 function BusinessSwitcher({
   lang,
   scenarios,
-  scenario,
+  selected,
   onSelect,
 }: {
   lang: Lang
   scenarios: BusinessScenario[]
-  scenario: BusinessScenario
+  selected: BusinessId | null
   onSelect: (id: BusinessId) => void
 }) {
   const label = lang === 'tr' ? 'Örnekleri işletmenize göre görün' : 'See the demos for your business'
@@ -584,7 +587,7 @@ function BusinessSwitcher({
           <button
             key={item.id}
             type="button"
-            aria-pressed={scenario.id === item.id}
+            aria-pressed={selected === item.id}
             onClick={() => onSelect(item.id)}
             className="min-h-9 rounded-control border border-border bg-canvas px-3 text-xs font-medium text-secondary transition-colors hover:border-control hover:text-primary aria-pressed:border-control aria-pressed:bg-surface-subtle aria-pressed:text-primary"
           >
