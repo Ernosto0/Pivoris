@@ -400,6 +400,20 @@ body {
 }
 
 /* Chat typing indicator dots */
+/* Hero tour: the active step's dot fills over that step's duration. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.hero-progress {
+  transform-origin: left;
+  animation: hero-progress linear both;
+}
+
 @keyframes typing-dot {
   0%,
   60%,
