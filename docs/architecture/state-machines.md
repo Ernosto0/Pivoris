@@ -322,3 +322,27 @@ change. Re-pausing is a new state revision even though its state label stays pau
 
 
 Session 05 sweep: submit quota forecast, ledger quota, calendar and reporting count ContentItem rows, so each carousel counts once without joining children. Notifications and failure detail use the existing item/operation states. Generation, templates, command-created content and the Phase 7.5 agent remain single-image/story only by design. Insights snapshot ingestion skips feed_carousel (album metrics are out of scope); provider calls return typed MEDIA_INSIGHTS_NOT_SUPPORTED for albums.
+
+---
+
+## 9. Workspace plan & subscription snapshot (Feature Phase 6, ADR-029)
+
+`workspace_plans.status` is driven by Dodo subscription snapshots (`billing_apply_event` and daily `billing_reconcile`), gated by monotonic `billing_accounts.last_event_ts` (any snapshot with `timestamp <= last_event_ts` is ignored) and skipped for `status` updates when `workspace_plans.billing_exempt = true`.
+
+| Provider snapshot (`data.status`) | `workspace_plans.status` | `workspace_plans.access_until` | Side effects |
+|---|---|---|---|
+| *(new workspace)* | `trial` | `null` (`trial_ends_at = created_at + BILLING_TRIAL_DAYS`) | — |
+| `active` (`cancel_at_next_billing_date = false`) | `active` | `null` | Plan & `monthly_quota` updated from product map. On **first** activation (`activated_once = false`), quota period resets (`period_start = now`, `used = 0`, `activated_once = true`) and `billing.activated` notifies `system_health.view`. Renewals keep the monthly quota cadence. |
+| `active` (`cancel_at_next_billing_date = true` with future `next_billing_date`) | `cancelled` | `next_billing_date` | Access lasts through the paid period; `billing.subscription_cancelled` audited. |
+| `past_due` | `past_due` | `data.past_due_ends_at` (7-day Dodo grace) | `billing.payment_failed` notifies `system_health.view`; `billing.subscription_past_due` audited. |
+| `cancelled` with future end date (`expires_at` / `next_billing_date > now`) | `cancelled` | end of paid period | Access continues until `access_until`. |
+| `on_hold` / `failed` | `past_due` | `now` | Immediate `BILLING_INACTIVE` block; `billing.paused` notification. |
+| `cancelled` (immediate / past end) / `expired` | `cancelled` | `now` | Immediate `BILLING_INACTIVE` block; `billing.paused` notification. |
+| `active` for a second, different `subscription_id` while current is active/past_due | *(unchanged)* | *(unchanged)* | Operator alert `billing:duplicate_subscription:<ws>`; existing state is preserved. |
+
+**Access evaluation (`plans.service.block_reason`):**
+- When `BILLING_PROVIDER == "none"` or `workspace.is_demo` or `row.billing_exempt`: billing never blocks; only `REPLY_QUOTA_PAUSED` (`used >= grace_limit`) applies.
+- Otherwise:
+  - `status == "trial"` and `now >= trial_ends_at` → `BILLING_INACTIVE`.
+  - `status != "trial"` and `access_until is not None` and `now >= access_until` → `BILLING_INACTIVE`.
+  - Otherwise, if `used >= grace_limit` → `REPLY_QUOTA_PAUSED`, else `None`.

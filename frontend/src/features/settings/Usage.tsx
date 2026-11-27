@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Skeleton } from "@/components/Feedback";
+import { useMeta } from "@/features/auth/hooks";
 import { useCurrentWorkspace } from "@/features/workspaces/context";
 import { useReplyUsage } from "./hooks";
-import { SettingRow, SettingsPanel, SettingsSection } from "./SettingsParts";
+import { FOCUS, SettingRow, SettingsPanel, SettingsSection } from "./SettingsParts";
 
 const STATE_TONE = {
   normal: "text-secondary",
@@ -27,8 +29,11 @@ const BAR_TONE = {
 export function Usage() {
   const { t, i18n } = useTranslation();
   const { workspace, role } = useCurrentWorkspace();
+  const meta = useMeta();
   const usage = useReplyUsage();
   if (role !== "owner" && role !== "manager") return null;
+
+  const billingEnabled = Boolean(meta.data?.billing_enabled);
 
   const number = new Intl.NumberFormat(i18n.language);
   const data = usage.data;
@@ -76,6 +81,16 @@ export function Usage() {
           <SettingRow label={t("usage.periodEnds")}>
             <p className="text-body text-primary">{date(data.period_end)}</p>
           </SettingRow>
+          {billingEnabled ? (
+            <SettingRow label={t("usage.manageBilling")}>
+              <Link
+                to={`/w/${workspace.id}/more/settings/billing`}
+                className={`inline-flex min-h-10 items-center rounded-control px-2.5 text-body font-semibold text-action hover:bg-surface-subtle ${FOCUS}`}
+              >
+                {t("usage.manageBilling")}
+              </Link>
+            </SettingRow>
+          ) : null}
           <p className="border-t border-border/70 px-4 py-3 text-metadata text-secondary sm:px-5">{t("usage.rule")}</p>
         </SettingsPanel>
       ) : null}

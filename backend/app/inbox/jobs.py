@@ -148,16 +148,26 @@ def draft_reply(job: JobContext) -> None:
             f"legacy:{job.job_id}:{prepared.covers_through_message_id}",
         )
         ticket_id = ticket.id if ticket is not None else None
+        stop_reason = (
+            usage.pause_reason(session, job.clock, job.workspace_id) or usage.PAUSED_REASON
+            if ticket_id is None
+            else None
+        )
         session.commit()
     if ticket_id is None:
-        plan = failed_plan(prepared, usage.PAUSED_REASON)
+        plan = failed_plan(prepared, stop_reason or usage.PAUSED_REASON)
     else:
         plan = make_plan(  # no transaction is open here
             runner_deps(job.session_factory, job.clock), prepared, job.correlation_id, job.job_id
         )
     newer = _store_draft(job, prepared, plan, ticket_id)
-    if newer is None:  # the slot was taken by another draft while this model call ran
-        newer = _store_draft(job, prepared, failed_plan(prepared, usage.PAUSED_REASON), None)
+    if newer is None:  # the slot was taken or billing lapsed while this model call ran
+        with job.session_factory() as session:
+            late_reason = (
+                usage.pause_reason(session, job.clock, job.workspace_id) or usage.PAUSED_REASON
+            )
+            session.commit()
+        newer = _store_draft(job, prepared, failed_plan(prepared, late_reason), None)
     if newer:
         # The customer wrote again while the model ran. This job's dedup key kept that
         # message's own enqueue from creating a second job, so this job must run again.

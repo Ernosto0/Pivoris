@@ -98,6 +98,16 @@ export type ResetResult = Schemas["ResetOut"];
 // Plans: the monthly AI reply allowance (owner and manager).
 export type ReplyUsage = Schemas["UsageOut"];
 
+// Hosted subscription billing (Feature Phase 6, ADR-029).
+export type Billing = Schemas["BillingOut"];
+export type BillingPlanPrice = Schemas["PlanPriceOut"];
+export type BillingFounderOffer = Schemas["FounderOfferOut"];
+export type BillingCheckoutBody = Schemas["CheckoutIn"];
+export type BillingCheckoutOut = Schemas["CheckoutOut"];
+export type BillingPortalOut = Schemas["PortalOut"];
+export type DevBillingSimulateBody = Schemas["DevBillingSimulateIn"];
+export type DevBillingSimulateOut = Schemas["DevBillingSimulateOut"];
+
 // Phase 9: Owner messaging channels (ADR-012, Session 02)
 export type ChannelLink = Schemas["ChannelLinkOut"];
 export type ChannelLinkCode = Schemas["ChannelLinkCodeOut"];

@@ -156,7 +156,12 @@ def test_telegram_types_explicitly_defined_and_valid() -> None:
         "quota.warning",
         "quota.grace",
         "quota.paused",
+        "billing.trial_ending",
+        "billing.payment_failed",
+        "billing.paused",
+        "billing.activated",
         "report.daily_ready",
+        "report.morning_briefing_ready",
         "report.missed_customers_ready",
     }
     assert expected == TELEGRAM_TYPES

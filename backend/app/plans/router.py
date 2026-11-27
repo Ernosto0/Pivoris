@@ -8,7 +8,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_clock, require_membership
-from app.core.clock import Clock
+from app.core.clock import Clock, SystemClock
+from app.core.config import get_settings
 from app.core.context import WorkspaceContext
 from app.core.db import get_db
 from app.plans import service
@@ -29,9 +30,27 @@ class UsageOut(BaseModel):
     period_end: datetime
     # normal < warning (80%) < grace (100%, drafting continues) < paused (the grace is used up)
     state: Literal["normal", "warning", "grace", "paused"]
+    trial_ends_at: datetime
+    access_until: datetime | None
+    billing_exempt: bool
+    block_reason: Literal["BILLING_INACTIVE", "REPLY_QUOTA_PAUSED"] | None
 
 
-def view(row: WorkspacePlan) -> UsageOut:
+def view(
+    row: WorkspacePlan,
+    *,
+    now: datetime | None = None,
+    is_demo: bool = False,
+    billing_on: bool | None = None,
+) -> UsageOut:
+    instant = now or SystemClock().now()
+    enabled = get_settings().billing_enabled if billing_on is None else billing_on
+    reason = service.block_reason(row, instant, billing_on=enabled, is_demo=is_demo)
+    block: Literal["BILLING_INACTIVE", "REPLY_QUOTA_PAUSED"] | None = None
+    if reason == "BILLING_INACTIVE":
+        block = "BILLING_INACTIVE"
+    elif reason == "REPLY_QUOTA_PAUSED":
+        block = "REPLY_QUOTA_PAUSED"
     return UsageOut(
         plan=row.plan,
         status=row.status,
@@ -43,6 +62,10 @@ def view(row: WorkspacePlan) -> UsageOut:
         period_start=row.period_start,
         period_end=row.period_end,
         state=service.state(row),
+        trial_ends_at=row.trial_ends_at,
+        access_until=row.access_until,
+        billing_exempt=bool(row.billing_exempt),
+        block_reason=block,
     )
 
 
@@ -52,6 +75,7 @@ def get_usage(
     db: Session = Depends(get_db),
     clock: Clock = Depends(get_clock),
 ) -> UsageOut:
-    result = view(service.get_plan(db, clock, ctx.workspace_id))
+    row = service.get_plan(db, clock, ctx.workspace_id)
+    result = view(row, now=clock.now(), is_demo=ctx.is_demo)
     db.commit()
     return result

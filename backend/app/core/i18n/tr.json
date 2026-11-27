@@ -591,5 +591,21 @@
   "content.issue.REEL_COVER_TOO_LARGE": "Kapak görseli en fazla 8 MB olmalıdır.",
   "content.issue.REEL_ASPECT_NOT_9_16": "Video önerilen 9:16 oranında değil; Instagram kırpabilir veya boşluk ekleyebilir.",
   "content.issue.REEL_RESOLUTION_BELOW_RECOMMENDED": "Video genişliği önerilen 540 pikselin altında.",
-  "content.issue.REEL_EDIT_LIST_PRESENT": "Videoda bir düzenleme listesi var; Instagram uyumluluğu canlı olarak henüz doğrulanmadı."
+  "content.issue.REEL_EDIT_LIST_PRESENT": "Videoda bir düzenleme listesi var; Instagram uyumluluğu canlı olarak henüz doğrulanmadı.",
+  "errors.BILLING_INACTIVE.what": "Deneme süreniz veya abonelik erişiminiz sona erdiği için yapay zekâ üretimi durduruldu.",
+  "errors.BILLING_INACTIVE.next": "Yapay zekâ özelliklerini sürdürmek için Abonelik sayfasından bir plan başlatın veya ödeme yönteminizi güncelleyin.",
+  "errors.BILLING_ALREADY_SUBSCRIBED.what": "Bu çalışma alanında zaten aktif veya ödeme bekleyen bir abonelik var.",
+  "errors.BILLING_ALREADY_SUBSCRIBED.next": "Planınızı veya ödeme yönteminizi Aboneliği yönet bölümünden güncelleyin.",
+  "errors.BILLING_SUBSCRIPTION_ACTIVE.what": "Aktif veya ödeme bekleyen aboneliği olan bir çalışma alanı silinemez.",
+  "errors.BILLING_SUBSCRIPTION_ACTIVE.next": "Önce Abonelik sayfasından aboneliğinizi iptal edin, ardından silme işlemini başlatın.",
+  "errors.BILLING_PROVIDER_UNAVAILABLE.what": "Ödeme sağlayıcısına şu anda ulaşılamıyor.",
+  "errors.BILLING_PROVIDER_UNAVAILABLE.next": "Birkaç saniye bekleyip tekrar deneyin.",
+  "activity.billing.checkout_created": "Abonelik ödeme sayfası başlatıldı",
+  "activity.billing.portal_opened": "Abonelik yönetim portalı açıldı",
+  "activity.billing.subscription_activated": "Abonelik etkinleştirildi",
+  "activity.billing.subscription_updated": "Abonelik güncellendi",
+  "activity.billing.subscription_past_due": "Abonelik ödemesi gecikti",
+  "activity.billing.subscription_cancelled": "Abonelik iptal edildi",
+  "activity.billing.plan_trial_set": "Deneme süresi güncellendi",
+  "activity.billing.exempt_changed": "Faturalandırma muafiyeti güncellendi"
 }

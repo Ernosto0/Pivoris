@@ -52,6 +52,7 @@ from app.knowledge import impact
 from app.knowledge import service as knowledge_service
 from app.knowledge.render import RenderedSpan, RenderError, RenderResult, render
 from app.knowledge.service import UsableFact
+from app.plans import service as plans_service
 
 SUBJECT_TYPE = transitions.SUBJECT_TYPE
 GENERATED_BY = "generate_content"
@@ -96,6 +97,8 @@ def stage_request(
     existing = service.existing_for_request(session, ctx, user_id, client_request_id)
     if existing is not None:
         return existing, False
+    if plans_service.is_billing_blocked(session, clock, ctx.workspace_id):
+        raise AppError("BILLING_INACTIVE")
 
     now = clock.now()
     correlation_id = uuid.uuid4()
@@ -305,6 +308,10 @@ def prepare(
     stale = item.status != "draft" or item.version != payload.version
     if stale and proposal is None:
         run.status, run.error_code = "failed", CONTENT_CHANGED
+        run.completed_at = clock.now()
+        return None
+    if proposal is None and plans_service.is_billing_blocked(session, clock, workspace_id):
+        run.status, run.error_code = "failed", plans_service.BILLING_INACTIVE_REASON
         run.completed_at = clock.now()
         return None
 

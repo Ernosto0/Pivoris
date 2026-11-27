@@ -31,6 +31,7 @@ from app.core.security import (
 )
 from app.demo import simulator
 from app.demo.seed import SeedError, seed
+from app.hosted.billing.cli import register as register_billing_commands
 from app.identity import repository as identity_repo
 from app.identity import service
 from app.integrations.channels.telegram import TelegramClient, process_update
@@ -155,6 +156,7 @@ def cmd_export_openapi(args: argparse.Namespace) -> int:
             "log_level": "ERROR",
             "demo_tools_enabled": True,
             "app_env": "development",
+            "billing_provider": "fake",
         }
     )
     spec = create_app(settings).openapi()
@@ -577,6 +579,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_poll.set_defaults(func=cmd_telegram_poll)
     register_plan_commands(sub)
+    register_billing_commands(sub)
     return parser
 
 

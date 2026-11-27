@@ -1,4 +1,4 @@
-"""The monthly AI reply allowance: the counter, admission control and the warnings.
+"""The monthly AI reply allowance and provider-agnostic trial/billing admission control.
 
 THE COUNTING RULE. One unit is spent for each customer reply draft the AI produced with reply
 text, at the moment the draft is stored: a direct-message ``ReplyDraft`` (also one that policy
@@ -18,6 +18,12 @@ consumes the reservation in the transaction that stores the draft. A reservation
 five minutes (more than the job timeout), so a crashed worker cannot block drafting for long.
 The account agent consumes in the transaction that stores its draft.
 
+BILLING ENFORCEMENT (ADR-029). Core plans code never imports ``app.hosted``. When
+``billing_provider != "none"`` and the workspace is neither ``is_demo`` nor ``billing_exempt``,
+an expired trial (``status == "trial"`` and ``now >= trial_ends_at``) or an expired access window
+(``status != "trial"`` and ``access_until is not None`` and ``now >= access_until``) stops AI
+reply drafting and AI content generation with reason ``BILLING_INACTIVE``.
+
 PERIODS roll forward lazily, on the next read or write after the period ends, by whole calendar
 months from the anchor day; the counter restarts at zero and the warnings re-arm. States:
 normal, warning (80%), grace (100%, up to 110%) and paused (110%). Paused is computed, not
@@ -33,11 +39,15 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.core.clock import Clock
+from app.core.config import get_settings
 from app.core.context import ActorRef, WorkspaceContext
 from app.core.errors import AppError
 from app.identity.models import Workspace
 from app.notifications.service import notify_permission_holders
 from app.plans.models import ReplyUsage, WorkspacePlan
+from app.plans.tiers import (
+    BILLING_INACTIVE_REASON as BILLING_INACTIVE_REASON,
+)
 from app.plans.tiers import (
     DEFAULT_PLAN,
     DEFAULT_STATUS,
@@ -55,6 +65,35 @@ def next_month(start: datetime, day: int) -> datetime:
     return start.replace(year=year, month=month, day=min(day, calendar.monthrange(year, month)[1]))
 
 
+def ensure_plan_row(db: Session, workspace: Workspace) -> None:
+    """Idempotently insert the default ``workspace_plans`` row for ``workspace``."""
+    start = workspace.created_at
+    trial_days = get_settings().billing_trial_days
+    db.execute(
+        insert(WorkspacePlan)
+        .values(
+            workspace_id=workspace.id,
+            plan=DEFAULT_PLAN,
+            monthly_quota=TIERS[DEFAULT_PLAN],
+            status=DEFAULT_STATUS,
+            period_start=start,
+            period_end=next_month(start, start.day),
+            anchor_day=start.day,
+            period_id=uuid.uuid4(),
+            used=0,
+            warned_80=False,
+            warned_100=False,
+            warned_paused=False,
+            trial_ends_at=start + timedelta(days=trial_days),
+            access_until=None,
+            billing_exempt=bool(workspace.is_demo),
+            warned_trial_ending=False,
+            warned_billing_paused=False,
+        )
+        .on_conflict_do_nothing(index_elements=["workspace_id"])
+    )
+
+
 def get_plan(db: Session, clock: Clock, workspace_id: uuid.UUID) -> WorkspacePlan:
     """The workspace's plan row, locked for the rest of the transaction and rolled forward to
     the current period. A workspace without a row (created by any path) gets the default."""
@@ -63,25 +102,7 @@ def get_plan(db: Session, clock: Clock, workspace_id: uuid.UUID) -> WorkspacePla
         workspace = db.get(Workspace, workspace_id)
         if workspace is None:
             raise AppError("NOT_FOUND")
-        start = workspace.created_at
-        db.execute(
-            insert(WorkspacePlan)
-            .values(
-                workspace_id=workspace_id,
-                plan=DEFAULT_PLAN,
-                monthly_quota=TIERS[DEFAULT_PLAN],
-                status=DEFAULT_STATUS,
-                period_start=start,
-                period_end=next_month(start, start.day),
-                anchor_day=start.day,
-                period_id=uuid.uuid4(),
-                used=0,
-                warned_80=False,
-                warned_100=False,
-                warned_paused=False,
-            )
-            .on_conflict_do_nothing(index_elements=["workspace_id"])
-        )
+        ensure_plan_row(db, workspace)
         row = _locked(db, workspace_id)
         if row is None:
             raise AppError("NOT_FOUND")
@@ -128,6 +149,33 @@ def state(row: WorkspacePlan) -> str:
     return "warning" if row.used * 100 >= quota(row) * WARNING_PERCENT else "normal"
 
 
+def billing_block_reason(
+    row: WorkspacePlan, now: datetime, *, billing_on: bool, is_demo: bool
+) -> str | None:
+    """Pure billing-only admission check (used by AI content generation and ``block_reason``)."""
+    if not billing_on or is_demo or bool(row.billing_exempt):
+        return None
+    if row.status == "trial":
+        if row.trial_ends_at is not None and now >= row.trial_ends_at:
+            return BILLING_INACTIVE_REASON
+        return None
+    if row.access_until is not None and now >= row.access_until:
+        return BILLING_INACTIVE_REASON
+    return None
+
+
+def block_reason(
+    row: WorkspacePlan, now: datetime, *, billing_on: bool, is_demo: bool
+) -> str | None:
+    """Pure admission check returning ``BILLING_INACTIVE``, ``REPLY_QUOTA_PAUSED`` or ``None``."""
+    billing = billing_block_reason(row, now, billing_on=billing_on, is_demo=is_demo)
+    if billing is not None:
+        return billing
+    if state(row) == "paused":
+        return PAUSED_REASON
+    return None
+
+
 def context(db: Session, workspace_id: uuid.UUID) -> WorkspaceContext:
     ws = db.get(Workspace, workspace_id)
     if ws is None:
@@ -161,6 +209,13 @@ def warnings(db: Session, clock: Clock, row: WorkspacePlan) -> None:
             setattr(row, attr, True)
 
 
+def _is_demo_workspace(db: Session, workspace_id: uuid.UUID) -> bool:
+    ws = db.get(Workspace, workspace_id)
+    if ws is None:
+        raise AppError("NOT_FOUND")
+    return bool(ws.is_demo)
+
+
 def reserve(db: Session, clock: Clock, workspace_id: uuid.UUID, key: str) -> ReplyUsage | None:
     row = get_plan(db, clock, workspace_id)
     old = db.scalar(
@@ -170,11 +225,22 @@ def reserve(db: Session, clock: Clock, workspace_id: uuid.UUID, key: str) -> Rep
     )
     if old is not None and old.state == "consumed":
         return old
+    now = clock.now()
+    if (
+        billing_block_reason(
+            row,
+            now,
+            billing_on=get_settings().billing_enabled,
+            is_demo=_is_demo_workspace(db, workspace_id),
+        )
+        is not None
+    ):
+        return None
     if (
         old is not None
         and old.state == "reserved"
         and old.period_id == row.period_id
-        and old.expires_at > clock.now()
+        and old.expires_at > now
     ):
         return old
     reserved = (
@@ -185,7 +251,7 @@ def reserve(db: Session, clock: Clock, workspace_id: uuid.UUID, key: str) -> Rep
                 ReplyUsage.workspace_id == workspace_id,
                 ReplyUsage.period_id == row.period_id,
                 ReplyUsage.state == "reserved",
-                ReplyUsage.expires_at > clock.now(),
+                ReplyUsage.expires_at > now,
             )
         )
         or 0
@@ -195,7 +261,7 @@ def reserve(db: Session, clock: Clock, workspace_id: uuid.UUID, key: str) -> Rep
         return None
     ticket = old or ReplyUsage(workspace_id=workspace_id, draft_key=key)
     ticket.period_id, ticket.state = row.period_id, "reserved"
-    ticket.expires_at = clock.now() + timedelta(minutes=5)
+    ticket.expires_at = now + timedelta(minutes=5)
     db.add(ticket)
     db.flush()
     return ticket
@@ -214,13 +280,19 @@ def finish(
         return False
     if ticket.state == "consumed":
         return True
-    if (
-        ticket.state != "reserved"
-        or ticket.period_id != row.period_id
-        or ticket.expires_at <= clock.now()
-    ):
+    now = clock.now()
+    if ticket.state != "reserved" or ticket.period_id != row.period_id or ticket.expires_at <= now:
         return False
-    if produced and row.used >= limit(row):
+    if produced and (
+        billing_block_reason(
+            row,
+            now,
+            billing_on=get_settings().billing_enabled,
+            is_demo=_is_demo_workspace(db, workspace_id),
+        )
+        is not None
+        or row.used >= limit(row)
+    ):
         ticket.state = "released"
         return False
     ticket.state = "consumed" if produced else "released"
@@ -236,8 +308,30 @@ def consume(db: Session, clock: Clock, workspace_id: uuid.UUID, key: str) -> boo
     return ticket is not None and finish(db, clock, workspace_id, ticket.id, produced=True)
 
 
+def pause_reason(db: Session, clock: Clock, workspace_id: uuid.UUID) -> str | None:
+    """Return ``BILLING_INACTIVE``, ``REPLY_QUOTA_PAUSED`` or ``None``.
+
+    When the stop reason is quota exhaustion, ensures the once-per-period warning was sent.
+    """
+    row = get_plan(db, clock, workspace_id)
+    reason = block_reason(
+        row,
+        clock.now(),
+        billing_on=get_settings().billing_enabled,
+        is_demo=_is_demo_workspace(db, workspace_id),
+    )
+    if reason == PAUSED_REASON:
+        warnings(db, clock, row)
+    return reason
+
+
 def is_paused(db: Session, clock: Clock, workspace_id: uuid.UUID) -> bool:
-    """Whether drafting is paused now. Also makes sure the owner has been told (once)."""
+    """Whether drafting is paused now (for either billing or quota)."""
+    return pause_reason(db, clock, workspace_id) is not None
+
+
+def is_quota_paused(db: Session, clock: Clock, workspace_id: uuid.UUID) -> bool:
+    """Whether the reply quota is paused now (ignoring billing). Used by sandbox test chat."""
     row = get_plan(db, clock, workspace_id)
     if state(row) != "paused":
         return False
@@ -245,8 +339,27 @@ def is_paused(db: Session, clock: Clock, workspace_id: uuid.UUID) -> bool:
     return True
 
 
+def is_billing_blocked(db: Session, clock: Clock, workspace_id: uuid.UUID) -> bool:
+    """Whether AI features are stopped due to inactive billing (ignoring reply quota)."""
+    row = get_plan(db, clock, workspace_id)
+    return (
+        billing_block_reason(
+            row,
+            clock.now(),
+            billing_on=get_settings().billing_enabled,
+            is_demo=_is_demo_workspace(db, workspace_id),
+        )
+        is not None
+    )
+
+
 def notify_paused_conversation(
-    db: Session, clock: Clock, workspace_id: uuid.UUID, conversation_id: uuid.UUID
+    db: Session,
+    clock: Clock,
+    workspace_id: uuid.UUID,
+    conversation_id: uuid.UUID,
+    *,
+    reason: str = PAUSED_REASON,
 ) -> None:
     """The account agent skipped a customer message because drafting is paused: tell the people
     who answer customers, like any other message that waits for a person. The legacy drafting
@@ -268,7 +381,7 @@ def notify_paused_conversation(
         permission="reply.approve",
         type="conversation.needs_human",
         severity="attention",
-        params={"conversation_id": str(conversation_id), "reasons": [PAUSED_REASON]},
+        params={"conversation_id": str(conversation_id), "reasons": [reason]},
         subject_type="conversation",
         subject_id=conversation_id,
         dedup_key=f"needs-human:{conversation_id}",

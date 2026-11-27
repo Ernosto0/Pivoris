@@ -41,6 +41,7 @@ _PREFIXES = (
     "security",
     "demo",
     "calendar",
+    "billing",
 )
 
 

@@ -432,6 +432,32 @@ wheels = [
 ]
 
 [[package]]
+name = "distro"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed", size = 60722, upload-time = "2023-12-24T09:54:32.31Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2", size = 20277, upload-time = "2023-12-24T09:54:30.421Z" },
+]
+
+[[package]]
+name = "dodopayments"
+version = "1.127.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/de/e6fd7bf23a17a395b2355d95c530b886eaab4dcf8748a0e55ae155e38d3b/dodopayments-1.127.0.tar.gz", hash = "sha256:d41f15d4bdf319fa8daa54c587c2f2afe43110f5b559662bbf387e7d5156d6f0", size = 544929, upload-time = "2026-11-16T14:09:53.734Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/62/92/9d3cf222c1beeeb6e1cccb42e32ab182d82dbbb6bb423548df0b97130edc/dodopayments-1.127.0-py3-none-any.whl", hash = "sha256:92a6fe4d96fd8ca0fd5b3ee38b120f1a3778df456e40f0df799bf68f75583227", size = 523852, upload-time = "2026-11-16T14:09:52.174Z" },
+]
+
+[[package]]
 name = "fastapi"
 version = "0.143.2"
 source = { registry = "https://pypi.org/simple" }
@@ -993,6 +1019,7 @@ dependencies = [
     { name = "boto3" },
     { name = "certifi" },
     { name = "cryptography" },
+    { name = "dodopayments" },
     { name = "fastapi" },
     { name = "httpx" },
     { name = "httpx2" },
@@ -1031,6 +1058,7 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.35" },
     { name = "certifi", specifier = ">=2026.10.18" },
     { name = "cryptography", specifier = ">=43.0" },
+    { name = "dodopayments", specifier = ">=1.127.0" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "httpx2", specifier = ">=2.13.1" },

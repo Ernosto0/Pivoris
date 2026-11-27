@@ -6,8 +6,8 @@ import { BottomSheet } from "@/components/BottomSheet";
 import { TextField } from "@/components/TextField";
 import { MORE_GROUPS, NAV_ITEMS, allowedDestination, workspaceTarget } from "./navigation";
 
-export function DestinationLauncher({ workspaceId, role, demoTools, onClose, returnFocusRef }: {
-  workspaceId: string; role: Role; demoTools: boolean; onClose: () => void; returnFocusRef?: RefObject<HTMLElement | null>;
+export function DestinationLauncher({ workspaceId, role, demoTools, billingEnabled = false, onClose, returnFocusRef }: {
+  workspaceId: string; role: Role; demoTools: boolean; billingEnabled?: boolean; onClose: () => void; returnFocusRef?: RefObject<HTMLElement | null>;
 }) {
   const { t, i18n } = useTranslation();
   const [query, setQuery] = useState("");
@@ -15,7 +15,7 @@ export function DestinationLauncher({ workspaceId, role, demoTools, onClose, ret
   const results = useRef<HTMLDivElement>(null);
   const destinations = [...NAV_ITEMS, ...MORE_GROUPS.flatMap(group => group.items)]
     .filter((item, index, all) => all.findIndex(other => other.path === item.path) === index)
-    .filter(item => allowedDestination(item, role, demoTools))
+    .filter(item => allowedDestination(item, role, demoTools, billingEnabled))
     .filter(item => t(item.labelKey).toLocaleLowerCase(i18n.language).includes(query.trim().toLocaleLowerCase(i18n.language)));
 
   function keyboard(event: KeyboardEvent<HTMLDivElement>) {

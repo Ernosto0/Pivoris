@@ -1,7 +1,16 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, UUIDPrimaryKeyMixin, WorkspaceScopedMixin, workspace_unique_constraint
@@ -34,6 +43,17 @@ class WorkspacePlan(Base):
     warned_80: Mapped[bool] = mapped_column(default=False)
     warned_100: Mapped[bool] = mapped_column(default=False)
     warned_paused: Mapped[bool] = mapped_column(default=False)
+    trial_ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    access_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
+    billing_exempt: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=text("false")
+    )
+    warned_trial_ending: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=text("false")
+    )
+    warned_billing_paused: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=text("false")
+    )
 
 
 class ReplyUsage(UUIDPrimaryKeyMixin, WorkspaceScopedMixin, Base):

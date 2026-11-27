@@ -48,6 +48,10 @@ ERROR_CATALOG: dict[str, ErrorSpec] = {
     "WEB_PUSH_NOT_CONFIGURED": ErrorSpec(409),
     "ACCOUNT_MISMATCH": ErrorSpec(409),
     "LAST_OWNER_REQUIRED": ErrorSpec(409),
+    "BILLING_INACTIVE": ErrorSpec(402, retryable=False),
+    "BILLING_ALREADY_SUBSCRIBED": ErrorSpec(409),
+    "BILLING_SUBSCRIPTION_ACTIVE": ErrorSpec(409),
+    "BILLING_PROVIDER_UNAVAILABLE": ErrorSpec(503, retryable=True),
     "REPORT_EVIDENCE_UNAVAILABLE": ErrorSpec(409),
     "REPORT_SOURCES_RETAINED_OUT": ErrorSpec(409),
     # Submitting content: the blocking item codes are in params.errors / the problem's ``errors``.

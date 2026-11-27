@@ -211,7 +211,9 @@ def _format_notification_text(notification: Notification, locale: str | None = N
     is_tr = (locale or "tr").lower().startswith("tr")
     lang = "tr" if is_tr else "en"
     params = notification.params if isinstance(notification.params, dict) else {}
-    localized = _LOCALIZED_NOTIFICATION_TEXT.get(notification.type, {}).get(lang)
+    localized = _LOCALIZED_NOTIFICATION_TEXT.get(notification.type, {}).get(lang) or QUOTA_TEXT.get(
+        notification.type, {}
+    ).get(lang)
 
     raw_title = (
         params.get("title")

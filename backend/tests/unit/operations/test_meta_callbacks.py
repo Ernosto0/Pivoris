@@ -201,9 +201,7 @@ def test_handle_data_deletion_page_owner_account() -> None:
     res = handle_data_deletion_request(session, clock, settings, signed_req)
 
     assert "confirmation_code" in res
-    assert res["url"].startswith(
-        "https://app.pivoris.test/api/v1/webhooks/meta/data-deletion/del_"
-    )
+    assert res["url"].startswith("https://app.pivoris.test/api/v1/webhooks/meta/data-deletion/del_")
     assert acc.status == "disconnected"
     assert session.add.called
     assert session.commit.called

@@ -38,6 +38,7 @@ LLM_REASONS = {
     "LLM_OUTPUT_INVALID": "LLM_OUTPUT_INVALID",
     "LLM_REFUSED": "LLM_REFUSED",
     "REPLY_QUOTA_PAUSED": "REPLY_QUOTA_PAUSED",  # plans: no model call was made
+    "BILLING_INACTIVE": "BILLING_INACTIVE",  # plans: trial or subscription access ended
 }
 
 

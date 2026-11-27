@@ -75,9 +75,9 @@ def test_run_retention_full_phase8_coverage() -> None:
 
         counts = run_retention(session_factory, settings, now, batch_size=100)
 
-    # 1. Verify counts returned
+    # 1. Verify counts returned (5 from _delete_inbound_events + 1 billing_webhook_events batch)
     assert isinstance(counts, RetentionCounts)
-    assert counts.webhook_rows_deleted == 5
+    assert counts.webhook_rows_deleted == 6
     assert counts.public_sources_nulled == 3
     assert counts.memories_nulled == 4
 
@@ -85,13 +85,14 @@ def test_run_retention_full_phase8_coverage() -> None:
     assert ws1_id in set_tenant_calls
     assert ws2_id in set_tenant_calls
 
-    # 3. Inspect executed statements to prove every Phase 7.5 rule executed
+    # 3. Inspect executed statements to prove every Phase 7.5 + billing rule executed
     target_tables = []
     for stmt in executed_statements:
         if isinstance(stmt, (Update, Delete)):
             target_tables.append(stmt.table.name)
 
     # Check that each expected Phase 7.5 table received an update statement
+    assert "billing_webhook_events" in target_tables
     assert "owner_questions" in target_tables
     assert "owner_answers" in target_tables
     assert "agent_owner_tasks" in target_tables
@@ -129,7 +130,7 @@ def test_retention_phase8_owner_question_and_answer_statements() -> None:
         patch("app.owner_requests.service.recover_questions"),
     ):
         counts = run_retention(session_factory, settings, now, batch_size=100)
-    assert counts.webhook_rows_deleted == 0
+    assert counts.webhook_rows_deleted == 1
 
     # Verify OwnerQuestion update statement: body=None, source_message_id=None, source_hash=""
     q_updates = [u for u in executed_updates if u.table.name == "owner_questions"]

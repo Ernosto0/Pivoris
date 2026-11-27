@@ -55,7 +55,7 @@ _TEXT: dict[str, dict[str, tuple[str, str]]] = {
         "tr": ("Instagram bağlantısı yenilenmeli", "Hesabı yeniden bağlamak için uygulamayı açın."),
     },
 }
-_TEXT.update(QUOTA_TEXT)
+_TEXT.update({k: v for k, v in QUOTA_TEXT.items() if k in PUSH_TYPES})
 _SIMULATION_PREFIX = {"en": "[Simulation] ", "tr": "[Simülasyon] "}
 
 
@@ -92,6 +92,8 @@ def deep_link(notification: Notification) -> str:
     kind = notification.type
     if kind.startswith("quota."):
         return f"{base}/more/settings#usage"
+    if kind.startswith("billing."):
+        return f"{base}/more/settings/billing"
     if kind.startswith("owner_question."):
         question = _uuid(params.get("question_id")) or _uuid(notification.subject_id)
         account = _uuid(params.get("account_id"))
@@ -113,10 +115,11 @@ def deep_link(notification: Notification) -> str:
 
 def build_payload(notification: Notification, locale: str | None) -> PushPayload:
     """The payload for ``notification``. An unsupported type is an error, never a fallback."""
-    if notification.type not in PUSH_TYPES or notification.type not in _TEXT:
+    entry = _TEXT.get(notification.type) or QUOTA_TEXT.get(notification.type)
+    if notification.type not in PUSH_TYPES or entry is None:
         raise ValueError(f"no push payload for notification type: {notification.type}")
     lang = "tr" if (locale or "tr").lower().startswith("tr") else "en"
-    title, body = _TEXT[notification.type][lang]
+    title, body = entry[lang]
     if notification.is_simulated:
         title = _SIMULATION_PREFIX[lang] + title
     return PushPayload(

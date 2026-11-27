@@ -3,7 +3,7 @@
 **Purpose:** Define the cost structure (COGS), unit economics, packaging, and pricing tiers for the Pivoris hosted SaaS across both the **Türkiye** (high-touch, TRY) and **Global** (self-service, USD) markets, while respecting the open-source core boundary ([ADR-019](../architecture/decisions/ADR-019-open-source-and-hosted-boundary.md)) and open questions ([OQ-01, OQ-06, OQ-09](../research/open-questions.md)).
 
 > [!IMPORTANT]
-> **What is built today (reconciled against code, Feature Phases 1–5 & Pilot Readiness Sessions 01–08, 2026-11-19).** Sell only what an owner can use on day one: one Instagram Professional account per workspace, mobile web app, Telegram owner control (primary), WhatsApp owner control (optional alternative, delivered in Session 02), 5 customer reply languages (`tr`, `en`, `ru`, `de`, `ar` with app UI strictly `tr` and `en`), grounded DM drafts with semi-automation (basic FAQ auto-sends under explicit owner grant; complex questions require human approval), private replies via Comment-to-DM, template images, feed carousels and video Reels, voice note transcripts & image descriptions, lead lists, test chat with Account Agent parity, and daily activity reports. Each workspace has a plan (`starter` 500, `growth` 2,500, or `pro` 7,500 AI replies per month; default `growth` on trial), a monthly reply counter, and warnings at 80% and 100% with a 10% grace buffer (built, P-11; operator manages plans via CLI, see §4 and §8). Automated billing does not exist in the code; all billing is manual (bank transfer / EFT invoice; CLI `plan-extend` is operational quota tracking, not payment enforcement). Pilots are managed by hand (§6, stage 1). The findings per feature are in [§8](#8-what-the-code-supports-today-p-19-check).
+> **What is built today (reconciled against code, Feature Phases 1–6, 2026-11-27).** Sell only what an owner can use on day one: one Instagram Professional account per workspace, mobile web app, Telegram owner control (primary), WhatsApp owner control (optional alternative, delivered in Session 02), 5 customer reply languages (`tr`, `en`, `ru`, `de`, `ar` with app UI strictly `tr` and `en`), grounded DM drafts with semi-automation (basic FAQ auto-sends under explicit owner grant; complex questions require human approval), private replies via Comment-to-DM, template images, feed carousels and video Reels, voice note transcripts & image descriptions, lead lists, test chat with Account Agent parity, and daily activity reports. Each workspace has a plan (`starter` 500, `growth` 2,500, or `pro` 7,500 AI replies per month; default `growth` on a 14-day no-card trial), a monthly reply counter, warnings at 80% and 100% with a 10% grace buffer, and self-service subscription billing via **Dodo Payments** in the optional hosted module `app/hosted/billing` ([ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)). Self-hosted deployments default to `BILLING_PROVIDER=none` and are never paywalled.
 
 ---
 
@@ -116,12 +116,12 @@ Target: Local studios, gyms, salons, cafés, and clinics in Bucak, Burdur, and A
 
 | Stage | Offer | Price | Purpose & Commercial Terms |
 |---|---|---|---|
-| **1. Pilot Trial (7 Days or 30 Days)** | **Ücretsiz Pilot (7 veya 30 Gün)** | **0 ₺** (No credit card required) | Operator sets up verified facts in 30 mins with the owner, connects Instagram, configures semi-automation delegation and channels, and runs live test DMs. Trial duration is agreed at onboarding (either 7 days or 30 days) and recorded in the Onboarding Record. **No credit card is required, and no automated charge occurs at trial end.** |
-| **2. Pilot Founder Lock-In** | **Kurucu İşletme Paketi** | **990 ₺ / ay** (+ KDV)<br>*(Locked for 12 months)* | Rewards the first 10–15 pilot businesses for feedback and case-study permission. Invoiced manually via bank transfer (Havale/EFT) with *E-Arşiv Fatura*. Yields **~82% gross margin**. |
+| **1. Free Trial (14 Days)** | **Ücretsiz Deneme (14 Gün)** | **0 ₺** (No credit card required) | Every new workspace starts with a 14-day free trial on the full Growth quota (`BILLING_TRIAL_DAYS=14`). Operator can extend trials with `plan-trial --days N`. **No credit card is required, and no automated charge occurs at trial end.** |
+| **2. Pilot Founder Lock-In** | **Kurucu İşletme Paketi** | **990 ₺ / ay** (+ KDV)<br>*(Growth tier · 2,500 AI replies/mo)* | Dedicated Dodo recurring product (`founder_monthly`) available only to workspaces flagged by the operator (`python -m app.cli billing-founder --workspace <slug> --on`) and excluded from the public Customer Portal plan-change collection. Yields **~82% gross margin**. |
 
 > [!NOTE]
-> **Manual Billing & Plan Management:**
-> Billing is handled 100% manually. At the conclusion of the agreed free trial (7 or 30 days), the workspace is not automatically charged. The operator issues an EFT/Havale invoice. Workspace quota periods are managed using the CLI command `python -m app.cli plan-extend --workspace <slug> --days <N>`. Running `plan-extend` is an operational quota and period adjustment—it does **not** represent automated payment enforcement or billing renewal.
+> **Self-Service Dodo Billing & Operator Overrides:**
+> Subscriptions are billed through Dodo Payments hosted checkout and managed in the Dodo Customer Portal ([ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)). Manual EFT/Havale billing has been retired. The operator CLI (`plan-set`, `plan-trial`, `billing-exempt`, `billing-founder`) remains available for support overrides; webhooks never overwrite the status of a `billing_exempt` workspace.
 
 ---
 
@@ -161,7 +161,7 @@ For the global English-speaking market ([idea.md §2.2](../idea.md)), onboarding
 | **Annual Price (~20% off)** | **\$24 / mo** *(\$288/yr)* | **\$49 / mo** *(\$588/yr)* | **\$99 / mo** *(\$1,188/yr)* |
 | **Instagram Professional Accounts** | 1 Account | 1 Account | Up to 3 Accounts (**Planned**: 1 per workspace today) |
 | **Workspace Seats (`owner`/`manager`/`staff`)** | 2 Seats | 5 Seats | 15 Seats |
-| **AI DM Replies & Drafts** | **500 / mo** | **2,500 / mo** | **10,000 / mo** |
+| **AI DM Replies & Drafts** | **500 / mo** | **2,500 / mo** | **7,500 / mo** |
 | **Comment Moderation & Private Replies** | Comment-to-DM Private Reply Included | Comment-to-DM Private Reply Included | Comment-to-DM Private Reply Included |
 | **Account Agent & Semi-Automation** | Semi-autonomous (Verified FAQ auto-reply + human approval) | **Full Account Agent** (Customer memory, bookings, voice/image context) | **Full Account Agent** |
 | **Scheduled Feed, Story, Carousel & Reel Posts** | 20 / mo | Unlimited *(up to Meta 50/24h limit)* | Unlimited *(up to Meta 50/24h limit)* |
@@ -174,13 +174,13 @@ For the global English-speaking market ([idea.md §2.2](../idea.md)), onboarding
 
 ### Trial & Overage Policy (Global & Türkiye)
 
-> **Built (P-11), except the trial cap and self-service upgrade.** Every workspace has a monthly AI reply quota (the plan's, or an operator override), a counter, warnings at 80% and 100%, a 10% grace buffer and a pause afterwards, all described below and in [§8](#8-what-the-code-supports-today-p-19-check). **Not built:** the 100-reply cap during the 14-day trial (a trial workspace gets its plan's full quota), the one-tap plan upgrade (the operator changes the plan with `python -m app.cli plan-set`), and any billing. The daily model-call cap per workspace (`LLM_MAX_CALLS_PER_WORKSPACE_PER_DAY`) remains a separate safety net.
+> **Built (P-11 & Feature Phase 6).** Every workspace has a monthly AI reply quota (the plan's, or an operator override), a counter, warnings at 80% and 100%, a 10% grace buffer, a 14-day no-card trial with the plan's full quota, and self-service subscription checkout + Customer Portal plan upgrades/downgrades via Dodo Payments ([ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)). The daily model-call cap per workspace (`LLM_MAX_CALLS_PER_WORKSPACE_PER_DAY`) remains a separate safety net.
 
-1. **Free Trial:** Users explore the full simulated workspace immediately with zero credentials (`is_simulated`), paste their bio/price list, and connect their real Instagram account for a 7-day or 30-day trial without credit card.
+1. **Free Trial:** Users explore the full simulated workspace immediately with zero credentials (`is_simulated`), paste their bio/price list, and connect their real Instagram account for a 14-day free trial without credit card (`BILLING_TRIAL_DAYS=14`). If unpaid after trial (or after Dodo's 7-day `past_due` grace period on renewal failure), AI reply drafting and AI content generation pause (`BILLING_INACTIVE`) while inbound inbox messages, human notifications, scheduled posts, and sandbox test chat keep working.
 2. **Soft Overages (No Surprise Bills):** If a workspace reaches 100% of its monthly AI reply quota:
    - We send an owner notification at **80%** and **100%** usage (once per period, to owners and managers, through every channel they use).
    - We provide a **10% grace buffer** so active customer conversations are never abruptly dropped mid-day.
-   - After the grace buffer, incoming DMs still appear in the Inbox and trigger human notifications, while AI drafting pauses until the next billing cycle or a plan change (operator changes the plan via CLI; one-tap upgrade is **Planned**). What counts: every customer reply draft the AI prepares (direct message, public comment reply, private reply), once per draft, whether approved, edited, auto-sent or discarded; manual replies, owner commands, content drafts and the test chat do not count. The USD Scale tier (10,000) is set via `plan-set --plan pro --quota 10000`.
+   - After the grace buffer, incoming DMs still appear in the Inbox and trigger human notifications, while AI drafting pauses until the next monthly quota cycle or an immediate plan upgrade in the Dodo Customer Portal. What counts: every customer reply draft the AI prepares (direct message, public comment reply, private reply), once per draft, whether approved, edited, auto-sent or discarded; manual replies, owner commands, content drafts and the test chat do not count. Both TRY Pro and USD Scale tiers provide 7,500 AI replies/month.
 
 ---
 
@@ -199,18 +199,31 @@ Per [ADR-019](../architecture/decisions/ADR-019-open-source-and-hosted-boundary.
 
 ---
 
-## 6. Billing Infrastructure Roadmap (Resolving OQ-06 in Stages)
+## 6. Billing Infrastructure (Resolved OQ-06 — Feature Phase 6)
 
-Do not build complex billing engineering before paid pilot validation ([mvp-scope.md §4](mvp-scope.md)):
+Self-service subscription billing is implemented in `backend/app/hosted/billing/` ([ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)) and enabled via `BILLING_PROVIDER=dodo` (hosted SaaS), `BILLING_PROVIDER=fake` (local dev/demo), or `BILLING_PROVIDER=none` (open-source self-hosted default):
 
-1. **Stage 1 — Assisted Pilots (Workspaces 1–15, Türkiye):**
-   - **Billing method:** Manual invoicing (*E-Arşiv Fatura* via GİB portal or Paraşüt) + **EFT/Havale** or a static **iyzico Link / PayTR Link** sent over WhatsApp.
-   - **Code changes required:** **Zero.** Manage workspace limits with the operator CLI (`plan-usage`, `plan-set`, `plan-reset`, `plan-extend`).
-2. **Stage 2 — Commercial Türkiye Rollout (Workspaces 15–100):**
-   - **Billing provider:** **iyzico** (Subscription API with saved cards in TRY) or **PayTR**.
-   - **Code changes required:** Add optional `app/hosted/billing` module ([ADR-019](../architecture/decisions/ADR-019-open-source-and-hosted-boundary.md)) storing customer and subscription IDs and driving existing plan fields from webhooks.
-3. **Stage 3 — Global Self-Service Launch:**
-   - **Billing provider:** **Lemon Squeezy** or **Paddle** (Merchant of Record), or **Stripe Billing**.
+1. **Türkiye & Global Unified on Dodo Payments:**
+   - **Billing provider:** **Dodo Payments** (Merchant of Record, decided 2026-11-27; manual EFT/Havale billing retired). Turkish workspaces (`TRY` / `TR`) pay fixed TRY prices via `by_country` localized pricing; global workspaces pay the USD base price.
+   - **Lifecycle:** 14-day cardless trial (`BILLING_TRIAL_DAYS=14`), immediate charge on subscribe (`trial_period_days: 0`), 7-day grace on failed renewal via Dodo `past_due` (`past_due_ends_at`), and Customer Portal plan changes/cancellations via Product Collection `pdc_0Nsr46kk52vbmRaSbwjbd`.
+
+### 6.1 Dodo Payments setup (test mode, 2026-11-27)
+
+Dodo Payments is the Merchant of Record for both markets: it calculates, collects and remits sales tax and VAT, and it issues the customer invoice. Pivoris is a secondary brand (`brnd_0Nsqs1ADANpmDH0r6nHGq`) under an existing Dodo business, so payouts and KYC are shared with that business. Prices are tax-exclusive (`tax_inclusive: false`); tax is added at checkout, matching the "+ KDV" TRY prices in §3.
+
+Each public plan and interval is one recurring product with a USD base price and a fixed TRY price for `TR`. Product `metadata` carries `pivoris_plan` (`starter` / `growth` / `pro`, matching `workspace_plans`) and `billing_interval` (`monthly` / `annual`) for webhook mapping. The 6 public products belong to Product Collection `pdc_0Nsr46kk52vbmRaSbwjbd` (upgrades immediate & prorated; downgrades at next billing date). The Founder product (`founder_monthly`) is TRY-only, maps to `growth`, and is excluded from the public collection.
+
+| Plan | Interval | USD (base) | TRY (`TR`) | Test-mode product ID |
+|---|---|---|---|---|
+| Starter / Başlangıç | Monthly | \$29 | 1.490 ₺ | `pdt_0NsqswkWAd0FK9oDO2f0o` |
+| Starter / Başlangıç | Annual | \$288 | 14.900 ₺ | `pdt_0NsqswqhBfAW8bwMJ3dxR` |
+| Growth / İşletme | Monthly | \$59 | 2.490 ₺ | `pdt_0NsqswwdrUERi0iaabEh9` |
+| Growth / İşletme | Annual | \$588 | 24.900 ₺ | `pdt_0Nsqsx2WkiHRSFL2R2i2b` |
+| Scale / Stüdyo & Şube | Monthly | \$119 | 4.490 ₺ | `pdt_0Nsqsx7NRkeGfrSgJx8mI` |
+| Scale / Stüdyo & Şube | Annual | \$1,188 | 44.900 ₺ | `pdt_0NsqsxDIbMNHGUrK6Vy6n` |
+| Founder / Kurucu İşletme | Monthly | — | 990 ₺ | `pdt_0Nsr46dXafmkuoTG6cJTO` |
+
+Remaining for live cutover: live-mode copies of the 7 products and Product Collection, plus live webhook secret configuration (see [billing-runbook.md](../operations/billing-runbook.md)).
 
 ---
 

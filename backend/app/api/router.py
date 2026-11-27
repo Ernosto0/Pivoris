@@ -22,6 +22,9 @@ from app.content.templates.router import router as template_images_router
 from app.core.config import Settings
 from app.core.db import check_readiness
 from app.core.i18n import SUPPORTED_LOCALES
+from app.hosted.billing.router import (
+    create_hosted_billing_api_router as create_hosted_billing_api_router,
+)
 from app.identity.legal import TERMS_VERSION
 from app.identity.router import auth_router, invites_router, workspaces_router
 from app.inbox.router import router as inbox_router
@@ -64,6 +67,7 @@ class MetaResponse(BaseModel):
     instagram_providers: list[Literal["mock", "meta"]]
     calendar_providers: list[Literal["mock", "google"]] = []
     mock_requires_demo_workspace: bool
+    billing_enabled: bool = False
 
 
 @health_router.get("/healthz")
@@ -100,6 +104,7 @@ def meta(settings: Settings = Depends(get_app_settings)) -> MetaResponse:
             provider for provider in ("mock", "google") if provider in settings.calendar_providers
         ],
         mock_requires_demo_workspace=settings.app_env == "production",
+        billing_enabled=settings.billing_enabled,
     )
 
 

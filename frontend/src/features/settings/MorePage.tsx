@@ -19,14 +19,15 @@ export function MorePage() {
   const meta = useMeta();
   const [launcher, setLauncher] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const billingEnabled = Boolean(meta.data?.billing_enabled);
   return <div className="flex flex-col gap-6 max-w-4xl">
     <PageHeader title={t("more.title")} description={t("shell.moreHint")} />
     <Button ref={trigger} variant="secondary" onClick={() => setLauncher(true)} aria-haspopup="dialog">{t("shell.openLauncher")}</Button>
-    {launcher ? <DestinationLauncher workspaceId={workspace.id} role={role} demoTools={Boolean(meta.data?.demo_tools_enabled)} onClose={() => setLauncher(false)} returnFocusRef={trigger} /> : null}
+    {launcher ? <DestinationLauncher workspaceId={workspace.id} role={role} demoTools={Boolean(meta.data?.demo_tools_enabled)} billingEnabled={billingEnabled} onClose={() => setLauncher(false)} returnFocusRef={trigger} /> : null}
     <div className="grid min-w-0 gap-6 min-[1000px]:grid-cols-2">
       {MORE_GROUPS.map(group => <section key={group.labelKey} aria-label={t(group.labelKey)} className="min-w-0 rounded-panel border border-border bg-surface p-5 shadow-xs">
         <h2 className="type-section px-2 pb-2 border-b border-border mb-2">{t(group.labelKey)}</h2>
-        <ul>{group.items.filter(item => allowedDestination(item, role, Boolean(meta.data?.demo_tools_enabled))).map(({ path, labelKey, icon: Icon }) => <ListRow key={path} className="py-1">
+        <ul>{group.items.filter(item => allowedDestination(item, role, Boolean(meta.data?.demo_tools_enabled), billingEnabled)).map(({ path, labelKey, icon: Icon }) => <ListRow key={path} className="py-1">
           <Link to={workspaceTarget(workspace.id, path)} className={ROW}><Icon className="shrink-0 text-xl text-secondary" /><span className="min-w-0 flex-1 break-words">{t(labelKey)}</span><ChevronRightIcon className="shrink-0 text-xl text-secondary" /></Link>
         </ListRow>)}</ul>
       </section>)}

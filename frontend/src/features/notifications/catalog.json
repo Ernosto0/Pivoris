@@ -13,6 +13,22 @@
       "severity": "attention"
     },
     {
+      "type": "billing.trial_ending",
+      "severity": "attention"
+    },
+    {
+      "type": "billing.payment_failed",
+      "severity": "attention"
+    },
+    {
+      "type": "billing.paused",
+      "severity": "critical"
+    },
+    {
+      "type": "billing.activated",
+      "severity": "info"
+    },
+    {
       "type": "owner_question.requested",
       "severity": "attention"
     },

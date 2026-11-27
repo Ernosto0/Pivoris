@@ -135,6 +135,14 @@ Moved out of "later" on 2026-11-18 at the owner's request (the product owner ask
 |---|---|---|
 | **F-12 Light lead list with CSV export** | A list, for a chosen period (workspace-local dates), of real conversations in which the customer asked about a price or a booking and no appointment exists afterwards; the same list as a CSV with four columns only (customer handle, last question, date, conversation link). Owner and manager only (`reports.view`); the export is audited with counts and the period, never customer data; formula injection is escaped; simulated data is never listed | Pipelines, stages, statuses, tags, notes, assignees, custom fields, a "done" marker, scores, reminders and automated follow-up; phone numbers, e-mail addresses or any other customer data in the export; scheduled or e-mailed exports; a link to external CRMs |
 
+### Feature Phase 6: Subscription billing with Dodo Payments (in scope since 2026-11-27)
+
+Planned in [feature-phase-6-billing.md](../implementation/phases/feature-phase-6-billing.md) and [ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md). Moved out of §4 Deferred on 2026-11-27 to enable self-service paid subscriptions for Türkiye and global customers while keeping self-hosting unpaywalled (`BILLING_PROVIDER=none` by default, [ADR-019](../architecture/decisions/ADR-019-open-source-and-hosted-boundary.md)).
+
+| Capability | Included scope | Explicitly excluded |
+|---|---|---|
+| **Subscription billing (`app/hosted/billing/`)** | Optional hosted billing module (`none\|fake\|dodo`); 14-day cardless trial (`BILLING_TRIAL_DAYS=14`, 30-day backfill for existing workspaces, `is_demo` and `billing_exempt` exempt); `BILLING_INACTIVE` enforcement stopping AI reply drafting, auto-send, and AI content generation while keeping inbox ingestion, human notifications, scheduled post publishing, and sandbox test chat active; Dodo hosted checkout (fixed TRY `+ KDV` for `TR`, USD `+ tax` elsewhere) and Customer Portal; CLI-gated 990 ₺/month Founder (`growth`) product; Standard Webhooks ingestion with PII stripping, deduplication, out-of-order protection, 7-day `past_due` grace, daily reconciliation, deadline notifications (Web Push, Telegram, in-app), workspace deletion guard (`BILLING_SUBSCRIPTION_ACTIVE`), and `BillingPage` with `?checkout=returned` polling ([INV-18](../invariants.md)) | Custom in-app card entry (PCI scope), manual EFT invoicing, WhatsApp billing utility templates (pending Meta template approval), multi-workspace consolidated invoicing |
+
 ## 4. Deferred (with reason and trigger)
 
 | Feature | Reason for deferral | Revisit trigger |
@@ -143,7 +151,7 @@ Moved out of "later" on 2026-11-18 at the owner's request (the product owner ask
 | Story/post **AI image generation** | Not core to the trust loop; model and design effort | OQ-15 after pilots |
 | ~~Video/Reels/carousels~~ | Implemented offline in Feature Phase 5 Sessions 04–07 (Track B, F-08); live Meta acceptance pending | Pilot demand |
 | ~~Human Agent tag (7-day replies)~~ | Implemented offline in Feature Phase 5 Session 09 (F-10b), off until Meta grants the feature; live check V-HA pending | Meta approval, then pilot demand |
-| Billing, plans, usage limits | No paying users yet | Paid commitments (OQ-06) |
+| ~~Billing, plans, usage limits~~ | Moved out of Deferred on 2026-11-27 and implemented in Feature Phase 6 (`app/hosted/billing/`, [ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)); live Dodo cutover pending dashboard webhook/portal configuration | Paid commitments (OQ-06, resolved) |
 | Advanced analytics and Instagram insights | Not the core problem | Pilot demand |
 | Multiple Instagram accounts per workspace, agencies | Complexity; not the target segment | Market evidence |
 | CRM, lead pipeline, booking integrations | Scope explosion | Strong pilot demand |

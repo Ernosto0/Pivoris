@@ -20,6 +20,8 @@ def load_handlers() -> None:
     import app.content.media_cleanup  # noqa: F401
     import app.content.subject  # noqa: F401
     import app.content.templates.jobs  # noqa: F401
+    import app.hosted.billing.jobs  # noqa: F401
+    import app.hosted.billing.models  # noqa: F401
     import app.inbox.image_description  # noqa: F401
     import app.inbox.impact  # noqa: F401
     import app.inbox.jobs  # noqa: F401

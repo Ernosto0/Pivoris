@@ -34,3 +34,4 @@ Each ADR records one significant decision: its context, the alternatives, the ch
 | [ADR-024](ADR-024-account-agent-and-delegated-autonomy.md) | Account agent with memory and delegated autonomy | Accepted target; implementation pending |
 | [ADR-027](ADR-027-whatsapp-owner-channel-scope.md) | WhatsApp owner channel: notifications and buttons only, no free-text commands | Accepted; implementation in Feature Phase 5 Track A |
 | [ADR-028](ADR-028-video-media-probing-and-storage.md) | Bounded video probing, original storage and JPEG thumbnails | Accepted; live acceptance pending |
+| [ADR-029](ADR-029-subscription-billing-dodo-payments.md) | Subscription billing via Dodo Payments in optional hosted module | Accepted (Feature Phase 6) |

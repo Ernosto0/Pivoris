@@ -627,24 +627,47 @@ def create_workspace(
     repo.add_member(
         session, WorkspaceMember(workspace_id=workspace.id, user_id=owner.id, role="owner")
     )
-    ctx = workspace_context(workspace, actor or ActorRef.user(owner.id), "owner")
-    audit.record(
-        session,
-        ctx,
-        "workspace.created",
-        "workspace",
-        workspace.id,
-        {
-            "slug": workspace.slug,
-            "business_category": workspace.business_category,
-            "market": workspace.market,
-            "timezone": workspace.timezone,
-            "currency": workspace.currency,
-            "owner_user_id": owner.id,
-        },
-        clock=clock,
+    from app.core.db import (
+        SESSION_TENANT_KEY,
+        clear_tenant_context,
+        get_current_tenant_guc,
+        set_tenant_context,
     )
-    session.commit()
+    from app.plans import service as plans_service
+
+    prev_guc = get_current_tenant_guc(session)
+    had_tenant_info = SESSION_TENANT_KEY in session.info
+    prev_tenant_info = session.info.get(SESSION_TENANT_KEY)
+    set_tenant_context(session, workspace.id)
+    try:
+        plans_service.ensure_plan_row(session, workspace)
+        ctx = workspace_context(workspace, actor or ActorRef.user(owner.id), "owner")
+        audit.record(
+            session,
+            ctx,
+            "workspace.created",
+            "workspace",
+            workspace.id,
+            {
+                "slug": workspace.slug,
+                "business_category": workspace.business_category,
+                "market": workspace.market,
+                "timezone": workspace.timezone,
+                "currency": workspace.currency,
+                "owner_user_id": owner.id,
+            },
+            clock=clock,
+        )
+        session.commit()
+    finally:
+        if prev_guc is not None:
+            set_tenant_context(session, prev_guc)
+            if not had_tenant_info:
+                session.info.pop(SESSION_TENANT_KEY, None)
+        else:
+            clear_tenant_context(session)
+            if had_tenant_info and prev_tenant_info is not None:
+                session.info[SESSION_TENANT_KEY] = prev_tenant_info
     return workspace
 
 

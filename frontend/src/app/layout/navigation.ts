@@ -10,6 +10,7 @@ export interface NavItem {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   managementOnly?: boolean;
   demoOnly?: boolean;
+  billingOnly?: boolean;
 }
 
 // Bottom tabs on mobile, sidebar on desktop (user-journeys.md §1).
@@ -45,13 +46,14 @@ export const MORE_GROUPS: readonly { labelKey: string; items: readonly NavItem[]
     ...(DESTINATION_GROUPS[2]?.items ?? []),
     { path: "more/notifications", labelKey: "more.notifications", icon: BellIcon },
     { path: "more/settings/members", labelKey: "more.members", icon: UsersIcon },
+    { path: "more/settings/billing", labelKey: "more.billing", icon: SparkIcon, managementOnly: true, billingOnly: true },
     { path: "more/settings/system-health", labelKey: "more.systemHealth", icon: InfoIcon, managementOnly: true },
     { path: "more/dev", labelKey: "more.devPanel", icon: SettingsIcon, demoOnly: true },
   ] },
 ];
 
-export const allowedDestination = (item: NavItem, role: Role, demoTools: boolean) =>
-  (!item.managementOnly || role !== "staff") && (!item.demoOnly || demoTools);
+export const allowedDestination = (item: NavItem, role: Role, demoTools: boolean, billingEnabled = false) =>
+  (!item.managementOnly || role !== "staff") && (!item.demoOnly || demoTools) && (!item.billingOnly || billingEnabled);
 export const workspaceTarget = (workspaceId: string, path: string) => `/w/${workspaceId}${path ? `/${path}` : ""}`;
 
 /** One selected desktop area even for nested record and settings/category URLs. */

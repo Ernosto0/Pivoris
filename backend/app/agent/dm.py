@@ -275,8 +275,11 @@ def send(
             notify(db, clock, context.workspace, owner_source[0], "owner_question.window_closed")
             return {"valid": True, "retained": True, "status": "waiting_customer"}
     if not usage.consume(db, clock, thread.workspace_id, f"dm:{thread.id}:{thread.event_cursor}"):
-        usage.notify_paused_conversation(db, clock, thread.workspace_id, conversation.id)
-        return {"status": "quota_paused", "reason": usage.PAUSED_REASON}
+        reason = usage.pause_reason(db, clock, thread.workspace_id) or usage.PAUSED_REASON
+        usage.notify_paused_conversation(
+            db, clock, thread.workspace_id, conversation.id, reason=reason
+        )
+        return {"status": "quota_paused", "reason": reason}
     draft_intent = determine_draft_intent(db, proposal, newest)
     draft = ReplyDraft(
         id=uuid.uuid4(),

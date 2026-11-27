@@ -15,7 +15,7 @@
 | uv | current | Installs and pins Python 3.12 for the backend (`uv python install 3.12`) |
 | Node.js | current LTS (≥ 20) | Frontend |
 
-No paid accounts or API keys are needed. Defaults: `LLM_PROVIDER=fake`, `INSTAGRAM_ENABLED_PROVIDERS=mock`, `MEDIA_STORAGE_BACKEND=local` ([INV-14](../invariants.md)).
+No paid accounts or API keys are needed. Defaults: `LLM_PROVIDER=fake`, `INSTAGRAM_ENABLED_PROVIDERS=mock`, `MEDIA_STORAGE_BACKEND=local`, `BILLING_PROVIDER=fake` in `.env.example` (`none` in code default for self-hosters) ([INV-14](../invariants.md), [ADR-029](../architecture/decisions/ADR-029-subscription-billing-dodo-payments.md)).
 
 ## 2. First-time setup
 
@@ -220,6 +220,17 @@ From `frontend/`, run `npm run dev -- --host 0.0.0.0`. In another PowerShell run
 | Media hosting for publishing | S3-compatible bucket (Phase 7) | local filesystem |
 | Owner messenger | Telegram bot token + public HTTPS or polling (Phase 9) | web notifications |
 | Email invites / reset | SMTP (Phase 8) | invite link shown on screen; CLI password reset |
+| Subscription billing (Feature Phase 6) | Dodo Payments API key + webhook secret (`BILLING_PROVIDER=dodo`) | `BILLING_PROVIDER=fake` + simulated `/dev/billing-checkout` (`none` disables billing completely) |
+
+### Simulated subscription billing walkthrough (`BILLING_PROVIDER=fake`)
+
+With `BILLING_PROVIDER=fake` and `DEMO_TOOLS_ENABLED=true` (the `.env.example` defaults; both refused in production), test the full subscription lifecycle locally with zero external credentials:
+
+1. Create a non-demo workspace via **Daha fazla → Çalışma alanı oluştur** (seeded demo workspaces have `is_demo = true` and `billing_exempt = true`, so they never block).
+2. Open **Daha fazla → Abonelik** (`/w/<id>/more/settings/billing`). Verify the 14-day cardless trial status, Monthly/Annual toggle, and TRY (`+ KDV`) or USD (`+ tax`) pricing cards.
+3. Click **Abone ol** on any plan. `FakeBillingProvider` redirects to `/dev/billing-checkout` displaying a **SİMÜLASYON** badge ([INV-09](../invariants.md)).
+4. Click **Ödemeyi tamamla (Aktif abonelik simüle et)** (`POST /api/v1/dev/billing/simulate`), which signs a Standard Webhooks payload through the real webhook verifier and `billing_apply_event` job, then returns to `?checkout=returned` and confirms **Aboneliğiniz etkinleştirildi** ([INV-18](../invariants.md)).
+5. Operator CLI overrides from `backend/`: `uv run python -m app.cli plan-trial --workspace <slug> --days 0` (test trial expiry `BILLING_INACTIVE`), `billing-founder --workspace <slug> --on` (unlock the 990 ₺/month Founder offer), and `billing-exempt --workspace <slug> --on/--off`. Full operational details: [billing-runbook.md](billing-runbook.md).
 
 ## 12. Real Instagram development (Phase 7, optional)
 

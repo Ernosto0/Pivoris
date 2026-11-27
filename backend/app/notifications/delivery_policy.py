@@ -25,6 +25,7 @@ IMMEDIATE_TYPES: frozenset[str] = frozenset(
         "owner_question.window_closed",
         "system.integration_error",
         "account.needs_reauth",
+        "billing.paused",
     }
 )
 
@@ -33,6 +34,9 @@ QUIET_HOURS_TYPES: frozenset[str] = frozenset(
         "quota.warning",
         "quota.grace",
         "quota.paused",
+        "billing.trial_ending",
+        "billing.payment_failed",
+        "billing.activated",
         "report.daily_ready",
         "report.morning_briefing_ready",
         "report.missed_customers_ready",

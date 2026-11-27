@@ -68,6 +68,8 @@ CATEGORY_C_TABLES: tuple[str, ...] = (
     "assistant_test_turns",
     "automation_policies",
     "audience_snapshots",
+    "billing_accounts",
+    "billing_checkouts",
     "business_facts",
     "content_item_media",
     "content_items",

@@ -55,6 +55,7 @@ COOLDOWN_AGENT_HEALTH = timedelta(hours=1)
 COOLDOWN_UNRESOLVED_OPERATIONS = timedelta(hours=2)
 COOLDOWN_CAPABILITY_LOSS = timedelta(hours=6)
 COOLDOWN_AI_BUDGET = timedelta(hours=6)
+COOLDOWN_BILLING = timedelta(hours=6)
 
 # Thresholds
 DEAD_JOB_WINDOW = timedelta(hours=24)
@@ -244,7 +245,10 @@ def _collect_signature_failure_bursts(session: Session, now: datetime) -> list[A
 
 
 def _collect_tenant_alerts(
-    session: Session, workspace: Workspace, now: datetime
+    session: Session,
+    workspace: Workspace,
+    now: datetime,
+    settings: Settings | None = None,
 ) -> list[AlertCandidate]:
     """Collect tenant-scoped alerts under active tenant RLS context."""
     candidates: list[AlertCandidate] = []
@@ -426,7 +430,77 @@ def _collect_tenant_alerts(
             )
         )
 
+    if settings is not None and settings.billing_enabled:
+        from app.core.db import Base
+
+        billing_accounts_tbl = Base.metadata.tables.get("billing_accounts")
+        if billing_accounts_tbl is not None:
+            dup_rows = session.execute(
+                select(
+                    billing_accounts_tbl.c.dodo_subscription_id,
+                    billing_accounts_tbl.c.conflict_subscription_id,
+                ).where(
+                    billing_accounts_tbl.c.workspace_id == ws_id,
+                    billing_accounts_tbl.c.conflict_subscription_id.is_not(None),
+                )
+            ).all()
+            for existing_sub, conflict_sub in dup_rows:
+                candidates.append(
+                    AlertCandidate(
+                        alert_key=f"billing:duplicate_subscription:{ws_id}",
+                        category="billing",
+                        severity="warning",
+                        summary="Second active subscription received for workspace",
+                        details={
+                            "workspace_id": str(ws_id),
+                            "existing_subscription_id": existing_sub,
+                            "conflict_subscription_id": conflict_sub,
+                        },
+                        cooldown=COOLDOWN_BILLING,
+                        workspace_id=ws_id,
+                    )
+                )
+
     return candidates
+
+
+def _collect_unmatched_billing_webhooks(
+    session: Session, now: datetime, settings: Settings
+) -> list[AlertCandidate]:
+    if not settings.billing_enabled:
+        return []
+    from app.core.db import Base
+
+    tbl = Base.metadata.tables.get("billing_webhook_events")
+    if tbl is None:
+        return []
+    rows = session.execute(
+        select(tbl.c.webhook_id, tbl.c.event_type, tbl.c.subscription_id)
+        .where(
+            tbl.c.status == "unmatched",
+            tbl.c.received_at >= now - timedelta(hours=24),
+        )
+        .order_by(tbl.c.received_at.desc())
+    ).all()
+    if not rows:
+        return []
+    sample = rows[0]
+    return [
+        AlertCandidate(
+            alert_key="billing:unmatched_webhook",
+            category="billing",
+            severity="warning",
+            summary=f"Unmatched Pivoris billing webhook ({len(rows)} in last 24h)",
+            details={
+                "count_24h": len(rows),
+                "sample_webhook_id": sample[0],
+                "sample_event_type": sample[1],
+                "sample_subscription_id": sample[2],
+            },
+            cooldown=COOLDOWN_BILLING,
+            workspace_id=None,
+        )
+    ]
 
 
 def collect_active_alert_candidates(
@@ -441,6 +515,7 @@ def collect_active_alert_candidates(
     candidates.extend(_collect_dead_jobs(session, now))
     candidates.extend(_collect_backup_failure(session, clock, settings))
     candidates.extend(_collect_signature_failure_bursts(session, now))
+    candidates.extend(_collect_unmatched_billing_webhooks(session, now, settings))
 
     # Agent dead jobs (system-wide Job table)
     dead_agent_jobs = _recent_dead_jobs(
@@ -485,11 +560,110 @@ def collect_active_alert_candidates(
     ).all()
     for ws in workspaces:
         set_tenant_context(session, ws.id)
-        candidates.extend(_collect_tenant_alerts(session, ws, now))
+        candidates.extend(_collect_tenant_alerts(session, ws, now, settings))
 
     # Clear tenant context back to global
     clear_tenant_context(session)
     return candidates
+
+
+def raise_alert_candidate(
+    session: Session,
+    clock: Clock,
+    settings: Settings,
+    cand: AlertCandidate,
+) -> OperatorAlertState:
+    """Immediately record or refresh a single firing ``AlertCandidate`` in the current session."""
+    now = clock.now().astimezone(UTC)
+    recipient = settings.operator_alert_email.strip()
+    state = session.scalar(
+        select(OperatorAlertState).where(OperatorAlertState.alert_key == cand.alert_key)
+    )
+    should_send = False
+    is_refire = False
+    if state is None:
+        state = OperatorAlertState(
+            id=uuid.uuid4(),
+            alert_key=cand.alert_key,
+            category=cand.category,
+            severity=cand.severity,
+            status="firing",
+            workspace_id=cand.workspace_id,
+            summary=cand.summary,
+            details=cand.details,
+            first_triggered_at=now,
+            last_notified_at=now,
+            cooldown_until=now + cand.cooldown,
+            notification_count=1,
+        )
+        session.add(state)
+        session.flush()
+        should_send = True
+    elif state.status == "resolved":
+        state.status = "firing"
+        state.resolved_at = None
+        state.first_triggered_at = now
+        state.last_notified_at = now
+        state.cooldown_until = now + cand.cooldown
+        state.notification_count = 1
+        state.summary = cand.summary
+        state.details = cand.details
+        state.severity = cand.severity
+        state.workspace_id = cand.workspace_id
+        should_send = True
+    else:
+        state.summary = cand.summary
+        state.details = cand.details
+        state.workspace_id = cand.workspace_id
+        if state.cooldown_until is None or now >= state.cooldown_until:
+            state.last_notified_at = now
+            state.cooldown_until = now + cand.cooldown
+            state.notification_count += 1
+            should_send = True
+            is_refire = True
+
+    if should_send:
+        try:
+            if recipient:
+                send_operator_alert_email(
+                    settings,
+                    to_email=recipient,
+                    alert_key=cand.alert_key,
+                    category=cand.category,
+                    severity=cand.severity,
+                    summary=cand.summary,
+                    details=cand.details,
+                    is_recovery=False,
+                )
+            audit.record(
+                session,
+                None,
+                "security.operator_alert_fired",
+                "operator_alert",
+                state.id,
+                {
+                    "alert_key": cand.alert_key,
+                    "category": cand.category,
+                    "severity": cand.severity,
+                    "summary": cand.summary,
+                    "is_refire": is_refire,
+                    "notification_count": state.notification_count,
+                },
+                clock=clock,
+                workspace_id=cand.workspace_id,
+            )
+        except Exception as exc:
+            audit.record(
+                session,
+                None,
+                "security.alert_delivery_failed",
+                "operator_alert",
+                state.id,
+                {"alert_key": cand.alert_key, "error": str(exc)},
+                clock=clock,
+                workspace_id=cand.workspace_id,
+            )
+    return state
 
 
 def evaluate_operator_alerts(

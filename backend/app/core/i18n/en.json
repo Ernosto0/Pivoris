@@ -591,5 +591,21 @@
   "content.issue.REEL_COVER_TOO_LARGE": "The cover image must be at most 8 MB.",
   "content.issue.REEL_ASPECT_NOT_9_16": "The video is not 9:16; Instagram may crop it or add blank bars.",
   "content.issue.REEL_RESOLUTION_BELOW_RECOMMENDED": "The video width is below the recommended 540 pixels.",
-  "content.issue.REEL_EDIT_LIST_PRESENT": "The video contains an edit list; live compatibility with Instagram is not yet verified."
+  "content.issue.REEL_EDIT_LIST_PRESENT": "The video contains an edit list; live compatibility with Instagram is not yet verified.",
+  "errors.BILLING_INACTIVE.what": "AI generation is paused because your trial or subscription access has ended.",
+  "errors.BILLING_INACTIVE.next": "Start a subscription or update your payment method on the Billing page to resume AI features.",
+  "errors.BILLING_ALREADY_SUBSCRIBED.what": "This workspace already has an active or past-due subscription.",
+  "errors.BILLING_ALREADY_SUBSCRIBED.next": "Update your plan or payment method in Manage subscription.",
+  "errors.BILLING_SUBSCRIPTION_ACTIVE.what": "A workspace cannot be deleted while its subscription is active or past due.",
+  "errors.BILLING_SUBSCRIPTION_ACTIVE.next": "Cancel your subscription on the Billing page first, then request workspace deletion.",
+  "errors.BILLING_PROVIDER_UNAVAILABLE.what": "The billing provider is temporarily unreachable.",
+  "errors.BILLING_PROVIDER_UNAVAILABLE.next": "Wait a moment and try again.",
+  "activity.billing.checkout_created": "Subscription checkout started",
+  "activity.billing.portal_opened": "Subscription portal opened",
+  "activity.billing.subscription_activated": "Subscription activated",
+  "activity.billing.subscription_updated": "Subscription updated",
+  "activity.billing.subscription_past_due": "Subscription payment past due",
+  "activity.billing.subscription_cancelled": "Subscription cancelled",
+  "activity.billing.plan_trial_set": "Trial period updated",
+  "activity.billing.exempt_changed": "Billing exemption updated"
 }

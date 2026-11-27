@@ -129,3 +129,36 @@ def test_bad_input_is_refused_and_changes_nothing(
     with pytest.raises(SystemExit):
         main(["plan-set", "--workspace", slug, "--plan", "enterprise"])
     assert run(capsys, "plan-usage", "--workspace", slug)["plan"] == "growth"
+
+
+def test_plan_trial_and_billing_exempt_commands_update_and_audit(
+    session_factory: sessionmaker[Session], capsys: pytest.CaptureFixture[str]
+) -> None:
+    from sqlalchemy import select
+
+    from app.audit.models import AuditLog
+
+    workspace_id, slug = make(session_factory)
+    assert main(["plan-trial", "--workspace", slug, "--days", "-1"]) == 1
+    capsys.readouterr()
+
+    out = run(capsys, "plan-trial", "--workspace", slug, "--days", "7")
+    trial_end = datetime.fromisoformat(str(out["trial_ends_at"]))
+    delta = trial_end - datetime.now(UTC)
+    assert timedelta(days=6, hours=23) < delta < timedelta(days=7, hours=1)
+
+    out = run(capsys, "billing-exempt", "--workspace", slug, "--on")
+    assert out["billing_exempt"] is True
+    out = run(capsys, "billing-exempt", "--workspace", slug, "--off")
+    assert out["billing_exempt"] is False
+
+    with session_factory() as session:
+        actions = list(
+            session.scalars(
+                select(AuditLog.action)
+                .where(AuditLog.workspace_id == workspace_id)
+                .order_by(AuditLog.occurred_at)
+            )
+        )
+    assert "billing.plan_trial_set" in actions
+    assert actions.count("billing.exempt_changed") == 2

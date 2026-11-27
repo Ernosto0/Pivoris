@@ -27,6 +27,10 @@ def test_owner_and_manager_see_the_default_plan(env: Env) -> None:
         assert (body["monthly_quota"], body["quota"], body["quota_override"]) == (2500, 2500, None)
         assert (body["used"], body["grace_limit"]) == (0, 2750)
         assert body["period_end"] > body["period_start"]
+        assert body["trial_ends_at"] > body["period_start"]
+        assert body["access_until"] is None
+        assert body["billing_exempt"] is False
+        assert body["block_reason"] is None
 
 
 def test_staff_may_not_see_it(env: Env) -> None:

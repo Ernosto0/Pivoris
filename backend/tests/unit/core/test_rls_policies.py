@@ -96,8 +96,8 @@ def test_all_category_c_tables_have_forced_rls(session_factory: sessionmaker[Ses
         ).all()
         policies_by_table = {r[0]: r[1] for r in pol_rows}
 
-        assert len(CATEGORY_C_TABLES) == 65, (
-            f"Expected 65 Category C tables, got {len(CATEGORY_C_TABLES)}"
+        assert len(CATEGORY_C_TABLES) == 70, (
+            f"Expected 70 Category C tables, got {len(CATEGORY_C_TABLES)}"
         )
 
         missing_rls = []
@@ -138,6 +138,7 @@ def test_category_a_and_b_tables_not_blocked_by_tenant_rls(
             "sessions",
             "workspaces",
             "whatsapp_webhook_events",
+            "billing_webhook_events",
         }
         category_b = {
             "workspace_members",

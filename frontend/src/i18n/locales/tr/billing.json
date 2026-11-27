@@ -1,0 +1,72 @@
+{
+  "billing": {
+    "title": "Abonelik ve planlar",
+    "intro": "Çalışma alanınızın abonelik durumu, yanıt kotaları ve fatura yönetimi.",
+    "disabled": "Bu sunucuda abonelik faturalandırması etkin değil.",
+    "managerReadOnly": "Plan seçimini ve abonelik yönetimini yalnızca çalışma alanı sahibi yapabilir.",
+    "manageSubscription": "Aboneliği yönet",
+    "subscribe": "Abone ol",
+    "subscribeFounder": "Kurucu pakete abone ol",
+    "currentPlan": "Mevcut plan",
+    "switchInPortal": "Plan değiştirmek için Aboneliği yönet'i kullanın",
+    "intervalGroup": "Faturalandırma dönemi",
+    "monthly": "Aylık",
+    "annual": "Yıllık (2 ay ücretsiz)",
+    "perMonth": "/ ay",
+    "perYear": "/ yıl",
+    "monthlyEquivalent": "Yıllık ödemede aylık {{amount}}",
+    "taxExclusiveTRY": "+ KDV (ödeme adımında eklenir)",
+    "taxExclusiveUSD": "+ vergi (ödeme adımında hesaplanır)",
+    "quotaPerMonth": "Ayda {{quota}} yapay zekâ müşteri yanıtı",
+    "recommended": "Önerilen",
+    "founder": {
+      "badge": "Kurucu İşletme Özel",
+      "title": "Kurucu İşletme Paketi",
+      "description": "İşletme (Growth) planının tüm özellikleri ve yanıt kotasıyla çalışma alanınıza tanımlı kurucu fiyatı."
+    },
+    "status": {
+      "heading": "Abonelik durumu",
+      "trialTitle": "Ücretsiz deneme aktif",
+      "trialBody": "Deneme süreniz {{date}} tarihine kadar devam eder. Kart bilgisi gerekmez.",
+      "activeTitle": "Abonelik aktif",
+      "activeBody": "Sonraki yenileme tarihi: {{date}}.",
+      "activeNoDate": "Aboneliğiniz aktif.",
+      "cancellingTitle": "Dönem sonunda iptal edilecek",
+      "cancellingBody": "Aboneliğiniz iptal edildi; {{date}} tarihine kadar tüm yapay zekâ özellikleri açık kalır.",
+      "pastDueTitle": "Ödeme sorunu — ek süre devam ediyor",
+      "pastDueBody": "Son ödeme alınamadı. {{date}} tarihine kadar kartınızı güncelleyin; o zamana kadar erişiminiz kesilmez.",
+      "stoppedTitle": "Yapay zekâ yanıt ve içerik üretimi durduruldu",
+      "stoppedBody": "Deneme süreniz veya ödeme ek süreniz sona erdi. Verileriniz korunur, müşteri mesajları gelen kutusuna düşmeye ve bildirim göndermeye devam eder, zamanlanmış paylaşımlar yayınlanır ve deneme sohbeti açık kalır. Yapay zekâyı yeniden başlatmak için bir plan seçin veya ödemenizi güncelleyin.",
+      "exemptTitle": "Faturalandırma muafiyeti aktif",
+      "exemptBody": "Bu çalışma alanı operatör tarafından faturalandırma duraklatmasından muaf tutulmuştur."
+    },
+    "return": {
+      "verifyingTitle": "Ödeme doğrulanıyor…",
+      "verifyingBody": "Ödeme sağlayıcısından abonelik onayı bekleniyor. Bu sayfa kendiliğinden güncellenir.",
+      "verifiedTitle": "Aboneliğiniz etkinleştirildi",
+      "verifiedBody": "Ödemeniz doğrulandı ve planınız çalışma alanınızda aktif.",
+      "unverifiedTitle": "Ödeme henüz doğrulanmadı",
+      "unverifiedBody": "Ödemeniz henüz bize ulaşmadı. İşlemi tamamladıysanız birkaç saniye içinde yansıyacaktır; sayfayı yenileyebilir veya tekrar kontrol edebilirsiniz.",
+      "checkAgain": "Tekrar kontrol et"
+    },
+    "notifications": {
+      "trial_ending": "Ücretsiz deneme süreniz yakında sona eriyor ({{date}}).",
+      "payment_failed": "Abonelik ödemesi alınamadı. Kesinti olmaması için {{date}} tarihine kadar ödeme yönteminizi güncelleyin.",
+      "paused": "Deneme veya abonelik süreniz sona erdiği için yapay zekâ üretimi durduruldu. Mesajlar gelen kutusuna düşmeye devam eder.",
+      "activated": "Aboneliğiniz etkinleştirildi; yapay zekâ üretimi aktif."
+    },
+    "devCheckout": {
+      "title": "Simüle Ödeme Sayfası",
+      "subtitle": "Bu ekran yalnızca yerel geliştirme ve demo ortamında görünür; gerçek kart bilgisi girilmez ve ücret alınmaz.",
+      "portalTitle": "Simüle Abonelik Yönetim Portalı",
+      "portalSubtitle": "Canlı ortamda bu bağlantı Dodo Payments Müşteri Portalını açar.",
+      "planLabel": "Seçilen plan",
+      "intervalLabel": "Dönem",
+      "refLabel": "Ödeme referansı",
+      "approve": "Ödemeyi tamamla (Aktif abonelik simüle et)",
+      "pastDue": "Ödeme hatası simüle et (7 gün ek süre)",
+      "cancelEnd": "Dönem sonu iptali simüle et",
+      "back": "Abonelik sayfasına dön"
+    }
+  }
+}

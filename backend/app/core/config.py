@@ -5,6 +5,8 @@ In ``production`` the defaults are safe and unsafe combinations refuse to start.
 Checks for variables introduced in later phases are added in those phases.
 """
 
+import base64
+import binascii
 import ipaddress
 from functools import lru_cache
 from pathlib import Path
@@ -52,7 +54,19 @@ _SECRET_FIELDS = frozenset(
         "whatsapp_webhook_verify_token",
         "google_client_secret",
         "web_push_vapid_private_key",
+        "dodo_api_key",
+        "dodo_webhook_secret",
     }
+)
+
+REQUIRED_DODO_PRODUCT_KEYS = (
+    "starter_monthly",
+    "starter_annual",
+    "growth_monthly",
+    "growth_annual",
+    "pro_monthly",
+    "pro_annual",
+    "founder_monthly",
 )
 
 # Per-task model overrides: task name -> Settings field (agent-runtime.md §10).
@@ -314,6 +328,16 @@ class Settings(BaseSettings):
     google_client_secret: SecretStr = SecretStr("")
     google_oauth_redirect_uri: str = "http://localhost:8000/oauth/google-calendar/callback"
 
+    # --- Hosted Subscription Billing (Feature Phase 6, ADR-029) ---
+    # Default 'none' keeps self-hosted installs unpaywalled (ADR-019). Production refuses 'fake'.
+    billing_provider: Literal["none", "fake", "dodo"] = "none"
+    billing_trial_days: int = Field(default=14, ge=1)
+    dodo_environment: Literal["test_mode", "live_mode"] = "test_mode"
+    dodo_api_key: SecretStr = SecretStr("")
+    dodo_webhook_secret: SecretStr = SecretStr("")
+    dodo_products: str = ""
+    billing_return_url: str = ""
+
     @field_validator("log_level", mode="before")
     @classmethod
     def _upper_log_level(cls, value: Any) -> Any:
@@ -344,7 +368,7 @@ class Settings(BaseSettings):
     def safety_problems(self) -> list[str]:
         """Provider/storage safety applies everywhere; production has extra deployment checks."""
         problems = self._instagram_problems() + self._calendar_problems()
-        problems += self._web_push_problems()
+        problems += self._web_push_problems() + self._billing_problems()
         keys = self.token_encryption_keys.get_secret_value()
         if (
             keys
@@ -614,6 +638,68 @@ class Settings(BaseSettings):
                 problems.append("GOOGLE_CLIENT_SECRET must be set when 'google' is enabled.")
             if not self.google_oauth_redirect_uri.strip():
                 problems.append("GOOGLE_OAUTH_REDIRECT_URI must be set when 'google' is enabled.")
+        return problems
+
+    @property
+    def billing_enabled(self) -> bool:
+        """True when hosted subscription billing is active (``fake`` or ``dodo``)."""
+        return self.billing_provider != "none"
+
+    @property
+    def dodo_product_map(self) -> dict[str, str]:
+        """Parsed ``DODO_PRODUCTS`` mapping ``product_key -> pdt_...``."""
+        mapping: dict[str, str] = {}
+        for item in self.dodo_products.split(","):
+            entry = item.strip()
+            if not entry or "=" not in entry:
+                continue
+            key, val = entry.split("=", 1)
+            key_clean, val_clean = key.strip(), val.strip()
+            if key_clean and val_clean:
+                mapping[key_clean] = val_clean
+        return mapping
+
+    def _billing_problems(self) -> list[str]:
+        problems: list[str] = []
+        if self.app_env == "production" and self.billing_provider == "fake":
+            problems.append("BILLING_PROVIDER must not be 'fake' in production.")
+        return_url = self.billing_return_url.strip()
+        if return_url:
+            parsed = urlparse(return_url)
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                problems.append("BILLING_RETURN_URL must be an absolute http(s) URL when set.")
+            elif self.app_env == "production" and self.billing_enabled and parsed.scheme != "https":
+                problems.append("BILLING_RETURN_URL must use https in production.")
+        if self.billing_provider == "dodo":
+            if not self.dodo_api_key.get_secret_value().strip():
+                problems.append("DODO_API_KEY must be set when BILLING_PROVIDER=dodo.")
+            raw_secret = self.dodo_webhook_secret.get_secret_value().strip()
+            if not raw_secret:
+                problems.append("DODO_WEBHOOK_SECRET must be set when BILLING_PROVIDER=dodo.")
+            else:
+                b64_part = raw_secret.removeprefix("whsec_")
+                try:
+                    decoded = base64.b64decode(b64_part, validate=True)
+                    if not decoded:
+                        raise binascii.Error("empty key")
+                except binascii.Error:
+                    problems.append(
+                        "DODO_WEBHOOK_SECRET must be valid base64 (after optional 'whsec_' prefix)."
+                    )
+            malformed = [
+                item.strip()
+                for item in self.dodo_products.split(",")
+                if item.strip() and "=" not in item.strip()
+            ]
+            if malformed:
+                problems.append("DODO_PRODUCTS entries must use 'key=pdt_...' format.")
+            product_map = self.dodo_product_map
+            unknown_keys = sorted(set(product_map) - set(REQUIRED_DODO_PRODUCT_KEYS))
+            if unknown_keys:
+                problems.append(f"DODO_PRODUCTS has unknown keys: {unknown_keys}.")
+            missing_keys = [k for k in REQUIRED_DODO_PRODUCT_KEYS if not product_map.get(k)]
+            if missing_keys:
+                problems.append(f"DODO_PRODUCTS is missing required keys: {missing_keys}.")
         return problems
 
     @property

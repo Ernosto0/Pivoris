@@ -271,7 +271,8 @@
     "notifications": "Bildirimler",
     "members": "Üyeler",
     "connections": "Instagram bağlantısı",
-    "systemHealth": "Sistem durumu"
+    "systemHealth": "Sistem durumu",
+    "billing": "Abonelik"
   },
   "settings": {
     "briefings": {
@@ -768,6 +769,22 @@
     "HUMAN_AGENT_NOT_ALLOWED": {
       "what": "24 saatten sonraki yanıt yalnızca sizin kendi yazdığınız bir mesaj olabilir; asistanın taslağı olamaz.",
       "next": "Yanıtı kendi cümlelerinizle yazın ve yeniden gönderin."
+    },
+    "BILLING_INACTIVE": {
+      "what": "Deneme süreniz veya abonelik erişiminiz sona erdiği için yapay zekâ üretimi durduruldu.",
+      "next": "Yapay zekâ özelliklerini sürdürmek için Abonelik sayfasından bir plan başlatın veya ödeme yönteminizi güncelleyin."
+    },
+    "BILLING_ALREADY_SUBSCRIBED": {
+      "what": "Bu çalışma alanında zaten aktif veya ödeme bekleyen bir abonelik var.",
+      "next": "Planınızı veya ödeme yönteminizi Aboneliği yönet bölümünden güncelleyin."
+    },
+    "BILLING_SUBSCRIPTION_ACTIVE": {
+      "what": "Aktif veya ödeme bekleyen aboneliği olan bir çalışma alanı silinemez.",
+      "next": "Önce Abonelik sayfasından aboneliğinizi iptal edin, ardından silme işlemini başlatın."
+    },
+    "BILLING_PROVIDER_UNAVAILABLE": {
+      "what": "Ödeme sağlayıcısına şu anda ulaşılamıyor.",
+      "next": "Birkaç saniye bekleyip tekrar deneyin."
     }
   },
   "connections": {
@@ -1114,6 +1131,18 @@
       "paused": "Yapay zeka yanıtları duraklatıldı: yanıt hakkı ve %10 ek hak doldu. Yeni mesajlar gelen kutunuza düşmeye devam eder, kendiniz yanıtlayabilirsiniz. Taslaklar yeni dönemde veya plan değişince devam eder."
     },
     "details": "Plan ve kullanımı gör",
+    "manageBilling": "Abonelik ve planlar",
+    "trialEnds": "Deneme bitişi",
+    "accessUntil": "Erişim sonu",
+    "billingBanner": {
+      "trialEndingTitle": "Ücretsiz deneme süreniz {{date}} tarihinde sona eriyor.",
+      "trialEndingSub": "Kesintisiz devam etmek için bir abonelik planı seçin.",
+      "paymentProblemTitle": "Son abonelik ödemesi alınamadı.",
+      "paymentProblemSub": "{{date}} tarihine kadar ödeme yönteminizi güncelleyin; erişiminiz o tarihe kadar sürer.",
+      "stoppedTitle": "Yapay zekâ yanıt ve içerik üretimi durduruldu.",
+      "stoppedSub": "Deneme veya abonelik süreniz sona erdi. Mesajlar gelen kutusuna düşmeye devam eder.",
+      "cta": "Aboneliği aç"
+    },
     "rule": "Asistanın hazırladığı her müşteri yanıtı taslağı, siz düzenleseniz veya silseniz bile bir kez sayılır. Kendi yazdığınız yanıtlar, komutlar ve içerik taslakları sayılmaz.",
     "notifications": {
       "warning": "Bu ayki yapay zeka yanıt hakkınızın %80'i kullanıldı.",

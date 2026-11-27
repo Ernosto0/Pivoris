@@ -204,6 +204,14 @@ _BY_GROUP: dict[str, tuple[str, ...]] = {
         "memory.corrected",
         "memory.forgotten",
         "memory.erased",
+        "billing.checkout_created",
+        "billing.portal_opened",
+        "billing.subscription_activated",
+        "billing.subscription_updated",
+        "billing.subscription_past_due",
+        "billing.subscription_cancelled",
+        "billing.plan_trial_set",
+        "billing.exempt_changed",
     ),
 }
 

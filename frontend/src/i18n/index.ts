@@ -6,6 +6,7 @@ import enAgent from "./locales/en/agent.json";
 import trAgent from "./locales/tr/agent.json";
 import enActivity from "./locales/en/activity.json";
 import enAi from "./locales/en/ai.json";
+import enBilling from "./locales/en/billing.json";
 import en from "./locales/en/common.json";
 import enContent from "./locales/en/content.json";
 import enInbox from "./locales/en/inbox.json";
@@ -17,6 +18,7 @@ import enSuggestions from "./locales/en/suggestions.json";
 import enTestChat from "./locales/en/testChat.json";
 import trActivity from "./locales/tr/activity.json";
 import trAi from "./locales/tr/ai.json";
+import trBilling from "./locales/tr/billing.json";
 import tr from "./locales/tr/common.json";
 import trContent from "./locales/tr/content.json";
 import trInbox from "./locales/tr/inbox.json";
@@ -66,8 +68,8 @@ i18n.on("languageChanged", (language) => {
 void i18n.use(initReactI18next).init({
   // One namespace; the knowledge catalog is a separate file merged into it (top-level keys differ).
   resources: {
-    tr: { common: { ...tr, ...trAgent, ...trAgentWork, ...trKnowledge, ...trAi, ...trInbox, ...trContent, ...trActivity, ...trReports, ...trMembers, ...trTestChat, ...trPush, ...trSuggestions } },
-    en: { common: { ...en, ...enAgent, ...enAgentWork, ...enKnowledge, ...enAi, ...enInbox, ...enContent, ...enActivity, ...enReports, ...enMembers, ...enTestChat, ...enPush, ...enSuggestions } },
+    tr: { common: { ...tr, ...trAgent, ...trAgentWork, ...trKnowledge, ...trAi, ...trBilling, ...trInbox, ...trContent, ...trActivity, ...trReports, ...trMembers, ...trTestChat, ...trPush, ...trSuggestions } },
+    en: { common: { ...en, ...enAgent, ...enAgentWork, ...enKnowledge, ...enAi, ...enBilling, ...enInbox, ...enContent, ...enActivity, ...enReports, ...enMembers, ...enTestChat, ...enPush, ...enSuggestions } },
   },
   lng: detectLanguage(),
   fallbackLng: DEFAULT_LANGUAGE,

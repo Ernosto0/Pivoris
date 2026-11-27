@@ -254,3 +254,17 @@ set and display number if any is set. The version and origin defaults do not ena
 | MEDIA_MAX_VIDEO_BYTES | 300000000 | Decimal 300 MB; keep Caddy video envelope in sync |
 | MEDIA_VIDEO_WORKSPACE_QUOTA_BYTES | 2147483648 | 2 GiB including thumbnails |
 | MEDIA_SCRATCH_DIR | empty | OS temp directory; writable, about 2x upload disk per request |
+
+## Hosted billing (Feature Phase 6, ADR-029)
+
+Optional hosted subscription module (`app/hosted/billing/`). Self-hosted deployments leave `BILLING_PROVIDER=none` (the code default) so no workspace is ever paywalled. `.env.example` sets `BILLING_PROVIDER=fake` so the local demo exercises the simulated checkout with zero credentials ([INV-14](../invariants.md)).
+
+| Variable | dev (`.env.example`) | prod | Description |
+|---|---|---|---|
+| `BILLING_PROVIDER` | `fake` (code default `none`) | `none` or `dodo` (`fake` refused) | `none` \| `fake` \| `dodo`. Controls whether billing enforcement, `/billing` routes, and `/webhooks/billing/dodo` are active |
+| `BILLING_TRIAL_DAYS` | `14` | `14` | Free trial length in whole days (`>= 1`) for newly created workspaces |
+| `DODO_API_KEY` 🔒 | empty | required if `dodo` | Dodo Payments bearer API key (`SecretStr`, in `_SECRET_FIELDS`) |
+| `DODO_WEBHOOK_SECRET` 🔒 | empty | required if `dodo` | Standard Webhooks signing secret (`whsec_…`, `SecretStr`, in `_SECRET_FIELDS`) |
+| `DODO_ENVIRONMENT` | `test_mode` | `live_mode` (or `test_mode` during staging/test rollout) | `test_mode` \| `live_mode` |
+| `DODO_PRODUCTS` | empty | required if `dodo` | Comma-separated `key=pdt_…` map covering `starter_monthly`, `starter_annual`, `growth_monthly`, `growth_annual`, `pro_monthly`, `pro_annual`, `founder_monthly` |
+| `BILLING_RETURN_URL` | empty (= `{FRONTEND_ORIGIN}`) | optional (`https://…`) | Base URL for checkout/portal return redirects; defaults to `FRONTEND_ORIGIN` when empty |

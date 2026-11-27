@@ -209,6 +209,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dev/billing/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Billing Webhook
+         * @description Verify caller owns the checkout's workspace, sign a Standard Webhook, and ingest it.
+         */
+        post: operations["simulate_billing_webhook_api_v1_dev_billing_simulate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dev/jobs": {
         parameters: {
             query?: never;
@@ -1511,6 +1531,57 @@ export interface paths {
          * @description The owner confirms the automation settings were looked at. Idempotent.
          */
         post: operations["review_policies_api_v1_workspaces__workspace_id__automation_policies_review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Billing */
+        get: operations["get_billing_api_v1_workspaces__workspace_id__billing_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Checkout */
+        post: operations["create_checkout_api_v1_workspaces__workspace_id__billing_checkout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Portal */
+        post: operations["create_portal_api_v1_workspaces__workspace_id__billing_portal_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3277,7 +3348,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/instagram/mock": {
+    "/webhooks/billing/dodo": {
         parameters: {
             query?: never;
             header?: never;
@@ -3286,8 +3357,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Receive Dodo Webhook */
+        post: operations["receive_dodo_webhook_webhooks_billing_dodo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/instagram": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Handshake */
+        get: operations["handshake_webhooks_instagram_get"];
+        put?: never;
         /** Receive */
-        post: operations["receive_webhooks_instagram_mock_post"];
+        post: operations["receive_webhooks_instagram_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3938,6 +4027,58 @@ export interface components {
             /** Authorize Url */
             authorize_url: string;
         };
+        /** BillingOut */
+        BillingOut: {
+            /** Access Until */
+            access_until: string | null;
+            /** Billing Exempt */
+            billing_exempt: boolean;
+            /** Block Reason */
+            block_reason: ("BILLING_INACTIVE" | "REPLY_QUOTA_PAUSED") | null;
+            /** Can Manage */
+            can_manage: boolean;
+            /** Cancel At Period End */
+            cancel_at_period_end: boolean;
+            /**
+             * Currency
+             * @enum {string}
+             */
+            currency: "TRY" | "USD";
+            /** Current Period End */
+            current_period_end: string | null;
+            founder_offer: components["schemas"]["FounderOfferOut"] | null;
+            /** Has Customer */
+            has_customer: boolean;
+            /** Has Subscription */
+            has_subscription: boolean;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Past Due Ends At */
+            past_due_ends_at: string | null;
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "starter" | "growth" | "pro";
+            /** Plans */
+            plans: components["schemas"]["PlanPriceOut"][];
+            /** Product Key */
+            product_key: string | null;
+            /** Provider Status */
+            provider_status: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "trial" | "active" | "past_due" | "cancelled";
+            /** Tax Exclusive */
+            tax_exclusive: boolean;
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+        };
         /** Body_meta_data_deletion_api_v1_webhooks_meta_data_deletion_post */
         Body_meta_data_deletion_api_v1_webhooks_meta_data_deletion_post: {
             /** Signed Request */
@@ -4305,6 +4446,28 @@ export interface components {
             telegram: boolean;
             /** Whatsapp */
             whatsapp: boolean;
+        };
+        /** CheckoutIn */
+        CheckoutIn: {
+            /**
+             * Interval
+             * @enum {string}
+             */
+            interval: "monthly" | "annual";
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "starter" | "growth" | "pro" | "founder";
+        };
+        /** CheckoutOut */
+        CheckoutOut: {
+            /** Checkout Url */
+            checkout_url: string;
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Ref */
+            ref: string;
         };
         /** ClarificationAnswer */
         ClarificationAnswer: {
@@ -5003,6 +5166,31 @@ export interface components {
             /** Next Version */
             next_version: number;
         };
+        /** DevBillingSimulateIn */
+        DevBillingSimulateIn: {
+            /**
+             * Outcome
+             * @default active
+             * @enum {string}
+             */
+            outcome: "active" | "past_due" | "on_hold" | "cancelled" | "cancelled_end_of_period" | "renewed";
+            /** Ref */
+            ref: string;
+        };
+        /** DevBillingSimulateOut */
+        DevBillingSimulateOut: {
+            /**
+             * Is Simulated
+             * @default true
+             */
+            is_simulated: boolean;
+            /** Status */
+            status: string;
+            /** Subscription Id */
+            subscription_id: string;
+            /** Webhook Id */
+            webhook_id: string;
+        };
         /**
          * DisclosureText
          * @description The notice appended to automatic replies, per reply language. Empty: the built-in text.
@@ -5419,6 +5607,25 @@ export interface components {
              * @default
              */
             tr: string;
+        };
+        /** FounderOfferOut */
+        FounderOfferOut: {
+            /** Ai Replies Quota */
+            ai_replies_quota: number;
+            /** Amount Display */
+            amount_display: string;
+            /**
+             * Interval
+             * @constant
+             */
+            interval: "monthly";
+            /**
+             * Plan
+             * @constant
+             */
+            plan: "growth";
+            /** Product Key */
+            product_key: string;
         };
         /** GenerateReportRequest */
         GenerateReportRequest: {
@@ -6075,6 +6282,11 @@ export interface components {
         /** MetaResponse */
         MetaResponse: {
             /**
+             * Billing Enabled
+             * @default false
+             */
+            billing_enabled: boolean;
+            /**
              * Calendar Providers
              * @default []
              */
@@ -6555,6 +6767,27 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** PlanPriceOut */
+        PlanPriceOut: {
+            /** Ai Replies Quota */
+            ai_replies_quota: number;
+            /** Amount Display */
+            amount_display: string;
+            /**
+             * Interval
+             * @enum {string}
+             */
+            interval: "monthly" | "annual";
+            /** Monthly Equivalent Display */
+            monthly_equivalent_display: string;
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "starter" | "growth" | "pro";
+            /** Product Key */
+            product_key: string;
+        };
         /** PoliciesIn */
         PoliciesIn: {
             /** Items */
@@ -6583,6 +6816,13 @@ export interface components {
              * @enum {string}
              */
             mode: "auto" | "approval" | "off";
+        };
+        /** PortalOut */
+        PortalOut: {
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Portal Url */
+            portal_url: string;
         };
         /** PriceCard */
         PriceCard: {
@@ -7568,6 +7808,12 @@ export interface components {
         };
         /** UsageOut */
         UsageOut: {
+            /** Access Until */
+            access_until: string | null;
+            /** Billing Exempt */
+            billing_exempt: boolean;
+            /** Block Reason */
+            block_reason: ("BILLING_INACTIVE" | "REPLY_QUOTA_PAUSED") | null;
             /** Grace Limit */
             grace_limit: number;
             /** Monthly Quota */
@@ -7601,6 +7847,11 @@ export interface components {
              * @enum {string}
              */
             status: "trial" | "active" | "past_due" | "cancelled";
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
             /** Used */
             used: number;
         };
@@ -7951,16 +8202,6 @@ export interface components {
              */
             daily_report_hour: number;
             /**
-             * Morning Briefing Enabled
-             * @default true
-             */
-            morning_briefing_enabled: boolean;
-            /**
-             * Morning Briefing Hour
-             * @default 9
-             */
-            morning_briefing_hour: number;
-            /**
              * Disclosure Enabled
              * @default true
              */
@@ -7978,6 +8219,16 @@ export interface components {
             follow_up_hours: number;
             follow_up_text?: components["schemas"]["FollowUpText"];
             /**
+             * Morning Briefing Enabled
+             * @default true
+             */
+            morning_briefing_enabled: boolean;
+            /**
+             * Morning Briefing Hour
+             * @default 9
+             */
+            morning_briefing_hour: number;
+            /**
              * Publish Max Delay Minutes
              * @default 1440
              */
@@ -7990,13 +8241,13 @@ export interface components {
         WorkspaceSettingsPatch: {
             /** Daily Report Hour */
             daily_report_hour?: number | null;
+            /** Disclosure Enabled */
+            disclosure_enabled?: boolean | null;
+            disclosure_text?: components["schemas"]["DisclosureText"] | null;
             /** Morning Briefing Enabled */
             morning_briefing_enabled?: boolean | null;
             /** Morning Briefing Hour */
             morning_briefing_hour?: number | null;
-            /** Disclosure Enabled */
-            disclosure_enabled?: boolean | null;
-            disclosure_text?: components["schemas"]["DisclosureText"] | null;
             /** Publish Max Delay Minutes */
             publish_max_delay_minutes?: number | null;
         };
@@ -8371,6 +8622,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_billing_webhook_api_v1_dev_billing_simulate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevBillingSimulateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevBillingSimulateOut"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -11051,6 +11335,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PoliciesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_billing_api_v1_workspaces__workspace_id__billing_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_checkout_api_v1_workspaces__workspace_id__billing_checkout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_portal_api_v1_workspaces__workspace_id__billing_portal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalOut"];
                 };
             };
             /** @description Validation Error */
@@ -14705,7 +15086,60 @@ export interface operations {
             };
         };
     };
-    receive_webhooks_instagram_mock_post: {
+    receive_dodo_webhook_webhooks_billing_dodo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    handshake_webhooks_instagram_get: {
+        parameters: {
+            query?: {
+                "hub.mode"?: string | null;
+                "hub.verify_token"?: string | null;
+                "hub.challenge"?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    receive_webhooks_instagram_post: {
         parameters: {
             query?: never;
             header?: never;

@@ -32,6 +32,30 @@ _SPECS = (
     NotificationSpec("quota.grace", ATTENTION, "system_health.view", "quota.grace:{period_id}"),
     NotificationSpec("quota.paused", ATTENTION, "system_health.view", "quota.paused:{period_id}"),
     NotificationSpec(
+        "billing.trial_ending",
+        ATTENTION,
+        "system_health.view",
+        "billing.trial_ending:{workspace_id}:{trial_ends_at}",
+    ),
+    NotificationSpec(
+        "billing.payment_failed",
+        ATTENTION,
+        "system_health.view",
+        "billing.payment_failed:{subscription_id}:{past_due_ends_at}",
+    ),
+    NotificationSpec(
+        "billing.paused",
+        CRITICAL,
+        "system_health.view",
+        "billing.paused:{workspace_id}:{episode}",
+    ),
+    NotificationSpec(
+        "billing.activated",
+        INFO,
+        "system_health.view",
+        "billing.activated:{subscription_id}",
+    ),
+    NotificationSpec(
         "owner_question.requested",
         ATTENTION,
         "owner_questions.answer",
@@ -134,6 +158,9 @@ PUSH_TYPES: dict[str, str] = {
     "quota.warning": "failures",
     "quota.grace": "failures",
     "quota.paused": "failures",
+    "billing.trial_ending": "failures",
+    "billing.payment_failed": "failures",
+    "billing.paused": "failures",
     "approval.requested": "approvals",
     "owner_question.requested": "questions",
     "owner_question.window_closed": "questions",
@@ -142,15 +169,18 @@ PUSH_TYPES: dict[str, str] = {
     "account.needs_reauth": "failures",
 }
 
-# WhatsApp (F-06, ADR-027): the same types as Web Push plus the daily summary. Linking the number is
+# WhatsApp (F-06, ADR-027): the same types as Web Push (excluding hosted billing, whose utility
+# templates require separate Meta approval) plus the daily summary. Linking the number is
 # the opt-in (there is no per-category preference yet). The text is fixed per type, in
 # ``integrations/channels/whatsapp/templates.py``; customer text is never included.
-WHATSAPP_TYPES: frozenset[str] = frozenset(PUSH_TYPES) | {
+WHATSAPP_TYPES: frozenset[str] = frozenset(
+    k for k in PUSH_TYPES if not k.startswith("billing.")
+) | {
     "report.daily_ready",
     "report.morning_briefing_ready",
 }
 
-# Telegram (ADR-012, Session 01): approvals, owner questions, operational failures, quota
+# Telegram (ADR-012, Session 01): approvals, owner questions, operational failures, quota/billing
 # warnings and existing report-ready notifications. Routine info notifications and weekly
 # delegation suggestions stay in-app.
 TELEGRAM_TYPES: frozenset[str] = frozenset(
@@ -169,6 +199,10 @@ TELEGRAM_TYPES: frozenset[str] = frozenset(
         "quota.warning",
         "quota.grace",
         "quota.paused",
+        "billing.trial_ending",
+        "billing.payment_failed",
+        "billing.paused",
+        "billing.activated",
         "report.daily_ready",
         "report.morning_briefing_ready",
         "report.missed_customers_ready",

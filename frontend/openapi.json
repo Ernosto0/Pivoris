@@ -1576,6 +1576,183 @@
         "title": "AuthorizeUrlOut",
         "type": "object"
       },
+      "BillingOut": {
+        "properties": {
+          "access_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Until"
+          },
+          "billing_exempt": {
+            "title": "Billing Exempt",
+            "type": "boolean"
+          },
+          "block_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BILLING_INACTIVE",
+                  "REPLY_QUOTA_PAUSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Block Reason"
+          },
+          "can_manage": {
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "cancel_at_period_end": {
+            "title": "Cancel At Period End",
+            "type": "boolean"
+          },
+          "currency": {
+            "enum": [
+              "TRY",
+              "USD"
+            ],
+            "title": "Currency",
+            "type": "string"
+          },
+          "current_period_end": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Period End"
+          },
+          "founder_offer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FounderOfferOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "has_customer": {
+            "title": "Has Customer",
+            "type": "boolean"
+          },
+          "has_subscription": {
+            "title": "Has Subscription",
+            "type": "boolean"
+          },
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "past_due_ends_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Past Due Ends At"
+          },
+          "plan": {
+            "enum": [
+              "starter",
+              "growth",
+              "pro"
+            ],
+            "title": "Plan",
+            "type": "string"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/PlanPriceOut"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "product_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Key"
+          },
+          "provider_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Status"
+          },
+          "status": {
+            "enum": [
+              "trial",
+              "active",
+              "past_due",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tax_exclusive": {
+            "title": "Tax Exclusive",
+            "type": "boolean"
+          },
+          "trial_ends_at": {
+            "format": "date-time",
+            "title": "Trial Ends At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan",
+          "status",
+          "provider_status",
+          "product_key",
+          "cancel_at_period_end",
+          "current_period_end",
+          "trial_ends_at",
+          "access_until",
+          "past_due_ends_at",
+          "billing_exempt",
+          "block_reason",
+          "currency",
+          "tax_exclusive",
+          "plans",
+          "founder_offer",
+          "has_subscription",
+          "has_customer",
+          "can_manage",
+          "is_simulated"
+        ],
+        "title": "BillingOut",
+        "type": "object"
+      },
       "Body_meta_data_deletion_api_v1_webhooks_meta_data_deletion_post": {
         "properties": {
           "signed_request": {
@@ -2655,6 +2832,57 @@
           "channels"
         ],
         "title": "ChannelPreferencesOut",
+        "type": "object"
+      },
+      "CheckoutIn": {
+        "properties": {
+          "interval": {
+            "enum": [
+              "monthly",
+              "annual"
+            ],
+            "title": "Interval",
+            "type": "string"
+          },
+          "plan": {
+            "enum": [
+              "starter",
+              "growth",
+              "pro",
+              "founder"
+            ],
+            "title": "Plan",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan",
+          "interval"
+        ],
+        "title": "CheckoutIn",
+        "type": "object"
+      },
+      "CheckoutOut": {
+        "properties": {
+          "checkout_url": {
+            "title": "Checkout Url",
+            "type": "string"
+          },
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "checkout_url",
+          "ref",
+          "is_simulated"
+        ],
+        "title": "CheckoutOut",
         "type": "object"
       },
       "ClarificationAnswer": {
@@ -4903,6 +5131,60 @@
         "title": "DelegationPreview",
         "type": "object"
       },
+      "DevBillingSimulateIn": {
+        "properties": {
+          "outcome": {
+            "default": "active",
+            "enum": [
+              "active",
+              "past_due",
+              "on_hold",
+              "cancelled",
+              "cancelled_end_of_period",
+              "renewed"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "DevBillingSimulateIn",
+        "type": "object"
+      },
+      "DevBillingSimulateOut": {
+        "properties": {
+          "is_simulated": {
+            "default": true,
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "subscription_id": {
+            "title": "Subscription Id",
+            "type": "string"
+          },
+          "webhook_id": {
+            "title": "Webhook Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "webhook_id",
+          "subscription_id"
+        ],
+        "title": "DevBillingSimulateOut",
+        "type": "object"
+      },
       "DisclosureText": {
         "additionalProperties": false,
         "description": "The notice appended to automatic replies, per reply language. Empty: the built-in text.",
@@ -6041,6 +6323,41 @@
           }
         },
         "title": "FollowUpText",
+        "type": "object"
+      },
+      "FounderOfferOut": {
+        "properties": {
+          "ai_replies_quota": {
+            "title": "Ai Replies Quota",
+            "type": "integer"
+          },
+          "amount_display": {
+            "title": "Amount Display",
+            "type": "string"
+          },
+          "interval": {
+            "const": "monthly",
+            "title": "Interval",
+            "type": "string"
+          },
+          "plan": {
+            "const": "growth",
+            "title": "Plan",
+            "type": "string"
+          },
+          "product_key": {
+            "title": "Product Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_key",
+          "plan",
+          "interval",
+          "amount_display",
+          "ai_replies_quota"
+        ],
+        "title": "FounderOfferOut",
         "type": "object"
       },
       "GenerateReportRequest": {
@@ -7852,6 +8169,11 @@
       },
       "MetaResponse": {
         "properties": {
+          "billing_enabled": {
+            "default": false,
+            "title": "Billing Enabled",
+            "type": "boolean"
+          },
           "calendar_providers": {
             "default": [],
             "items": {
@@ -9261,6 +9583,53 @@
         "title": "PersonalityOut",
         "type": "object"
       },
+      "PlanPriceOut": {
+        "properties": {
+          "ai_replies_quota": {
+            "title": "Ai Replies Quota",
+            "type": "integer"
+          },
+          "amount_display": {
+            "title": "Amount Display",
+            "type": "string"
+          },
+          "interval": {
+            "enum": [
+              "monthly",
+              "annual"
+            ],
+            "title": "Interval",
+            "type": "string"
+          },
+          "monthly_equivalent_display": {
+            "title": "Monthly Equivalent Display",
+            "type": "string"
+          },
+          "plan": {
+            "enum": [
+              "starter",
+              "growth",
+              "pro"
+            ],
+            "title": "Plan",
+            "type": "string"
+          },
+          "product_key": {
+            "title": "Product Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan",
+          "interval",
+          "product_key",
+          "amount_display",
+          "monthly_equivalent_display",
+          "ai_replies_quota"
+        ],
+        "title": "PlanPriceOut",
+        "type": "object"
+      },
       "PoliciesIn": {
         "additionalProperties": false,
         "properties": {
@@ -9351,6 +9720,24 @@
           "mode"
         ],
         "title": "PolicyItem",
+        "type": "object"
+      },
+      "PortalOut": {
+        "properties": {
+          "is_simulated": {
+            "title": "Is Simulated",
+            "type": "boolean"
+          },
+          "portal_url": {
+            "title": "Portal Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "portal_url",
+          "is_simulated"
+        ],
+        "title": "PortalOut",
         "type": "object"
       },
       "PriceCard": {
@@ -12085,6 +12472,37 @@
       },
       "UsageOut": {
         "properties": {
+          "access_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Until"
+          },
+          "billing_exempt": {
+            "title": "Billing Exempt",
+            "type": "boolean"
+          },
+          "block_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BILLING_INACTIVE",
+                  "REPLY_QUOTA_PAUSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Block Reason"
+          },
           "grace_limit": {
             "title": "Grace Limit",
             "type": "integer"
@@ -12147,6 +12565,11 @@
             "title": "Status",
             "type": "string"
           },
+          "trial_ends_at": {
+            "format": "date-time",
+            "title": "Trial Ends At",
+            "type": "string"
+          },
           "used": {
             "title": "Used",
             "type": "integer"
@@ -12162,7 +12585,11 @@
           "grace_limit",
           "period_start",
           "period_end",
-          "state"
+          "state",
+          "trial_ends_at",
+          "access_until",
+          "billing_exempt",
+          "block_reason"
         ],
         "title": "UsageOut",
         "type": "object"
@@ -13225,6 +13652,18 @@
           "follow_up_text": {
             "$ref": "#/components/schemas/FollowUpText"
           },
+          "morning_briefing_enabled": {
+            "default": true,
+            "title": "Morning Briefing Enabled",
+            "type": "boolean"
+          },
+          "morning_briefing_hour": {
+            "default": 9,
+            "maximum": 12.0,
+            "minimum": 5.0,
+            "title": "Morning Briefing Hour",
+            "type": "integer"
+          },
           "publish_max_delay_minutes": {
             "default": 1440,
             "maximum": 1440.0,
@@ -13274,6 +13713,30 @@
               }
             ]
           },
+          "morning_briefing_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Morning Briefing Enabled"
+          },
+          "morning_briefing_hour": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 5.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Morning Briefing Hour"
+          },
           "publish_max_delay_minutes": {
             "anyOf": [
               {
@@ -13294,7 +13757,7 @@
     }
   },
   "info": {
-    "title": "Pivoris",
+    "title": "AgentNest",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",
@@ -13720,6 +14183,48 @@
         "summary": "Verify Email",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/api/v1/dev/billing/simulate": {
+      "post": {
+        "description": "Verify caller owns the checkout's workspace, sign a Standard Webhook, and ingest it.",
+        "operationId": "simulate_billing_webhook_api_v1_dev_billing_simulate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevBillingSimulateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevBillingSimulateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Simulate Billing Webhook",
+        "tags": [
+          "dev"
         ]
       }
     },
@@ -18710,6 +19215,145 @@
         "summary": "Review Policies",
         "tags": [
           "automation"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing": {
+      "get": {
+        "operationId": "get_billing_api_v1_workspaces__workspace_id__billing_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Billing",
+        "tags": [
+          "billing"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/checkout": {
+      "post": {
+        "operationId": "create_checkout_api_v1_workspaces__workspace_id__billing_checkout_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Checkout",
+        "tags": [
+          "billing"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/portal": {
+      "post": {
+        "operationId": "create_portal_api_v1_workspaces__workspace_id__billing_portal_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Portal",
+        "tags": [
+          "billing"
         ]
       }
     },
@@ -24835,9 +25479,105 @@
         ]
       }
     },
-    "/webhooks/instagram/mock": {
+    "/webhooks/billing/dodo": {
       "post": {
-        "operationId": "receive_webhooks_instagram_mock_post",
+        "operationId": "receive_dodo_webhook_webhooks_billing_dodo_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Receive Dodo Webhook",
+        "tags": [
+          "webhooks"
+        ]
+      }
+    },
+    "/webhooks/instagram": {
+      "get": {
+        "operationId": "handshake_webhooks_instagram_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "hub.mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hub.Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub.verify_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hub.Verify Token"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub.challenge",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hub.Challenge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Handshake",
+        "tags": [
+          "webhooks"
+        ]
+      },
+      "post": {
+        "operationId": "receive_webhooks_instagram_post",
         "responses": {
           "200": {
             "content": {

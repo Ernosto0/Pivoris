@@ -848,3 +848,62 @@ Stored workspace settings add `follow_up_enabled=false`, `follow_up_hours=6` (1 
 `follow_up_text={tr:"", en:""}` (400 characters and 1000 UTF-8 bytes per custom template).
 Empty selects the neutral built-in default. Dedicated inbox settings endpoints validate
 placeholders against live facts; the generic workspace PATCH excludes these keys.
+
+### Subscription billing (Feature Phase 6, migrations 0103–0104; ADR-029)
+
+**Migration `0103`** (`20261127_0103_workspace_plan_billing_fields.py`, parent `0102`) extends `workspace_plans` (provider-agnostic core in `app/plans/`):
+- `trial_ends_at timestamptz not null`: backfilled on existing rows (and inserted for any `workspaces` row lacking a `workspace_plans` row) to the fixed release grace timestamp `2026-12-27T00:00:00Z` (release + 30 days). New workspaces get `created_at + BILLING_TRIAL_DAYS` (default 14 days).
+- `access_until timestamptz null`: deadline for `past_due` (`past_due_ends_at` from Dodo) or `cancelled` (end of paid period, or `now` on immediate cancel / `on_hold` / `failed` / `expired`); `null` when `status = 'active'` and not scheduled to end.
+- `billing_exempt boolean not null default false`: operator override (`billing-exempt --on/--off`), seeded `true` for `workspaces.is_demo = true` in the backfill; webhooks never overwrite `workspace_plans.status` while `billing_exempt` is true.
+- `warned_trial_ending boolean not null default false` and `warned_billing_paused boolean not null default false`: track whether the lifecycle deadline notifications (`billing.trial_ending` and `billing.paused`) have fired for the current trial/block episode (re-armed when reactivated or when `plan-trial` extends the trial).
+
+**Migration `0104`** (`20261127_0104_hosted_billing_tables.py`, parent `0103`) creates the hosted billing tables (`app/hosted/billing/`):
+
+**`billing_accounts`** (Category C tenant table, ENABLE + FORCE RLS, `tenant_isolation_policy`):
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | `unique (workspace_id, id)` |
+| workspace_id | uuid not null unique | FK `workspaces(id) on delete cascade`; one billing account row per workspace |
+| dodo_customer_id | text null | Dodo `cus_…` ID (used for portal session creation; **never** used for webhook workspace lookup because one email can own multiple workspaces) |
+| dodo_subscription_id | text null unique | Dodo `sub_…` ID |
+| product_key | text null | Catalog key (`starter_monthly`, `starter_annual`, `growth_monthly`, `growth_annual`, `pro_monthly`, `pro_annual`, `founder_monthly`) |
+| provider_status | text null | Latest Dodo subscription status (`pending`, `active`, `past_due`, `on_hold`, `paused`, `cancelled`, `failed`, `expired`) |
+| cancel_at_period_end | boolean not null default false | Mirrors Dodo `cancel_at_next_billing_date` |
+| current_period_end | timestamptz null | Mirrors Dodo `next_billing_date` / `expires_at` |
+| past_due_ends_at | timestamptz null | Dodo 7-day grace deadline (`data.past_due_ends_at`) |
+| last_event_ts | timestamptz null | Monotonic event timestamp fence; older out-of-order snapshots are ignored |
+| activated_once | boolean not null default false | True after the first `active` transition resets the quota period; renewals do not re-anchor |
+| founder_eligible | boolean not null default false | Operator flag (`billing-founder --on/--off`) permitting checkout of `founder_monthly` |
+| is_simulated | boolean not null default false | True when driven by `BILLING_PROVIDER=fake` or dev simulate ([INV-09](../invariants.md)) |
+| created_at / updated_at | timestamptz not null | UTC |
+
+**`billing_checkouts`** (Category C tenant table, ENABLE + FORCE RLS, `tenant_isolation_policy`):
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | `unique (workspace_id, id)` |
+| workspace_id | uuid not null | FK `workspaces(id) on delete cascade` |
+| ref | text not null unique | Random `chk_<token>` passed in Dodo `metadata.pivoris_ref` |
+| product_key | text not null | Requested catalog product key |
+| created_by_user_id | uuid null | FK `users(id) on delete set null` |
+| dodo_session_id | text null | Dodo `cks_…` session ID recorded after external call |
+| expires_at | timestamptz not null | Checkout reference validity window |
+| consumed_at | timestamptz null | Stamped when bound to a subscription |
+| is_simulated | boolean not null default false | |
+| created_at | timestamptz not null | UTC |
+
+**`billing_webhook_events`** (Category A global ingress table, like `whatsapp_webhook_events`; no tenant RLS):
+| Column | Type | Notes |
+|---|---|---|
+| webhook_id | text PK | Standard Webhooks `webhook-id` header (deduplication key, [INV-06](../invariants.md)) |
+| type | text not null | Event type, e.g. `subscription.active` |
+| status | text not null | `CHECK in ('queued', 'ignored', 'unmatched', 'applied')` |
+| workspace_id | uuid null | Resolved workspace (null for `ignored` / `unmatched`) |
+| event_timestamp | timestamptz null | Parsed top-level `timestamp` |
+| payload | jsonb null | Verified payload with customer `email`, `name`, and `phone_number` stripped; nulled at 30 days and deleted at 90 days by retention |
+| received_at / processed_at | timestamptz | UTC |
+
+**`SECURITY DEFINER` helpers** (migration `0104`, `SET search_path = <schema>, pg_temp`):
+- `resolve_billing_workspace(p_subscription_id text, p_ref text) RETURNS TABLE (workspace_id uuid, matched_by text)`: resolves strictly by `billing_accounts.dodo_subscription_id` first, then by `billing_checkouts.ref` (`pivoris_ref`), never by `customer_id`.
+- `discover_billing_deadlines(p_now timestamptz, p_trial_warn_horizon timestamptz, p_limit int DEFAULT 100) RETURNS TABLE (workspace_id uuid)`: discovers non-demo, non-exempt workspaces needing `billing.trial_ending` (within 3 days of `trial_ends_at`) or `billing.paused` (`trial` past `trial_ends_at`, or non-trial past `access_until`).
+
+`CATEGORY_C_TABLES` advances from 65 to 67 (`billing_accounts`, `billing_checkouts`), and `billing_webhook_events` joins the Category A global ingress set.

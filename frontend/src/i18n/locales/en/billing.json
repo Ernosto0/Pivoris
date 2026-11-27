@@ -1,0 +1,72 @@
+{
+  "billing": {
+    "title": "Subscription and plans",
+    "intro": "Your workspace subscription status, AI reply allowances, and billing management.",
+    "disabled": "Subscription billing is not enabled on this server.",
+    "managerReadOnly": "Only the workspace owner can choose a plan or manage the subscription.",
+    "manageSubscription": "Manage subscription",
+    "subscribe": "Subscribe",
+    "subscribeFounder": "Subscribe to Founder plan",
+    "currentPlan": "Current plan",
+    "switchInPortal": "Use Manage subscription to change plans",
+    "intervalGroup": "Billing interval",
+    "monthly": "Monthly",
+    "annual": "Annual (2 months free)",
+    "perMonth": "/ mo",
+    "perYear": "/ yr",
+    "monthlyEquivalent": "{{amount}} / mo billed annually",
+    "taxExclusiveTRY": "+ VAT (added at checkout)",
+    "taxExclusiveUSD": "+ tax (calculated at checkout)",
+    "quotaPerMonth": "{{quota}} AI customer replies / month",
+    "recommended": "Recommended",
+    "founder": {
+      "badge": "Founder Offer",
+      "title": "Founder Business Plan",
+      "description": "Full Growth tier features and AI reply allowance at the locked founder rate enabled for your workspace."
+    },
+    "status": {
+      "heading": "Subscription status",
+      "trialTitle": "Free trial active",
+      "trialBody": "Your free trial runs until {{date}}. No card required.",
+      "activeTitle": "Subscription active",
+      "activeBody": "Next renewal date: {{date}}.",
+      "activeNoDate": "Your subscription is active.",
+      "cancellingTitle": "Cancels at period end",
+      "cancellingBody": "Your subscription has been cancelled; full AI access continues until {{date}}.",
+      "pastDueTitle": "Payment problem — grace period active",
+      "pastDueBody": "The last payment failed. Update your card by {{date}}; your access continues without interruption until then.",
+      "stoppedTitle": "AI reply drafting and content generation are paused",
+      "stoppedBody": "Your trial or payment grace period has ended. Your data stays safe, customer messages still arrive in the inbox and notify your team, scheduled posts still publish, and the test chat keeps working. Subscribe or update your payment method to resume AI features.",
+      "exemptTitle": "Billing exemption active",
+      "exemptBody": "This workspace is exempted from billing pauses by the operator."
+    },
+    "return": {
+      "verifyingTitle": "Verifying payment…",
+      "verifyingBody": "Waiting for subscription confirmation from the payment provider. This page updates automatically.",
+      "verifiedTitle": "Your subscription is active",
+      "verifiedBody": "Your payment has been verified and your plan is active.",
+      "unverifiedTitle": "Payment not yet verified",
+      "unverifiedBody": "We have not received confirmation yet. If you completed payment, it usually arrives within moments; reload or check again.",
+      "checkAgain": "Check again"
+    },
+    "notifications": {
+      "trial_ending": "Your free trial ends soon ({{date}}).",
+      "payment_failed": "Subscription payment failed. Update your payment method by {{date}} to avoid interruption.",
+      "paused": "AI drafting is paused because your trial or subscription ended. Messages still arrive in your inbox.",
+      "activated": "Your subscription is active; AI drafting and content generation are enabled."
+    },
+    "devCheckout": {
+      "title": "Simulated Checkout",
+      "subtitle": "This screen appears only in local development and demo mode; no real card is entered and nothing is charged.",
+      "portalTitle": "Simulated Subscription Portal",
+      "portalSubtitle": "In production this opens the Dodo Payments Customer Portal.",
+      "planLabel": "Selected plan",
+      "intervalLabel": "Interval",
+      "refLabel": "Checkout reference",
+      "approve": "Complete payment (Simulate active subscription)",
+      "pastDue": "Simulate payment failure (7-day grace)",
+      "cancelEnd": "Simulate cancel at period end",
+      "back": "Back to Billing"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "business_id": "bus_0NmBkEGHU88a8xMDJrH7j",
+  "type": "subscription.active",
+  "timestamp": "2026-11-27T12:25:00.000000Z",
+  "data": {
+    "payload_type": "Subscription",
+    "subscription_id": "sub_NicheColdOtherBrand01",
+    "brand_id": "bus_0NmBkEGHU88a8xMDJrH7j",
+    "product_id": "pdt_NicheColdOther001",
+    "status": "active",
+    "currency": "USD",
+    "recurring_pre_tax_amount": 4900,
+    "tax_inclusive": false,
+    "quantity": 1,
+    "trial_period_days": 0,
+    "payment_frequency_count": 1,
+    "payment_frequency_interval": "Month",
+    "subscription_period_count": 20,
+    "subscription_period_interval": "Year",
+    "created_at": "2026-11-27T12:25:00.000000Z",
+    "previous_billing_date": "2026-11-27T12:25:00.000000Z",
+    "next_billing_date": "2026-12-27T12:25:00.000000Z",
+    "cancel_at_next_billing_date": false,
+    "past_due_ends_at": null,
+    "payment_id": null,
+    "has_payment_method": true,
+    "on_demand": false,
+    "addons": [],
+    "meters": [],
+    "credit_entitlement_cart": [],
+    "meter_credit_entitlement_cart": [],
+    "customer": {
+      "customer_id": "cus_OtherBrandCustomer01",
+      "name": "Other Brand Customer",
+      "email": "buyer@nichecold.example",
+      "phone_number": null,
+      "metadata": {}
+    },
+    "billing": {
+      "country": "US"
+    },
+    "metadata": {}
+  }
+}

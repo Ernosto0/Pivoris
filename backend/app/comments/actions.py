@@ -172,7 +172,8 @@ def propose(db: Session, clock: Clock, ctx: BrokerContext, args: BaseModel) -> d
     if validated is not None and not usage.consume(
         db, clock, thread.workspace_id, f"public:{thread.id}:{thread.event_cursor}"
     ):
-        return {"status": "quota_paused", "reason": usage.PAUSED_REASON}
+        reason = usage.pause_reason(db, clock, thread.workspace_id) or usage.PAUSED_REASON
+        return {"status": "quota_paused", "reason": reason}
     body = {
         "comment_id": str(comment.id),
         "comment_version": comment.version,

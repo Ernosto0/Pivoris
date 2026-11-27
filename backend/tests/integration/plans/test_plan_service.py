@@ -277,3 +277,113 @@ def test_a_period_lasts_about_a_month(db_session: Session, clock: FrozenClock) -
     workspace, _ = make_workspace(db_session, clock)
     row = service.get_plan(db_session, clock, workspace.id)
     assert timedelta(days=27) <= row.period_end - row.period_start <= timedelta(days=31)
+
+
+def test_create_workspace_initializes_14_day_trial_and_demo_exemption(
+    db_session: Session, clock: FrozenClock
+) -> None:
+    from app.identity import service as identity_service
+    from app.identity.schemas import WorkspaceCreate
+    from tests.factories import create_user
+
+    owner = create_user(db_session)
+    ws = identity_service.create_workspace(
+        db_session,
+        clock,
+        owner,
+        WorkspaceCreate(
+            name="Studio",
+            business_category="fitness",
+            market="tr",
+            default_locale="tr",
+            timezone="Europe/Istanbul",
+            currency="TRY",
+        ),
+    )
+    db_session.execute(
+        select(WorkspacePlan)  # ensure RLS GUC is set before reading WorkspacePlan directly
+    )
+    from app.core.db import set_tenant_context
+
+    set_tenant_context(db_session, ws.id)
+    row = service.get_plan(db_session, clock, ws.id)
+    assert row.trial_ends_at == ws.created_at + timedelta(days=14)
+    assert row.billing_exempt is False
+
+    demo_ws = identity_service.create_workspace(
+        db_session,
+        clock,
+        owner,
+        WorkspaceCreate(
+            name="Demo Studio",
+            business_category="fitness",
+            market="tr",
+            default_locale="tr",
+            timezone="Europe/Istanbul",
+            currency="TRY",
+        ),
+        is_demo=True,
+    )
+    set_tenant_context(db_session, demo_ws.id)
+    demo_row = service.get_plan(db_session, clock, demo_ws.id)
+    assert demo_row.billing_exempt is True
+
+
+def test_billing_block_stops_reply_and_content_generation_while_test_chat_stays_open(
+    db_session: Session, clock: FrozenClock, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.content import generation
+    from app.core import config
+    from app.core.db import set_tenant_context
+    from app.core.errors import AppError
+    from tests.factories import knowledge_ctx
+
+    monkeypatch.setenv("BILLING_PROVIDER", "fake")
+    config.get_settings.cache_clear()
+    try:
+        workspace, users = make_workspace(db_session, clock, quota=100)
+        set_tenant_context(db_session, workspace.id)
+        row = service.get_plan(db_session, clock, workspace.id)
+        row.trial_ends_at = clock.now() + timedelta(days=14)
+        db_session.flush()
+
+        assert service.pause_reason(db_session, clock, workspace.id) is None
+        clock.advance(days=14)
+        assert service.pause_reason(db_session, clock, workspace.id) == "BILLING_INACTIVE"
+        assert service.consume(db_session, clock, workspace.id, "blocked-draft") is False
+        # Sandbox test chat checks only quota, so it remains unpaused.
+        assert service.is_quota_paused(db_session, clock, workspace.id) is False
+
+        # Content generation refuses with BILLING_INACTIVE.
+        ctx = knowledge_ctx(workspace, users["owner"], "owner")
+        with pytest.raises(AppError) as exc_info:
+            generation.stage_request(
+                db_session,
+                clock,
+                ctx,
+                content_type="feed_image",
+                objective="New class schedule",
+                notes=None,
+                client_request_id="req-blocked-1",
+            )
+        assert exc_info.value.code == "BILLING_INACTIVE"
+
+        # Conversely, when billing is active and reply quota is exhausted, content generation works.
+        row.status = "active"
+        row.access_until = None
+        row.used = 200  # > grace limit 110
+        db_session.flush()
+        assert service.pause_reason(db_session, clock, workspace.id) == "REPLY_QUOTA_PAUSED"
+        item, created = generation.stage_request(
+            db_session,
+            clock,
+            ctx,
+            content_type="feed_image",
+            objective="Allowed despite reply quota pause",
+            notes=None,
+            client_request_id="req-allowed-1",
+        )
+        assert created is True and item.id is not None
+    finally:
+        monkeypatch.setenv("BILLING_PROVIDER", "none")
+        config.get_settings.cache_clear()

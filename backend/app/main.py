@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_error_handlers
 from app.api.middleware import RequestIdMiddleware
-from app.api.router import api_router, health_router
+from app.api.router import api_router, create_hosted_billing_api_router, health_router
 from app.api.v1.telegram_webhook_router import router as telegram_webhook_router
 from app.api.v1.whatsapp_webhook_router import router as whatsapp_webhook_router
 from app.core.clock import Clock, SystemClock
@@ -14,6 +14,8 @@ from app.core.logging import configure_logging, get_logger
 from app.core.sentry import init_sentry
 from app.demo.dev_router import router as dev_router
 from app.handlers import load_handlers
+from app.hosted.billing.dev_router import router as dev_billing_router
+from app.hosted.billing.webhooks import create_billing_webhooks_router
 from app.inbox.webhooks_router import create_webhooks_router
 from app.knowledge.templates import validate_templates
 from app.operations.meta_callbacks_router import router as meta_callbacks_router
@@ -62,6 +64,11 @@ def create_app(settings: Settings | None = None, clock: Clock | None = None) -> 
     app.include_router(create_webhooks_router(settings))  # signature-authenticated, no /api/v1
     app.include_router(whatsapp_webhook_router)
     app.include_router(telegram_webhook_router)  # Telegram bot webhook (secret token validated)
+    if settings.billing_enabled:
+        app.include_router(create_hosted_billing_api_router())
+        app.include_router(create_billing_webhooks_router())
     if settings.demo_tools_enabled and not in_production:  # INV-20
         app.include_router(dev_router)
+        if settings.billing_enabled:
+            app.include_router(dev_billing_router)
     return app

@@ -29,3 +29,15 @@ def test_the_web_push_contracts_are_kept(monkeypatch: pytest.MonkeyPatch) -> Non
     stay enforced even while an unrelated contract is broken."""
     monkeypatch.chdir(BACKEND_DIR)
     assert lint_imports(limit_to_contracts=WEB_PUSH_CONTRACTS) == 0
+
+
+HOSTED_CONTRACTS = (
+    "hosted-entry-points-only",
+    "dodo-sdk-only-in-adapter",
+)
+
+
+def test_the_hosted_billing_contracts_are_kept(monkeypatch: pytest.MonkeyPatch) -> None:
+    """ADR-019 / ADR-029: core modules never import app.hosted, and only dodo.py imports Dodo."""
+    monkeypatch.chdir(BACKEND_DIR)
+    assert lint_imports(limit_to_contracts=HOSTED_CONTRACTS) == 0

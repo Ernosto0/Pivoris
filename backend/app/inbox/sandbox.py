@@ -433,7 +433,7 @@ def prepare_agent_practice(
         rule = ActionRule.model_validate(delegation.policy.get("actions", {}).get("dm.send", {}))
     from app.plans import service as usage
 
-    quota_available = not usage.is_paused(session, clock, context.workspace_id)
+    quota_available = not usage.is_quota_paused(session, clock, context.workspace_id)
     if rule.max_per_day is not None and delegation is not None:
         day_start = datetime.combine(clock.now().astimezone(UTC).date(), time.min, tzinfo=UTC)
         used = (

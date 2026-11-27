@@ -163,14 +163,16 @@ def claim(deps: RunnerDeps, workspace_id: uuid.UUID, thread_id: uuid.UUID) -> Cl
             db.add(goal)
             db.flush()
             thread.current_goal_key = goal.goal_key
-        if thread.surface in {"dm", "comment"} and usage.is_paused(db, deps.clock, workspace_id):
-            # The monthly reply allowance is used up (plans): no model call, no draft. The
-            # customer's message is already in the inbox; the people who answer are told.
+        if thread.surface in {"dm", "comment"} and (
+            stop_reason := usage.pause_reason(db, deps.clock, workspace_id)
+        ):
+            # Drafting is stopped (quota or billing): no model call, no draft. The customer's
+            # message is already in the inbox; the people who answer are told.
             if thread.dm_conversation_id:
                 usage.notify_paused_conversation(
-                    db, deps.clock, workspace_id, thread.dm_conversation_id
+                    db, deps.clock, workspace_id, thread.dm_conversation_id, reason=stop_reason
                 )
-            set_state(db, deps, goal, thread, "failed", reason=usage.PAUSED_REASON)
+            set_state(db, deps, goal, thread, "failed", reason=stop_reason)
             db.commit()
             return None
         sync_usage(db, goal)

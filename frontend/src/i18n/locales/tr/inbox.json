@@ -215,6 +215,7 @@
       "LLM_UNAVAILABLE": "Asistan şu anda kullanılamıyor",
       "LLM_BUDGET_EXCEEDED": "Günlük asistan sınırına ulaşıldı",
       "REPLY_QUOTA_PAUSED": "Aylık yapay zeka yanıt hakkı doldu (taslak hazırlama duraklatıldı)",
+      "BILLING_INACTIVE": "Deneme veya abonelik süresi sona erdi (yapay zekâ taslakları durduruldu)",
       "LLM_OUTPUT_INVALID": "Asistanın yanıtı geçersizdi",
       "LLM_REFUSED": "Asistan yanıtlamayı reddetti",
       "ATTACHMENT_ONLY": "Yalnızca fotoğraf veya dosya",

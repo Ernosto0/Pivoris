@@ -1,7 +1,8 @@
-"""Operator commands for a workspace's plan (no payment integration: the operator sets it).
+"""Operator commands for a workspace's plan and billing overrides.
 
-``plan-usage``, ``plan-set``, ``plan-reset`` and ``plan-extend``; registered by ``app.cli``.
-Each prints the workspace's usage as one JSON line and exits 0, or prints an error and exits 1.
+``plan-usage``, ``plan-set``, ``plan-reset``, ``plan-extend``, ``plan-trial`` and
+``billing-exempt``; registered by ``app.cli``. Each prints the workspace's usage as one JSON line
+and exits 0, or prints an error and exits 1.
 """
 
 import argparse
@@ -9,7 +10,9 @@ import json
 import sys
 from datetime import timedelta
 
+from app.audit import service as audit
 from app.core.clock import SystemClock
+from app.core.context import ActorRef, WorkspaceContext
 from app.core.db import get_session_factory, set_tenant_context
 from app.identity.repository import get_workspace_by_slug
 from app.plans import service
@@ -25,6 +28,14 @@ def run(args: argparse.Namespace) -> int:
             print("error: workspace not found", file=sys.stderr)
             return 1
         set_tenant_context(db, workspace.id)
+        ctx = WorkspaceContext(
+            workspace_id=workspace.id,
+            actor=ActorRef.system("cli"),
+            role=None,
+            timezone=workspace.timezone,
+            locale=workspace.default_locale,
+            is_demo=workspace.is_demo,
+        )
         row = service.get_plan(db, clock, workspace.id)
         if args.command == "plan-set":
             if args.quota is not None and args.quota < 1:
@@ -53,7 +64,34 @@ def run(args: argparse.Namespace) -> int:
             # The period lasts longer and later periods follow its new end date. Usage is kept.
             row.period_end += timedelta(days=args.days)
             row.anchor_day = row.period_end.day
-        result = view(row)
+        elif args.command == "plan-trial":
+            if args.days < 0:
+                print("error: --days must not be negative", file=sys.stderr)
+                return 1
+            row.trial_ends_at = clock.now() + timedelta(days=args.days)
+            row.warned_trial_ending = False
+            row.warned_billing_paused = False
+            audit.record(
+                db,
+                ctx,
+                "billing.plan_trial_set",
+                "workspace_plan",
+                workspace.id,
+                {"days": args.days, "trial_ends_at": row.trial_ends_at.isoformat()},
+                clock=clock,
+            )
+        elif args.command == "billing-exempt":
+            row.billing_exempt = bool(args.on)
+            audit.record(
+                db,
+                ctx,
+                "billing.exempt_changed",
+                "workspace_plan",
+                workspace.id,
+                {"billing_exempt": row.billing_exempt},
+                clock=clock,
+            )
+        result = view(row, now=clock.now(), is_demo=workspace.is_demo)
         db.commit()
     print(json.dumps(result.model_dump(mode="json"), ensure_ascii=False))
     return 0
@@ -65,6 +103,8 @@ def register(sub: "argparse._SubParsersAction[argparse.ArgumentParser]") -> None
         "plan-set": "set a workspace's plan, quota override and status",
         "plan-reset": "start a fresh period now with zero usage",
         "plan-extend": "make the current period end later (usage is kept)",
+        "plan-trial": "set trial_ends_at relative to now (in days)",
+        "billing-exempt": "turn billing exemption on or off for a workspace",
     }
     for name, help_text in helps.items():
         parser = sub.add_parser(name, help=help_text)
@@ -78,5 +118,9 @@ def register(sub: "argparse._SubParsersAction[argparse.ArgumentParser]") -> None
                 "--clear-override", action="store_true", help="use the plan's own quota"
             )
             parser.add_argument("--status", choices=STATUSES)
-        elif name == "plan-extend":
+        elif name in ("plan-extend", "plan-trial"):
             parser.add_argument("--days", type=int, required=True)
+        elif name == "billing-exempt":
+            toggle = parser.add_mutually_exclusive_group(required=True)
+            toggle.add_argument("--on", action="store_true", help="exempt from billing blocks")
+            toggle.add_argument("--off", action="store_true", help="enforce normal billing rules")

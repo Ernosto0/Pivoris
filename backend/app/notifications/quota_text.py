@@ -37,3 +37,8 @@ TEXT: dict[str, dict[str, tuple[str, str]]] = {
         ),
     },
 }
+
+
+def register_notification_texts(extra: dict[str, dict[str, tuple[str, str]]]) -> None:
+    """Register additional fixed external-channel notification copy (e.g. hosted billing)."""
+    TEXT.update(extra)

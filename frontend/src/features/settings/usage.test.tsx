@@ -28,6 +28,10 @@ function usage(overrides: Partial<ReplyUsage> = {}): ReplyUsage {
     period_start: "2026-10-15T09:00:00Z",
     period_end: "2026-11-15T09:00:00Z",
     state: "normal",
+    trial_ends_at: "2099-01-01T00:00:00Z",
+    access_until: null,
+    billing_exempt: false,
+    block_reason: null,
     ...overrides,
   };
 }

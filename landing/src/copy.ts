@@ -247,7 +247,7 @@ export const copy: Record<Lang, Copy> = {
       lead: 'Pivoris müşterilerinize doğrulanmış bilgilerle yanıt verir ve içeriğinizi hazırlar. Siz her şeyi Telegram’dan takip eder, gerektiğinde onay verirsiniz.',
       cta: 'Ücretsiz pilota başvurun',
       secondary: 'Simülasyonu deneyin',
-      points: ['30 gün ücretsiz', 'Kart bilgisi yok', 'Kurulum 30 dakika'],
+      points: ['14 gün ücretsiz', 'Kart bilgisi yok', 'Kurulum 30 dakika'],
     },
     preview: {
       example: 'Örnek ekran',
@@ -601,9 +601,8 @@ export const copy: Record<Lang, Copy> = {
           body: 'Gizlilik politikası ve kullanım koşulları bu sitede ve uygulamada yer alır; veri silme sayfası uygulamada bulunur. Müşterilerinize göstereceğiniz KVKK aydınlatma metni şablonunu ve veri işleme sözleşmesi taslağını kurulumda size veririz. Belgeler henüz avukat incelemesinden geçmedi; kendi unvanınızla yayınlamadan önce kendi avukatınıza da onaylatmanızı öneririz.',
         },
         {
-          title: 'Türk lirasıyla fatura',
-          badge: 'Planlanan',
-          body: 'Pilot ücretsizdir ve kendiliğinden ücretlendirme yoktur. Ücretli döneme geçerseniz faturalandırma Türk lirası (₺) ile yapılacak; ödeme ve fatura düzeni (e-arşiv fatura, havale/EFT ya da ödeme bağlantısı) başlamadan önce sizinle netleştirilir.',
+          title: 'Kartla ödeme ve fatura',
+          body: '14 günlük deneme ücretsizdir; kart bilgisi istemez ve kendiliğinden ücretlendirme yoktur. Aboneliğe geçtiğinizde ödemeler kartla alınır: Türkiye’de sabit Türk lirası (₺ + KDV), diğer ülkelerde ABD doları ($ + vergi) uygulanır ve faturanız yetkili satıcı (Merchant of Record) olarak Dodo Payments tarafından düzenlenir.',
         },
         {
           title: 'Yerinde ya da görüntülü kurulum',
@@ -663,14 +662,14 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           q: 'Pilot bitince ne olacak?',
-          a: 'Pilot 30 gün ücretsizdir; kart bilgisi istemiyoruz ve kendiliğinden ücretlendirme yoktur. Devam etmek isterseniz paket koşullarını birlikte netleştiririz. Pilot işletmelere 12 ay sabit kurucu fiyatı sunuyoruz.',
+          a: 'Deneme süresi 14 gün ücretsizdir; kart bilgisi istemiyoruz ve kendiliğinden ücretlendirme yoktur. Devam etmek isterseniz uygulama içinden Dodo Payments güvencesiyle kartla abone olabilirsiniz; pilot işletmelere özel aylık kurucu paketi sunuyoruz.',
         },
       ],
     },
     pilot: {
       eyebrow: 'Pilot programı',
       title: 'İşletmenize daha çok zaman ayırın.',
-      body: 'Rutin soruların otomatik yanıtlandığı, içerik ve müşteri takibinin tek yerde toplandığı bir iş gününü 30 gün ücretsiz deneyin. Instagram’ı aktif kullanan 10–15 yerel işletmeyle başlıyoruz.',
+      body: 'Rutin soruların otomatik yanıtlandığı, içerik ve müşteri takibinin tek yerde toplandığı bir iş gününü 14 gün ücretsiz deneyin. Instagram’ı aktif kullanan 10–15 yerel işletmeyle başlıyoruz.',
       expectations: [
         {
           badge: '30 dakika',
@@ -679,7 +678,7 @@ export const copy: Record<Lang, Copy> = {
             'Yerinde ya da görüntülü; fiyat ve saatlerinizi birlikte girip 5 gerçek müşteri sorusuyla deneriz.',
         },
         {
-          badge: '30 gün ücretsiz',
+          badge: '14 gün ücretsiz',
           title: 'Ücret ve kart bilgisi yok',
           detail:
             'Kendi müşterilerinizle, gerçek iş akışınızda deneyin. Memnun kalmazsanız bağlantıyı kaldırın.',
@@ -734,7 +733,7 @@ export const copy: Record<Lang, Copy> = {
       preview: 'Önizleme: bu form henüz bir yere bağlı değil. Bilgileriniz gönderilmedi.',
       failed: 'Gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.',
     },
-    mobileCta: { label: 'Ücretsiz pilota başvurun', sub: '30 gün · kart yok' },
+    mobileCta: { label: 'Ücretsiz pilota başvurun', sub: '14 gün · kart yok' },
     footer: {
       tagline: 'İşletmenizi bilen, rutin işleri halleden asistanınız.',
       trademark:
@@ -785,7 +784,7 @@ export const copy: Record<Lang, Copy> = {
       lead: 'Pivoris answers your customers from verified details and prepares your content. You follow everything on Telegram and approve when it matters.',
       cta: 'Apply for the free pilot',
       secondary: 'Try the simulation',
-      points: ['Free for 30 days', 'No card needed', '30-minute setup'],
+      points: ['Free for 14 days', 'No card needed', '30-minute setup'],
     },
     preview: {
       example: 'Example screen',
@@ -1138,9 +1137,8 @@ export const copy: Record<Lang, Copy> = {
           body: 'The privacy policy and terms of use are available on this site and in the app; a data-deletion page is in the app. We hand you the KVKK information-notice template for your customers and a draft data processing agreement during setup. They have not been through a lawyer’s review yet; before you publish them under your company name, we recommend your own lawyer approves them.',
         },
         {
-          title: 'Simple, transparent billing',
-          badge: 'Planned',
-          body: 'The pilot is free and nothing is charged automatically. If you move to a paid plan, pricing is billed in US dollars ($) and the invoice and payment arrangement is agreed with you before it starts.',
+          title: 'Card payment and invoices',
+          body: 'The 14-day trial is free, requires no card, and never charges automatically. When you subscribe, payments are processed by card—in fixed Turkish lira (₺ + VAT) in Türkiye and US dollars ($ + tax) elsewhere—with invoices issued by Dodo Payments as Merchant of Record.',
         },
         {
           title: 'Set up in person or by video',
@@ -1199,14 +1197,14 @@ export const copy: Record<Lang, Copy> = {
         },
         {
           q: 'What happens after the pilot?',
-          a: 'The pilot is free for 30 days, with no card required or automatic charges. If you want to continue, we agree the package terms together. Pilot businesses get a founder price fixed for 12 months.',
+          a: 'The trial is free for 14 days, with no card required and no automatic charges. When you are ready to continue, you can subscribe by card in the app via Dodo Payments; eligible pilot businesses receive a dedicated monthly founder plan.',
         },
       ],
     },
     pilot: {
       eyebrow: 'Pilot programme',
       title: 'Make more time for your business.',
-      body: 'Try a working day with automatic routine replies, content and customer follow-up in one place, free for 30 days. We are starting with 10–15 local businesses active on Instagram.',
+      body: 'Try a working day with automatic routine replies, content and customer follow-up in one place, free for 14 days. We are starting with 10–15 local businesses active on Instagram.',
       expectations: [
         {
           badge: '30 minutes',
@@ -1215,7 +1213,7 @@ export const copy: Record<Lang, Copy> = {
             'In person or on a video call, we enter your prices and hours and try 5 real customer questions.',
         },
         {
-          badge: 'Free for 30 days',
+          badge: 'Free for 14 days',
           title: 'No fee, no card',
           detail: 'Try it with your own customers in your real workflow. Not for you? Disconnect.',
         },
@@ -1269,7 +1267,7 @@ export const copy: Record<Lang, Copy> = {
       preview: 'Preview: this form is not connected yet. Nothing was sent.',
       failed: 'Could not send. Check your connection and try again.',
     },
-    mobileCta: { label: 'Apply for the free pilot', sub: '30 days · no card' },
+    mobileCta: { label: 'Apply for the free pilot', sub: '14 days · no card' },
     footer: {
       tagline: 'An assistant that knows your business and handles the routine.',
       trademark:

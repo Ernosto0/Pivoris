@@ -64,6 +64,7 @@ Authentication: [ADR-013](decisions/ADR-013-authentication-and-tenancy.md). Pass
 | `members.manage` | ✓ | | |
 | `integrations.manage` (connect/disconnect) | ✓ | | |
 | `automation.manage` (automation policies) | ✓ | | |
+| `billing.manage` (subscription checkout and customer portal, ADR-029) | ✓ | | |
 | `knowledge.edit` (propose/enter) | ✓ | ✓ | ✓ (as candidates) |
 | `knowledge.verify` (verify, accept candidates, update via command) | ✓ | ✓ | |
 | `commands.use` | ✓ | ✓ | ✓ |

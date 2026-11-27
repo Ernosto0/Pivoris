@@ -78,6 +78,21 @@ def request_workspace_deletion(
     if workspace.status == "deleting":
         raise AppError("CONFLICT_STATE")
 
+    if settings.billing_enabled:
+        from app.core.db import Base
+
+        billing_accounts_tbl = Base.metadata.tables.get("billing_accounts")
+        if billing_accounts_tbl is not None:
+            active_sub = session.scalar(
+                select(billing_accounts_tbl.c.dodo_subscription_id).where(
+                    billing_accounts_tbl.c.workspace_id == ctx.workspace_id,
+                    billing_accounts_tbl.c.dodo_subscription_id.is_not(None),
+                    billing_accounts_tbl.c.provider_status.in_(("active", "past_due")),
+                )
+            )
+            if active_sub is not None:
+                raise AppError("BILLING_SUBSCRIPTION_ACTIVE")
+
     now = clock.now()
     scheduled_at = now + timedelta(days=GRACE_PERIOD_DAYS)
     requested_by_id = uuid.UUID(ctx.actor.id) if ctx.actor.id and ctx.actor.type == "user" else None
@@ -312,6 +327,13 @@ def purge_workspace(session: Session, clock: Clock, workspace_id: uuid.UUID) -> 
         ws_col = getattr(model, "workspace_id", None)
         if ws_col is not None:
             session.execute(delete(model).where(ws_col == workspace_id))
+
+    from app.core.db import Base
+
+    for extra_name in ("billing_checkouts", "billing_accounts"):
+        extra_tbl = Base.metadata.tables.get(extra_name)
+        if extra_tbl is not None:
+            session.execute(delete(extra_tbl).where(extra_tbl.c.workspace_id == workspace_id))
 
     # Durable tombstone
     session.add(

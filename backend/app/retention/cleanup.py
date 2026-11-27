@@ -226,6 +226,40 @@ def run_retention(
             ),
         )
     )
+    from app.core.db import Base
+
+    billing_wh = Base.metadata.tables.get("billing_webhook_events")
+    if billing_wh is not None:
+        rows_deleted += run(
+            lambda batch: delete(billing_wh).where(
+                billing_wh.c.webhook_id.in_(
+                    select(billing_wh.c.webhook_id)
+                    .where(
+                        billing_wh.c.received_at < cutoff(settings.retention_inbound_event_row_days)
+                    )
+                    .limit(batch)
+                )
+            )
+        )
+        payloads_nulled += run(
+            lambda batch: (
+                update(billing_wh)
+                .where(
+                    billing_wh.c.webhook_id.in_(
+                        select(billing_wh.c.webhook_id)
+                        .where(
+                            and_(
+                                billing_wh.c.received_at
+                                < cutoff(settings.retention_webhook_payload_days),
+                                billing_wh.c.payload.is_not(None),
+                            )
+                        )
+                        .limit(batch)
+                    )
+                )
+                .values(payload=null())
+            )
+        )
 
     # The redacted model input is only for reproducing a run; a run still in progress keeps it.
     agent_inputs = run_tenant(

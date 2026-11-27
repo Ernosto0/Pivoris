@@ -1,6 +1,7 @@
 import { useRef, useState, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { AppError } from "@/api/errors";
 import { BottomSheet } from "@/components/BottomSheet";
 import { Button } from "@/components/Button";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -123,6 +124,7 @@ export function WorkspaceDangerZone() {
       {body}
       {dialog ? (
         <DeleteDialog
+          workspaceId={workspace.id}
           name={workspace.name}
           pending={request.isPending}
           error={request.error}
@@ -136,6 +138,7 @@ export function WorkspaceDangerZone() {
 }
 
 function DeleteDialog({
+  workspaceId,
   name,
   pending,
   error,
@@ -143,6 +146,7 @@ function DeleteDialog({
   onConfirm,
   returnFocusRef,
 }: {
+  workspaceId: string;
   name: string;
   pending: boolean;
   error: unknown;
@@ -214,6 +218,17 @@ function DeleteDialog({
           onChange={(event) => setTyped(event.target.value)}
         />
         {error ? <ErrorMessage error={error} /> : null}
+        {error instanceof AppError && error.code === "BILLING_SUBSCRIPTION_ACTIVE" ? (
+          <div>
+            <Link
+              to={`/w/${workspaceId}/more/settings/billing`}
+              onClick={onClose}
+              className={`inline-flex min-h-10 items-center rounded-control border border-border bg-surface px-4 text-body font-semibold text-action hover:bg-surface-subtle ${FOCUS}`}
+            >
+              {t("billing.manageSubscription")}
+            </Link>
+          </div>
+        ) : null}
       </form>
     </BottomSheet>
   );

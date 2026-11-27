@@ -23,6 +23,18 @@ export function describeNotification(
     case "quota.grace":
     case "quota.paused":
       return t(`usage.notifications.${notification.type.split(".")[1]}`);
+    case "billing.trial_ending":
+      return t("billing.notifications.trial_ending", {
+        date: String(params.trial_ends_at ?? "").slice(0, 10),
+      });
+    case "billing.payment_failed":
+      return t("billing.notifications.payment_failed", {
+        date: String(params.past_due_ends_at ?? "").slice(0, 10),
+      });
+    case "billing.paused":
+      return t("billing.notifications.paused");
+    case "billing.activated":
+      return t("billing.notifications.activated");
     case "owner_question.requested":
       return t("notifications.type.owner_question_requested");
     case "owner_question.expired":

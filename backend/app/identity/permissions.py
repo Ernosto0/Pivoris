@@ -50,6 +50,7 @@ PERMISSION_MATRIX: dict[str, frozenset[str]] = {
     "settings.view": _ALL,
     "data.export": _OWNER_ONLY,
     "data.delete": _OWNER_ONLY,
+    "billing.manage": _OWNER_ONLY,
 }
 
 

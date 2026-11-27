@@ -104,6 +104,11 @@ const Members = lazyNamed(() => import("@/features/settings/Members"), "Members"
 const MorePage = lazyNamed(() => import("@/features/settings/MorePage"), "MorePage");
 const SettingsPage = lazyNamed(() => import("@/features/settings/SettingsPage"), "SettingsPage");
 const SystemHealth = lazyNamed(() => import("@/features/settings/SystemHealth"), "SystemHealth");
+const BillingPage = lazyNamed(() => import("@/features/billing/BillingPage"), "BillingPage");
+const DevBillingCheckoutPage = lazyNamed(
+  () => import("@/features/billing/DevBillingCheckoutPage"),
+  "DevBillingCheckoutPage",
+);
 const WorkspacePickerPage = lazyNamed(
   () => import("@/features/workspaces/WorkspacePickerPage"),
   "WorkspacePickerPage",
@@ -138,6 +143,7 @@ export const appRoutes: RouteObject[] = [
     children: [
       { path: "/", element: wrapLazy(<WorkspacePickerPage />) },
       { path: "/workspaces/new", element: wrapLazy(<CreateWorkspaceWizard />) },
+      { path: "/dev/billing-checkout", element: wrapLazy(<DevBillingCheckoutPage />) },
       {
         path: "/w/:workspaceId",
         element: <WorkspaceGate />,
@@ -160,6 +166,7 @@ export const appRoutes: RouteObject[] = [
           { path: "more/settings", element: wrapLazy(<SettingsPage />) },
           { path: "more/settings/connections", element: wrapLazy(<Connections />) },
           { path: "more/settings/members", element: wrapLazy(<Members />) },
+          { path: "more/settings/billing", element: wrapLazy(<BillingPage />) },
           { path: "more/settings/system-health", element: wrapLazy(<SystemHealth />) },
           { path: "more/knowledge", element: wrapLazy(<KnowledgePage />) },
           { path: "more/knowledge/suggestions", element: wrapLazy(<SuggestionsPage />) },

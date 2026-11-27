@@ -14,6 +14,7 @@ os.environ["APP_ENV"] = "test"
 os.environ["SENTRY_DSN"] = ""
 os.environ["COOKIE_SECURE"] = "false"
 os.environ["INSTAGRAM_ENABLED_PROVIDERS"] = "mock"
+os.environ["BILLING_PROVIDER"] = "none"
 os.environ.setdefault("LOG_LEVEL", "WARNING")
 
 from app.core.config import Settings, get_settings  # noqa: E402

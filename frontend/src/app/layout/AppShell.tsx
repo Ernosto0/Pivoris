@@ -29,7 +29,8 @@ export function AppShell() {
   const selected = selectedDestination(path);
   const context = shellContext(path);
   const productName = meta.data?.product_name ?? t("app.name");
-  const groups = DESTINATION_GROUPS.map(group => ({ ...group, items: group.items.filter(item => allowedDestination(item, role, Boolean(meta.data?.demo_tools_enabled))) }));
+  const billingEnabled = Boolean(meta.data?.billing_enabled);
+  const groups = DESTINATION_GROUPS.map(group => ({ ...group, items: group.items.filter(item => allowedDestination(item, role, Boolean(meta.data?.demo_tools_enabled), billingEnabled)) }));
   const parent = groups.flatMap(group => group.items).find(item => item.path === context.parent);
   const account = new URLSearchParams(location.search).get("account");
   const parentSearch = parent?.path.startsWith("more/agent") && account ? `?${new URLSearchParams({ account })}` : "";
@@ -104,6 +105,6 @@ export function AppShell() {
         return <Link key={destination} to={workspaceTarget(workspace.id, destination)} aria-current={active ? "page" : undefined} className={`flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center text-xs leading-tight font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${active ? "bg-surface-subtle text-action font-semibold" : "text-secondary"}`}><Icon className="text-2xl" /><span className="max-w-full break-words">{t(labelKey)}</span></Link>;
       })}
     </nav>
-    {launcher ? <DestinationLauncher workspaceId={workspace.id} role={role} demoTools={Boolean(meta.data?.demo_tools_enabled)} onClose={() => setLauncher(null)} returnFocusRef={launcher === "pointer" ? trigger : undefined} /> : null}
+    {launcher ? <DestinationLauncher workspaceId={workspace.id} role={role} demoTools={Boolean(meta.data?.demo_tools_enabled)} billingEnabled={billingEnabled} onClose={() => setLauncher(null)} returnFocusRef={launcher === "pointer" ? trigger : undefined} /> : null}
   </div></DirtyForms>;
 }

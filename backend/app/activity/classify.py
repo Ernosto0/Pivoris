@@ -133,6 +133,9 @@ RULES: dict[str, Rule] = {
     "agent.step_transition": Rule(routine=True, fields=("to",), by_value=_AGENT_STATES),
     "agent.action_transition": Rule(routine=True, fields=("to", "status"), by_value=_AGENT_STATES),
     "memory.written": Rule(routine=True),
+    "billing.subscription_activated": Rule("success"),
+    "billing.subscription_past_due": Rule("warning"),
+    "billing.subscription_cancelled": Rule("warning"),
 }
 
 
